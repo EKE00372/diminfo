@@ -1,23 +1,17 @@
-## Interface: 70300
+## Interface: 80000
 ## Author: Loshine
 ## Title: |cff777777dim|rinfo
 ## Notes: Info Text Bar, Fanupdate by EK
-## Version: v2.3
+## Version: v2.5
 ## SavedVariables: diminfo
-## OptionalDeps: !BlizzBugFix, !LibUIDropDownMenu
 ## X-Credits: Tukz, Katae, Loshine, DDestruction, msylgj0, Siweia
-
-#@no-lib-strip@
-Lib\LibStub\LibStub.lua
-Lib\LibUIDropDownMenu\LibUIDropDownMenu.xml
-#@end-no-lib-strip@
 
 init.lua
 cfg.lua
 
-Locale\english.lua
-Locale\chinese.lua
-Locale\taiwan.lua
+Locale\enUS.lua
+Locale\zhCN.lua
+Locale\zhTW.lua
 
 Modules\Positions.lua
 
@@ -33,5 +27,4 @@ Modules\System.lua
 
 Modules\Currency.lua
 
-#bbuffed.lua
 panel.lua
