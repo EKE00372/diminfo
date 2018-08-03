@@ -4,17 +4,20 @@ local init = ns.init
 local panel = CreateFrame("Frame", nil, UIParent)
 
 if cfg.Bags == true then
-	
+
+	-- make addon frame anchor-able
 	local Stat = CreateFrame("Frame", "diminfo_Bag")
 	Stat:EnableMouse(true)
 	Stat:SetFrameStrata("BACKGROUND")
 	Stat:SetFrameLevel(3)
-
+	
+	-- setup text
 	local Text  = panel:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(unpack(cfg.Fonts))
 	Text:SetPoint(unpack(cfg.BagsPoint))
 	Stat:SetAllPoints(Text)
-
+	
+	-- tooltip
 	local function OnEvent(self, event, ...)
 		if (diminfo.AutoSell == nil) then
 			diminfo.AutoSell = true
@@ -28,6 +31,7 @@ if cfg.Bags == true then
 		Text:SetText(cfg.ColorClass and init.Colored..BACKPACK_TOOLTIP.." |r"..free.."/"..total or BACKPACK_TOOLTIP.." "..free.."/"..total)
 		self:SetAllPoints(Text)
 		
+		-- Setup
 		Stat:SetScript("OnEnter", function()
 			GameTooltip:SetOwner(self, "ANCHOR_TOP", 0, 10)
 			GameTooltip:ClearAllPoints()
@@ -50,13 +54,13 @@ if cfg.Bags == true then
 	Stat:SetScript("OnMouseDown", function(self,button)
 		if button == "RightButton" then
 			diminfo.AutoSell = not diminfo.AutoSell
-			self:GetScript("OnEnter")(self)	
+			self:GetScript("OnEnter")(self)
 		else
 			ToggleAllBags()
 		end
 	end)
 	
-	-- 自動賣垃圾
+	-- Auto sell gray
 	local SellGray = CreateFrame("Frame")
 	SellGray:SetScript("OnEvent", function()
 		if diminfo.AutoSell == true then
