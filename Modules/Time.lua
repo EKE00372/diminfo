@@ -5,11 +5,13 @@ local panel = CreateFrame("Frame", nil, UIParent)
 
 if cfg.Time == true then
 
+	-- make addon frame anchor-able
 	local Stat = CreateFrame("Frame", "diminfo_Time")
 	Stat:EnableMouse(true)
 	Stat:SetFrameStrata("BACKGROUND")
 	Stat:SetFrameLevel(3)
 
+	-- setup text
 	local Text  = panel:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(unpack(cfg.Fonts))
 	Text:SetPoint(unpack(cfg.TimePoint))
@@ -18,13 +20,15 @@ if cfg.Time == true then
 	local int = 1
 	local Hr24, Hr, Min
 	local function Update(self, t)
-		local pendingCalendarInvites = CalendarGetNumPendingInvites()
+		local pendingCalendarInvites = C_Calendar.GetNumPendingInvites()
 		int = int - t
 		if int < 0 then
+			-- 本地時間
 			if GetCVar("timeMgrUseLocalTime") == "1" then
 				Hr24 = tonumber(date("%H"))
 				Hr = tonumber(date("%I"))
 				Min = date("%M")
+				-- 24小時制
 				if GetCVar("timeMgrUseMilitaryTime") == "1" then
 					if pendingCalendarInvites > 0 then
 					Text:SetText("|cffFF0000"..Hr24..":"..Min)
@@ -97,10 +101,12 @@ if cfg.Time == true then
 
 	Stat:SetScript("OnEnter", function(self)
 		OnLoad = function(self) RequestRaidInfo() end
-		local w, m, d, y = CalendarGetDate()
+		local today = C_Calendar.GetDate()
+		local w, m, d, y = today.weekday, today.month, today.monthDay, today.year
 		GameTooltip:SetOwner(self, "ANCHOR_BOTTOM", 0, -10)
 		GameTooltip:ClearLines()
-		GameTooltip:AddLine(format(FULLDATE, CALENDAR_WEEKDAY_NAMES[w], months[m], d, y), 0, .6, 1)
+		--GameTooltip:AddLine(format(FULLDATE, CALENDAR_WEEKDAY_NAMES[w], months[m], d, y), 0, .6, 1)
+		GameTooltip:AddLine(format(FULLDATE, CALENDAR_WEEKDAY_NAMES[w], CALENDAR_FULLDATE_MONTH_NAMES[m], d, y), 0,.6,1)
 		GameTooltip:AddLine(" ")
 		GameTooltip:AddDoubleLine(TIMEMANAGER_TOOLTIP_LOCALTIME, zsub(GameTime_GetLocalTime(true), "%s*AM", "am", "%s*PM", "pm"), .6, .8, 1, 1, 1, 1)
 		GameTooltip:AddDoubleLine(TIMEMANAGER_TOOLTIP_REALMTIME, zsub(GameTime_GetGameTime(true), "%s*AM", "am", "%s*PM", "pm"), .6, .8, 1, 1, 1, 1)
@@ -142,7 +148,7 @@ if cfg.Time == true then
 			GameTooltip:AddLine(difficultyName, 1,1,1)
 			end
 		end
-		-- 世界首領
+		-- world boss/世界首領
 		for i = 1, GetNumSavedWorldBosses() do
 			local name, id, reset = GetSavedWorldBossInfo(i)
 			if not (id == 11 or id == 12 or id == 13) then
