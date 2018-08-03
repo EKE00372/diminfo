@@ -20,10 +20,10 @@ cfg.Bags = true
 cfg.BagsPoint = {"BOTTOMRIGHT", UIParent, -15, 8}
 
 cfg.Spec = true
-cfg.SpecPoint = {"RIGHT", "diminfo_Bag", "LEFT", -70, 0}
+cfg.SpecPoint = {"RIGHT", "diminfo_Bag", "LEFT", -20, 0}
 
 cfg.Memory = true
-cfg.MemoryPoint = {"RIGHT", "diminfo_Loot", "LEFT", -70, 0}
+cfg.MemoryPoint = {"RIGHT", "diminfo_Spec", "LEFT", -20, 0}
 cfg.MaxAddOns = 30
 
 cfg.System = true
