@@ -2,26 +2,22 @@
 ## Author: Loshine
 ## Title: |cff777777dim|rinfo
 ## Notes: Info Text Bar, Fanupdate by EK
-## Version: v2.5
+## Version: v2.6
 ## SavedVariables: diminfo
 ## X-Credits: Tukz, Katae, Loshine, DDestruction, msylgj0, Siweia
 
 init.lua
 cfg.lua
-
-Locale\enUS.lua
-Locale\zhCN.lua
-Locale\zhTW.lua
+Locale.lua
 
 Modules\Positions.lua
-
 Modules\Time.lua
 Modules\Friends.lua
 Modules\Guild.lua
-Modules\Bags.lua
 Modules\Durability.lua
-Modules\Spec.lua
 
+Modules\Bags.lua
+Modules\Spec.lua
 Modules\Memory.lua
 Modules\System.lua
 
