@@ -4,16 +4,20 @@ local init = ns.init
 local panel = CreateFrame("Frame", nil, UIParent)
 
 if cfg.System == true then
+
+	-- make addon frame anchor-able
 	local Stat = CreateFrame("Frame", "diminfo_System")
 	Stat:EnableMouse(true)
 	Stat:SetFrameStrata("BACKGROUND")
 	Stat:SetFrameLevel(3)
 
+	-- setup text
 	local Text  = panel:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(unpack(cfg.Fonts))
 	Text:SetPoint(unpack(cfg.SystemPoint))
 	Stat:SetAllPoints(Text)
 
+	-- latency
 	local function colorlatency(latency)
 		if latency < 300 then
 			return "|cff0CD809"..latency
@@ -61,6 +65,7 @@ if cfg.System == true then
 		end)
 	end
 
+	-- tooltip
 	Stat:SetScript("OnEnter", function(self)
 		RefreshCput(self)
 		GameTooltip:SetOwner(self, "ANCHOR_TOP", 0, 10)
