@@ -16,16 +16,16 @@ if cfg.Spec == true then
 	Text:SetFont(unpack(cfg.Fonts))
 	Text:SetPoint(unpack(cfg.SpecPoint))
 	Stat:SetAllPoints(Text)
-
+	
 	-- right-click menu
 	local menuFrame = CreateFrame("Frame", "LootSpecMenu", UIParent, "UIDropDownMenuTemplate")
 	local menuList = {
-		{	-- 標題
+		{	-- title
 			text = SELECT_LOOT_SPECIALIZATION,
 			isTitle = true,
 			notCheckable = true
 		},
-		{	-- 預設
+		{	-- default
 			notCheckable = true,
 			func = function()
 				SetLootSpecialization(0)
@@ -39,13 +39,14 @@ if cfg.Spec == true then
 	
 	local function Checktalentgroup(index)
 		return GetSpecialization(false, false, index)
-	end 
+	end
 	
 	local function OnEvent(self, event, ...) 
 		if not GetSpecialization() then return end
-		-- set texture
+		
+		-- set icon texture
 		local function addIcon(texture)
-			texture = texture and "|T"..texture..":16:16:0:0:32:32:2:32:2:32|t" or ""
+			texture = texture and "|T"..texture..":0:0:0:0:50:50:4:46:4:46|t" or ""
 			return texture
 		end
 		
@@ -64,15 +65,15 @@ if cfg.Spec == true then
 				lootIcon = addIcon(select(4, GetSpecializationInfoByID(specID)))
 			end
 			
-			Text:SetText(cfg.ColorClass and init.Colored..SPECIALIZATION..specIcon..LOOT..lootIcon)
+			Text:SetText(cfg.ColorClass and init.Colored..infoL["Spec"]..specIcon..LOOT..lootIcon)
 		else
-			Text:SetText(cfg.ColorClass and init.Colored..SPECIALIZATION.."|r"..NONE..LOOT..NONE or SPECIALIZATION.."|r"..NONE..LOOT..NONE)
+			Text:SetText(cfg.ColorClass and init.Colored..infoL["Spec"].."|r"..NONE..LOOT..NONE or SPECIALIZATION.."|r"..NONE..LOOT..NONE)
 		end
 		
 		-- Setup Talents Tooltip
 		self:SetAllPoints(Text)
 		self:SetScript("OnEnter", function(self)
-
+		
 				GameTooltip:SetOwner(self, "ANCHOR_TOP", 0, 10)
 				GameTooltip:ClearAllPoints()
 				GameTooltip:SetPoint("BOTTOM", self, "TOP", 0, 1)
@@ -90,7 +91,6 @@ if cfg.Spec == true then
 						for j = 1, 3 do
 							local talentID, name, iconTexture, selected, available = GetTalentInfo(i,j,1)
 							if selected then
-								--table.insert(telentTable, j.." ".."|T"..select(3, GetTalentInfo(i,j,1))..":0:0:-2:0:32:32:2:30:2:30|t"..name)
 								table.insert(telentTable, addIcon(iconTexture).." ["..j.."]"..name)
 							end
 						end
@@ -106,7 +106,7 @@ if cfg.Spec == true then
 				local pvpTalents
 				if UnitLevel("player") >= SHOW_PVP_TALENT_LEVEL then
 					pvpTalents = C_SpecializationInfo.GetAllSelectedPvpTalentIDs()
-
+					
 					if #pvpTalents > 0 then
 						-- pvp title
 						local pvpTexture = select(3, GetCurrencyInfo(104))
@@ -129,7 +129,7 @@ if cfg.Spec == true then
 			GameTooltip:Hide()
 		end)
 	end
-	 
+	
 	Stat:RegisterEvent("PLAYER_LOGIN")
 	Stat:RegisterEvent("CONFIRM_TALENT_WIPE")
 	Stat:RegisterEvent("PLAYER_TALENT_UPDATE")
