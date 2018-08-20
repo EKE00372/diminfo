@@ -5,7 +5,7 @@ local panel = CreateFrame("Frame", nil, UIParent)
 
 if cfg.Friends == true then
 
-	-- create a popup for bn broadcast(戰網廣播)
+	-- create a popup for bn broadcast/推送戰網廣播
 	StaticPopupDialogs.SET_BN_BROADCAST = {
 		text = BN_BROADCAST_TOOLTIP,
 		button1 = ACCEPT,
@@ -161,9 +161,9 @@ if cfg.Friends == true then
 			local name, level, class, area, connected, status, note = GetFriendInfo(i)
 			if connected then
 				if status == CHAT_FLAG_AFK then
-					status = "|T"..FRIENDS_TEXTURE_AFK..":0:0:-2:-2:32:32:2:30:2:30|t"
+					status = "|T"..FRIENDS_TEXTURE_AFK..":0:0:-2:-2:50:50:4:46:4:46|t"
 				elseif status == CHAT_FLAG_DND then
-					status = "|T"..FRIENDS_TEXTURE_DND..":0:0:-2:-2:32:32:2:30:2:30|t"
+					status = "|T"..FRIENDS_TEXTURE_DND..":0:0:-2:-2:50:50:4:46:4:46|t"
 				else
 					status = ""
 				end
@@ -199,9 +199,9 @@ if cfg.Friends == true then
 				
 				local status, account, infoText
 				if isAFK or isGameAFK then
-					status = " |T"..FRIENDS_TEXTURE_AFK..":0:0:-2:-2:32:32:2:30:2:30|t"
+					status = " |T"..FRIENDS_TEXTURE_AFK..":0:0:-2:-2:50:50:4:46:4:46|t"
 				elseif isDND or isGameBusy then
-					status = " |T"..FRIENDS_TEXTURE_DND..":0:0:-2:-2:32:32:2:30:2:30|t"
+					status = " |T"..FRIENDS_TEXTURE_DND..":0:0:-2:-2:50:50:4:46:4:46|t"
 				else
 					status = ""
 				end
@@ -241,8 +241,8 @@ if cfg.Friends == true then
 		elseif ( client == "Pro" ) then
 			return "Interface\\FriendsFrame\\Battlenet-Overwatchicon"
 		else
-			--return "Interface\\FriendsFrame\\Battlenet-Battleneticon" -- bad look
-			return "Interface\\FriendsFrame\\UI-Toast-FriendOnlineIcon"
+			return "Interface\\FriendsFrame\\Battlenet-Battleneticon"
+			--return "Interface\\FriendsFrame\\UI-Toast-FriendOnlineIcon" -- bad look
 		end
 	end
 	
@@ -327,6 +327,7 @@ if cfg.Friends == true then
 		local numberOfFriends, onlineFriends = GetNumFriends()
 		local totalBNet, numBNetOnline = BNGetNumFriends()
 		local totalonline = onlineFriends + numBNetOnline
+		local currentBroadcast = select(4, BNGetInfo(1))
 		
 		-- 無人在線上
 		if totalonline == 0 then return end
@@ -347,6 +348,13 @@ if cfg.Friends == true then
 		GameTooltip:SetOwner(self, "ANCHOR_BOTTOM", 0, -10)
 		GameTooltip:ClearLines()
 		GameTooltip:AddDoubleLine(FRIEND, format("%s/%s", totalonline, totalfriends), 0, .6, 1, 0, .6, 1)
+		
+		-- show my BN roadcast
+		if currentBroadcast ~= "" then
+			GameTooltip:AddLine(" ")
+			GameTooltip:AddLine(BATTLENET_BROADCAST)
+			GameTooltip:AddLine(currentBroadcast, .6, .8, 1)
+		end
 		
 		-- in-game friends/遊戲好友
 		if onlineFriends > 0 then
@@ -388,7 +396,7 @@ if cfg.Friends == true then
 							classc = levelc
 						end
 						--if UnitInParty(info[5]) or UnitInRaid(info[5]) then grouped = " +" else grouped = "" end
-						local clienticon = "|T"..GetClientTexture(info[7])..":16:16:2:0:32:32:2:30:2:30|t " or ""
+						local clienticon = "|T"..GetClientTexture(info[7])..":16:16:2:0:50:50:4:46:4:46|t " or ""
 						
 						if info[4] then	-- 有tag
 							GameTooltip:AddDoubleLine(format(clienticon..HexColor(levelc)..info[16].."|r "..info[5]..info[11]),info[3], classc.r, classc.g, classc.b, 1, 1, 1)
@@ -405,7 +413,7 @@ if cfg.Friends == true then
 							GameTooltip:AddDoubleLine(format(HexColor(levelc)..info[16].."|r "..info[5]), info[12], classc.r, classc.g, classc.b, realmc.r, realmc.g, realmc.b)
 						end
 					else
-						local clienticon = "|T"..GetClientTexture(info[7])..":16:16:2:0:32:32:2:30:2:30|t " or ""
+						local clienticon = "|T"..GetClientTexture(info[7])..":16:16:2:0:50:50:4:46:4:46|t " or ""
 						if info[4] then
 							GameTooltip:AddDoubleLine(format(clienticon..info[5]..info[11]), info[3], 1, 1, 1, 1, 1, 1)
 						else
