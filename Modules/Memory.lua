@@ -101,7 +101,7 @@ if cfg.Memory == true then
 			local before = gcinfo()
 			collectgarbage("collect")
 			RefreshMem(self)
-			print(format("|cff66C6FF%s|r%s",infoL["Garbage collected"],formatMem(before - gcinfo())))
+			print(format("|cff66C6FF%s|r%s", infoL["Garbage collected"], formatMem(before - gcinfo())))
 		elseif btn == "RightButton" then
 			diminfo.AutoCollect = not diminfo.AutoCollect
 		end
@@ -148,7 +148,7 @@ if cfg.Memory == true then
 						moreMem = moreMem + Memory[i][2]
 					end
 				end
-				GameTooltip:AddDoubleLine(format("%d %s (%s)",more, HIDE, infoL["Shift"]),formatMem(moreMem),.6,.8,1,.6,.8,1)
+				GameTooltip:AddDoubleLine(format("%d %s (%s)",more, infoL["Hidden"], infoL["Shift"]), formatMem(moreMem),.6,.8,1,.6,.8,1)
 			end
 
 			GameTooltip:AddLine(" ")
