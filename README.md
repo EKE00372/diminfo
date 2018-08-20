@@ -14,7 +14,7 @@ spec mod reference: [NDui](https://github.com/siweia/NDui), [AftermathUI](https:
     * disable coordinate in instance.
     * disable guild xp.
 *   fix for BFA:
-    * disable coordinate
+    * rework coordinate function.
     * remove guild xp code.
 *   make addon frame anchor-able.
 *   use global strings on translate if it's possible.
