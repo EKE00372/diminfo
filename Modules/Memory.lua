@@ -5,17 +5,20 @@ local panel = CreateFrame("Frame", nil, UIParent)
 
 if cfg.Memory == true then
 
+	-- make addon frame anchor-able
 	local Stat = CreateFrame("Frame", "diminfo_Memory")
 	Stat:SetFrameStrata("BACKGROUND")
 	Stat:SetFrameLevel(3)
 	Stat:EnableMouse(true)
 	
+	-- setup text
 	local Text  = panel:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(unpack(cfg.Fonts))
 	Text:SetPoint(unpack(cfg.MemoryPoint))
 	Stat:SetAllPoints(Text)
 
 	local colorme = string.format("%02x%02x%02x", 1*255, 1*255, 1*255)
+	local Total, Mem, MEMORY_TEXT, Memory, maxAddOns, statColor																	
 
 	local function formatMem(memory, color)
 		if color then
@@ -34,16 +37,15 @@ if cfg.Memory == true then
 			end
 		else
 			local mem = floor(memory * mult + 0.5) / mult
-				if mem % 1 == 0 then
-					return mem..string.format(".0 %skb%s", unpack(statColor))
-				else
-					return mem..string.format(" %skb%s", unpack(statColor))
-				end
+			if mem % 1 == 0 then
+				return mem..string.format(".0 %skb%s", unpack(statColor))
+			else
+				return mem..string.format(" %skb%s", unpack(statColor))
+			end
 		end
 
 	end
 
-	local Total, Mem, MEMORY_TEXT, Memory
 	local function RefreshMem(self)
 		Memory = {}
 		UpdateAddOnMemoryUsage()
@@ -66,7 +68,7 @@ if cfg.Memory == true then
 		UpdateAddOnMemoryUsage()
 		tTotal = 0
 		for i = 1, GetNumAddOns() do
-			tMem = GetAddOnMemoryUsage(i)
+			local tMem = GetAddOnMemoryUsage(i)
 			tTotal = tTotal + tMem
 		end
 	end
@@ -92,6 +94,7 @@ if cfg.Memory == true then
 
 	if diminfo.AutoCollect == nil then diminfo.AutoCollect = true end
 
+	-- click function
 	Stat:SetScript("OnMouseDown", function(self,btn)
 		if btn == "LeftButton" then
 			RefreshMem(self)
@@ -106,33 +109,35 @@ if cfg.Memory == true then
 		RefreshText()
 	end)
 
+	-- setup tooltip
 	Stat:SetScript("OnEnter", function(self)
-			RefreshMem(self)
+		RefreshMem(self)
 		
-			GameTooltip:SetOwner(self, "ANCHOR_TOP", 0, 10);
-			GameTooltip:ClearAllPoints()
-			GameTooltip:SetPoint("BOTTOM", self, "TOP", 0, 1)
-			GameTooltip:ClearLines()
-			local _, _, latencyHome, latencyWorld = GetNetStats()
-			GameTooltip:AddDoubleLine(format("%s:", ADDONS), formatMem(Total), 0, 0.6, 1, 1, 1, 1)
-			GameTooltip:AddLine(" ")
-			if IsShiftKeyDown() then
-				maxAddOns = #Memory
-			else
-				maxAddOns = math.min(cfg.MaxAddOns, #Memory)
-			end
+		GameTooltip:SetOwner(self, "ANCHOR_TOP", 0, 10);
+		GameTooltip:ClearAllPoints()
+		GameTooltip:SetPoint("BOTTOM", self, "TOP", 0, 1)
+		GameTooltip:ClearLines()
+		
+		local _, _, latencyHome, latencyWorld = GetNetStats()
+		GameTooltip:AddDoubleLine(ADDONS, formatMem(Total), 0, 0.6, 1, 1, 1, 1)
+		GameTooltip:AddLine(" ")
+		if IsShiftKeyDown() then
+			maxAddOns = #Memory
+		else
+			maxAddOns = math.min(cfg.MaxAddOns, #Memory)
+		end
 
-			for i = 1, maxAddOns do
-				if Memory[i][3] then
-					local color = Memory[i][2] <= 102.4 and {0,1} -- 0 - 100
-					or Memory[i][2] <= 512 and {0.75,1} -- 100 - 512
-					or Memory[i][2] <= 1024 and {1,1} -- 512 - 1mb
-					or Memory[i][2] <= 2560 and {1,0.75} -- 1mb - 2.5mb
-					or Memory[i][2] <= 5120 and {1,0.5} -- 2.5mb - 5mb
-					or {1,0.1} -- 5mb +
-					GameTooltip:AddDoubleLine(Memory[i][1], formatMem(Memory[i][2], false), 1, 1, 1, color[1], color[2], 0)						
-				end
+		for i = 1, maxAddOns do
+			if Memory[i][3] then
+				local color = Memory[i][2] <= 102.4 and {0,1} -- 0 - 100
+				or Memory[i][2] <= 512 and {0.75,1} -- 100 - 512
+				or Memory[i][2] <= 1024 and {1,1} -- 512 - 1mb
+				or Memory[i][2] <= 2560 and {1,0.75} -- 1mb - 2.5mb
+				or Memory[i][2] <= 5120 and {1,0.5} -- 2.5mb - 5mb
+				or {1,0.1} -- 5mb +
+				GameTooltip:AddDoubleLine(Memory[i][1], formatMem(Memory[i][2], false), 1, 1, 1, color[1], color[2], 0)						
 			end
+		end
 
 			local more = 0
 			local moreMem = 0
@@ -143,7 +148,7 @@ if cfg.Memory == true then
 						moreMem = moreMem + Memory[i][2]
 					end
 				end
-				GameTooltip:AddDoubleLine(format("%d %s (%s)",more,infoL["Hidden"],infoL["Shift"]),formatMem(moreMem),.6,.8,1,.6,.8,1)
+				GameTooltip:AddDoubleLine(format("%d %s (%s)",more, HIDE, infoL["Shift"]),formatMem(moreMem),.6,.8,1,.6,.8,1)
 			end
 
 			GameTooltip:AddLine(" ")
@@ -158,7 +163,7 @@ if cfg.Memory == true then
 	Stat:SetScript("OnUpdate", Update)
 	Update(Stat, 20)
 	
-	-- AutoCollect
+	-- Auto Collect
 	local eventcount = 0
 	local a = CreateFrame("Frame")
 	a:RegisterAllEvents()
