@@ -17,27 +17,27 @@ if cfg.Bags == true then
 	Text:SetPoint(unpack(cfg.BagsPoint))
 	Stat:SetAllPoints(Text)
 	
-	-- tooltip
 	local function OnEvent(self, event, ...)
 		if (diminfo.AutoSell == nil) then
 			diminfo.AutoSell = true
 		end
 		
+		-- text
 		local free, total, used = 0, 0, 0
 		for i = 0, NUM_BAG_SLOTS do
 			free, total = free + GetContainerNumFreeSlots(i), total + GetContainerNumSlots(i)
 		end
 		used = total - free
-		Text:SetText(cfg.ColorClass and init.Colored..BACKPACK_TOOLTIP.." |r"..free.."/"..total or BACKPACK_TOOLTIP.." "..free.."/"..total)
+		Text:SetText(cfg.ColorClass and init.Colored..BAGSLOT.." |r"..free.."/"..total or BACKPACK_TOOLTIP.." "..free.."/"..total)
 		self:SetAllPoints(Text)
 		
-		-- Setup
+		-- tooltip
 		Stat:SetScript("OnEnter", function()
 			GameTooltip:SetOwner(self, "ANCHOR_TOP", 0, 10)
 			GameTooltip:ClearAllPoints()
 			GameTooltip:SetPoint("BOTTOM", self, "TOP", 0, 1)
 			GameTooltip:ClearLines()
-			GameTooltip:AddDoubleLine(BACKPACK_TOOLTIP, free, 0, .6, 1, 0, .6, 1)
+			GameTooltip:AddDoubleLine(BAGSLOT, free, 0, .6, 1, 0, .6, 1)
 			GameTooltip:AddLine(" ")
 			GameTooltip:AddDoubleLine(TOTAL, total, .6, .8, 1, 1, 1, 1)
 			GameTooltip:AddDoubleLine(USE, used, .6, .8, 1, 1, 1, 1)
