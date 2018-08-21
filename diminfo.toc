@@ -21,6 +21,4 @@ Modules\Spec.lua
 Modules\Memory.lua
 Modules\System.lua
 
-Modules\Currency.lua
-
 panel.lua
