@@ -1,9 +1,8 @@
-﻿local addon, ns = ...
-local cfg = ns.cfg
-local init = ns.init
+﻿local addon, ns = ... 
+local C, F, G = unpack(ns)
 local panel = CreateFrame("Frame", nil, UIParent)
 
-if cfg.Friends == true then
+if not C.Friends then return end
 
 	-- create a popup for bn broadcast/推送戰網廣播
 	StaticPopupDialogs.SET_BN_BROADCAST = {
@@ -46,8 +45,8 @@ if cfg.Friends == true then
 	
 	-- setup text
 	local Text  = panel:CreateFontString(nil, "OVERLAY")
-	Text:SetFont(unpack(cfg.Fonts))
-	Text:SetPoint(unpack(cfg.FriendsPoint))
+	Text:SetFont(G.Fonts, G.FontSize, G.FontFlag)
+	Text:SetPoint(unpack(C.FriendsPoint))
 	Stat:SetAllPoints(Text)
 
 	-- status/狀態判斷
@@ -142,11 +141,7 @@ if cfg.Friends == true then
 		menuFrame:Hide() 
 		SetItemRef( "BNplayer:"..arg1..":"..arg2, ("|Hplayer:%1$s|h[%1$s]|h"):format(arg1), "LeftButton" )		 
 	end
-	
-	local function HexColor(c)
-		return (c.r and format("|cff%02x%02x%02x", c.r * 255, c.g * 255, c.b * 255))
-	end
-	
+		
 	local worldOfWarcraftString = "WOW"
 	local battleNetString = "Battle.NET"
 	local activezone, inactivezone = {r = 0.3, g = 1, b = 0.3}, {r = 0.65, g = 0.65, b = 0.65}
@@ -158,21 +153,23 @@ if cfg.Friends == true then
 	local function BuildFriendTable(total)
 		wipe(friendTable)
 		for i = 1, total do		
-			local name, level, class, area, connected, status, note = GetFriendInfo(i)
-			if connected then
-				if status == CHAT_FLAG_AFK then
-					status = "|T"..FRIENDS_TEXTURE_AFK..":0:0:-2:-2:50:50:4:46:4:46|t"
-				elseif status == CHAT_FLAG_DND then
-					status = "|T"..FRIENDS_TEXTURE_DND..":0:0:-2:-2:50:50:4:46:4:46|t"
-				else
-					status = ""
-				end
+			--local name, level, class, area, connected, status, note = C_FriendList.GetFriendInfoByIndex(i)
+			local info = C_FriendList.GetFriendInfoByIndex(i)
+			--connected, name, className, area, notes, guid, level, dnd, afk, referAFriend, mobile
+			if info and info.connected then
+			local status = " |T"..FRIENDS_TEXTURE_ONLINE..":0:0:-2:-2:50:50:4:46:4:46|t"
+			if info.afk then
+				status =  " |T"..FRIENDS_TEXTURE_AFK..":0:0:-2:-2:50:50:4:46:4:46|t"
+			elseif info.dnd then
+				status = " |T"..FRIENDS_TEXTURE_DND..":0:0:-2:-2:50:50:4:46:4:46|t"
+			end
+			
 				for k,v in pairs(LOCALIZED_CLASS_NAMES_MALE) do
 					if class == v then
 						class = k
 					end
 				end
-				friendTable[i] = { name, level, class, area, connected, status, note }
+				tinsert(friendTable, {info.name, info.level, class, info.area, status})
 			end
 		end
 		-- sort by name/按名字排序
@@ -247,7 +244,7 @@ if cfg.Friends == true then
 	end
 	
 	local function Update(self, event, ...)
-		local _, onlineFriends = GetNumFriends()
+		local onlineFriends = C_FriendList.GetNumOnlineFriends()
 		local _, numBNetOnline = BNGetNumFriends()
 
 		-- refresh when on/offline/上下線時強制更新
@@ -261,7 +258,7 @@ if cfg.Friends == true then
 		-- force refresh tooltip/獲取列表時強制更新
 		dataValid = false
 		
-		Text:SetText(format(cfg.ColorClass and init.Colored..FRIENDS.." |r".."%d" or FRIENDS.." %d", onlineFriends + numBNetOnline))
+		Text:SetText(format(C.ClassColor and F.Hex(G.Ccolors)..FRIENDS.." |r".."%d" or FRIENDS.." %d", onlineFriends + numBNetOnline))
 		self:SetAllPoints(Text)
 	end
 	
@@ -289,7 +286,7 @@ if cfg.Friends == true then
 						classc = levelc
 					end
 		
-					local nametext = HexColor(levelc)..info[2].." "..HexColor(classc)..info[1]
+					local nametext = F.Hex(levelc)..info[2].." "..F.Hex(classc)..info[1]
 					menuList[2].menuList[menuCountInvites] = {text = nametext, arg1 = info[1], notCheckable = true, func = inviteClick}
 					menuList[3].menuList[menuCountWhispers] = {text = nametext, arg1 = info[1], notCheckable = true, func = whisperClick}
 				end
@@ -310,7 +307,7 @@ if cfg.Friends == true then
 							classc = levelc
 						end
 						--if UnitInParty(info[5]) or UnitInRaid(info[5]) then grouped = 1 else grouped = 2 end						
-						local nametext = HexColor(levelc)..info[16].." "..HexColor(classc)..info[5]
+						local nametext = F.Hex(levelc)..info[16].." "..F.Hex(classc)..info[5]
 						menuList[2].menuList[menuCountInvites] = {text = nametext, arg1 = info[5].. "-"..info[12], notCheckable = true, func = inviteClick}
 					end
 				end
@@ -324,7 +321,8 @@ if cfg.Friends == true then
 	-- tooltip setup: friend list/好友列表
 	Stat:SetScript("OnEnter", function(self)
 
-		local numberOfFriends, onlineFriends = GetNumFriends()
+		local numberOfFriends = C_FriendList.GetNumFriends()
+		local onlineFriends = C_FriendList.GetNumOnlineFriends()
 		local totalBNet, numBNetOnline = BNGetNumFriends()
 		local totalonline = onlineFriends + numBNetOnline
 		local currentBroadcast = select(4, BNGetInfo(1))
@@ -376,7 +374,7 @@ if cfg.Friends == true then
 						classc = levelc
 					end
 					
-					GameTooltip:AddDoubleLine(format(HexColor(levelc)..info[2].."|r "..info[1].." "..info[6]), info[4], classc.r, classc.g, classc.b, zonec.r, zonec.g, zonec.b)
+					GameTooltip:AddDoubleLine((F.Hex(levelc)..info[2].."|r "..F.Hex(classc)..info[1].." |r"..info[5]), info[4], classc.r, classc.g, classc.b, zonec.r, zonec.g, zonec.b)
 				end
 			end
 		end
@@ -399,9 +397,9 @@ if cfg.Friends == true then
 						local clienticon = "|T"..GetClientTexture(info[7])..":16:16:2:0:50:50:4:46:4:46|t " or ""
 						
 						if info[4] then	-- 有tag
-							GameTooltip:AddDoubleLine(format(clienticon..HexColor(levelc)..info[16].."|r "..info[5]..info[11]),info[3], classc.r, classc.g, classc.b, 1, 1, 1)
+							GameTooltip:AddDoubleLine(format(clienticon..F.Hex(levelc)..info[16].."|r "..info[5]..info[11]),info[3], classc.r, classc.g, classc.b, 1, 1, 1)
 						else	-- 只有實名
-							GameTooltip:AddDoubleLine(format(clienticon..HexColor(levelc)..info[16].."|r "..info[5]..info[11]),info[2], classc.r, classc.g, classc.b, 1, 1, 1)
+							GameTooltip:AddDoubleLine(format(clienticon..F.Hex(levelc)..info[16].."|r "..info[5]..info[11]),info[2], classc.r, classc.g, classc.b, 1, 1, 1)
 						end
 						if IsShiftKeyDown() then
 							--if GetRealZoneText() == info[16] then zonec = activezone else zonec = inactivezone end
@@ -410,7 +408,7 @@ if cfg.Friends == true then
 							else
 								realmc = inactivezone
 							end
-							GameTooltip:AddDoubleLine(format(HexColor(levelc)..info[16].."|r "..info[5]), info[12], classc.r, classc.g, classc.b, realmc.r, realmc.g, realmc.b)
+							GameTooltip:AddDoubleLine(format(F.Hex(levelc)..info[16].."|r "..info[5]), info[12], classc.r, classc.g, classc.b, realmc.r, realmc.g, realmc.b)
 						end
 					else
 						local clienticon = "|T"..GetClientTexture(info[7])..":16:16:2:0:50:50:4:46:4:46|t " or ""
@@ -443,4 +441,3 @@ if cfg.Friends == true then
 	Stat:RegisterEvent("PLAYER_ENTERING_WORLD")
 	Stat:RegisterEvent("CHAT_MSG_SYSTEM")
 	Stat:SetScript("OnEvent", Update)
-end

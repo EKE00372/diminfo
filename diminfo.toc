@@ -1,24 +1,13 @@
-## Interface: 80000
-## Author: Loshine
-## Title: |cff777777dim|rinfo
-## Notes: Info Text Bar, Fanupdate by EK
-## Version: v2.6
+## Interface: 11302
+## Author: Loshine, EK
+## Title: |cff777777dim|rinfo_Classic
+## Notes: Info Data Bar
+## Version: C1.2
 ## SavedVariables: diminfo
 ## X-Credits: Tukz, Katae, Loshine, DDestruction, msylgj0, Siweia
 
-init.lua
-cfg.lua
+Config.lua
+API.lua
+
 Locale.lua
-
-Modules\Positions.lua
-Modules\Time.lua
-Modules\Friends.lua
-Modules\Guild.lua
-Modules\Durability.lua
-
-Modules\Bags.lua
-Modules\Spec.lua
-Modules\Memory.lua
-Modules\System.lua
-
-panel.lua
+diminfo.xml

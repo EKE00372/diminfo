@@ -1,9 +1,8 @@
-﻿local addon, ns = ...
-local cfg = ns.cfg
-local init = ns.init
+﻿local addon, ns = ... 
+local C, F, G = unpack(ns)
 local panel = CreateFrame("Frame", nil, UIParent)
 
-if cfg.Bags == true then
+if not C.Bags then return end
 
 	-- make addon frame anchor-able
 	local Stat = CreateFrame("Frame", "diminfo_Bag")
@@ -13,27 +12,27 @@ if cfg.Bags == true then
 	
 	-- setup text
 	local Text  = panel:CreateFontString(nil, "OVERLAY")
-	Text:SetFont(unpack(cfg.Fonts))
-	Text:SetPoint(unpack(cfg.BagsPoint))
+	Text:SetFont(G.Fonts, G.FontSize, G.FontFlag)
+	Text:SetPoint(unpack(C.BagsPoint))
 	Stat:SetAllPoints(Text)
 	
 	local function OnEvent(self, event, ...)
-		if (diminfo.AutoSell == nil) then
+		if diminfo.AutoSell == nil then
 			diminfo.AutoSell = true
 		end
 		
 		-- text
-		local free, total, used = 0, 0, 0
+		local free, total, used = 0, 0, 0		
 		for i = 0, NUM_BAG_SLOTS do
 			free, total = free + GetContainerNumFreeSlots(i), total + GetContainerNumSlots(i)
 		end
 		used = total - free
-		Text:SetText(cfg.ColorClass and init.Colored..BAGSLOT.." |r"..free.."/"..total or BACKPACK_TOOLTIP.." "..free.."/"..total)
+		Text:SetText(C.ClassColor and F.Hex(G.Ccolors)..BAGSLOT.." |r"..free.."/"..total or BACKPACK_TOOLTIP.." "..free.."/"..total)
 		self:SetAllPoints(Text)
 		
 		-- tooltip
 		Stat:SetScript("OnEnter", function()
-			GameTooltip:SetOwner(self, "ANCHOR_TOP", 0, 10)
+			GameTooltip:SetOwner(self, "ANCHOR_BOTTOM", 0, -10)
 			GameTooltip:ClearAllPoints()
 			GameTooltip:SetPoint("BOTTOM", self, "TOP", 0, 1)
 			GameTooltip:ClearLines()
@@ -84,4 +83,3 @@ if cfg.Bags == true then
 		end
 	end)
 	SellGray:RegisterEvent("MERCHANT_SHOW")
-end

@@ -16,19 +16,16 @@
 		["Shift"] = "Shift展開",
 		["Hidden"] = HIDE,
 	
-		["Default UI Memory Usage:"] = "内建插件資源耗用：",
-		["Total Memory Usage:"] = "總資源耗用：",
+		["Default UI Memory Usage:"] = "内建插件資源占用：",
+		["Total Memory Usage:"] = "總資源占用：",
 		["Garbage collected"] = "釋放記憶體：",
-		["AutoCollect"] = "自動整理記憶體暫存：",
-
-		["No Talents"] = "無專精",
-		["Spec"] = SPECIALIZATION,
+		["AutoCollect"] = "自動整理暫存記憶體：",
 
 		["Home"] = "本地",
 		["Latency"] = "延遲：",
 		["CPU Usage"] = "顯示CPU占用比例：",
-		["Reload UI(on)"] = "|cff777777dim|rinfo[|cff00ff00System|r]: 重載介面後顯示插件的CPU佔用。",
-		["Reload UI(off)"] = "|cff777777dim|rinfo[|cff00ff00System|r]: 重載介面後隱藏插件的CPU佔用。",
+		["Reload UI(on)"] = "|cff777777dim|rinfo[|cff00ff00System|r]：重載介面後顯示插件的CPU佔用。",
+		["Reload UI(off)"] = "|cff777777dim|rinfo[|cff00ff00System|r]：重載介面後隱藏插件的CPU佔用。",
 	}
 elseif GetLocale() == "zhCN" then
 	infoL = {
@@ -46,20 +43,18 @@ elseif GetLocale() == "zhCN" then
 		["Sorting by:"] = "排序方式：",
 	
 		["Shift"] = "Shift展开",
+		["Hidden"] = HIDE,
 	
-		["Default UI Memory Usage:"] = "内建插件资源耗用：",
-		["Total Memory Usage:"] = "总资源耗用：",
+		["Default UI Memory Usage:"] = "内建插件资源占用：",
+		["Total Memory Usage:"] = "总资源占用：",
 		["Garbage collected"] = "释放记忆体：",
-		["AutoCollect"] = "自动整理记忆体暂存：",
-
-		["No Talents"] = "无专精",
-		["Spec"] = SPECIALIZATION,
+		["AutoCollect"] = "自动整理暂存记忆体：",
 
 		["Home"] = "本地",
 		["Latency"] = "延迟：",
 		["CPU Usage"] = "显示CPU占用比例：",
-		["Reload UI(on)"] = "|cff777777dim|rinfo[|cff00ff00System|r]: 重载界面后显示插件的CPU佔用。",
-		["Reload UI(off)"] = "|cff777777dim|rinfo[|cff00ff00System|r]: 重载界面后隐藏插件的CPU佔用。",
+		["Reload UI(on)"] = "|cff777777dim|rinfo[|cff00ff00System|r]：重载界面后显示插件的CPU佔用。",
+		["Reload UI(off)"] = "|cff777777dim|rinfo[|cff00ff00System|r]：重载界面后隐藏插件的CPU佔用。",
 	}
 else
 	infoL = {
@@ -84,13 +79,10 @@ else
 		["Garbage collected"] = "Garbage collected: ",
 		["AutoCollect"] = "AutoCollect: ",
 	
-		["No Talents"] = "No Spec",
-		["Spec"] = "Spec",
-	
 		["Home"] = "Home",
 		["Latency"] = "Latency",
 		["CPU Usage"] = "Show CPU Usage",
-		["Reload UI(on)"] = "|cff777777dim|rinfo[|cff00ff00System|r]:You could see addon's CPU usage after reloding UI.",
-		["Reload UI(off)"] = "|cff777777dim|rinfo[|cff00ff00System|r]:You could hide the addon's CPU usage table after reloding UI.",
+		["Reload UI(on)"] = "|cff777777dim|rinfo[|cff00ff00System|r]: You could see addon's CPU usage after reloding UI.",
+		["Reload UI(off)"] = "|cff777777dim|rinfo[|cff00ff00System|r]: You could hide the addon's CPU usage table after reloding UI.",
 	}
 end
