@@ -1,9 +1,8 @@
-﻿local addon, ns = ...
-local cfg = ns.cfg
-local init = ns.init
+﻿local addon, ns = ... 
+local C, F, G, T = unpack(ns)
 local panel = CreateFrame("Frame", nil, UIParent)
 
-if cfg.Memory == true then
+if not C.Memory then return end
 
 	-- make addon frame anchor-able
 	local Stat = CreateFrame("Frame", "diminfo_Memory")
@@ -13,43 +12,37 @@ if cfg.Memory == true then
 	
 	-- setup text
 	local Text  = panel:CreateFontString(nil, "OVERLAY")
-	Text:SetFont(unpack(cfg.Fonts))
-	Text:SetPoint(unpack(cfg.MemoryPoint))
+	Text:SetFont(G.Fonts, G.FontSize, G.FontFlag)
+	Text:SetPoint(unpack(C.MemoryPoint))
 	Stat:SetAllPoints(Text)
 
 	local colorme = string.format("%02x%02x%02x", 1*255, 1*255, 1*255)
 	local Total, Mem, MEMORY_TEXT, Memory, maxAddOns, statColor																	
 
-	local function formatMem(memory, color)
-		if color then
-			statColor = { "|cff"..colorme, "|r" }
-		else
-			statColor = { "", "" }
-		end
-		
+	local function formatMem(memory)
 		local mult = 10^1
 		if memory > 999 then
 			local mem = floor((memory/1024) * mult + 0.5) / mult
 			if mem % 1 == 0 then
-				return mem..string.format(".0 %smb%s", unpack(statColor))
+				return mem..F.Hex(statColor)..".0 mb|r"
 			else
-				return mem..string.format(" %smb%s", unpack(statColor))
+				return mem..F.Hex(statColor).." mb|r"
 			end
 		else
 			local mem = floor(memory * mult + 0.5) / mult
 			if mem % 1 == 0 then
-				return mem..string.format(".0 %skb%s", unpack(statColor))
+				return mem..F.Hex(statColor)..".0 kb|r"
 			else
-				return mem..string.format(" %skb%s", unpack(statColor))
+				return mem..F.Hex(statColor).." kb|r"
 			end
 		end
-
 	end
 
 	local function RefreshMem(self)
 		Memory = {}
 		UpdateAddOnMemoryUsage()
 		Total = 0
+		
 		for i = 1, GetNumAddOns() do
 			Mem = GetAddOnMemoryUsage(i)
 			Memory[i] = { select(2, GetAddOnInfo(i)), Mem, IsAddOnLoaded(i) }
@@ -75,9 +68,9 @@ if cfg.Memory == true then
 	
 	local function formatTotal(Total)
 		if Total >= 1024 then
-			return format(cfg.ColorClass and "%.1f"..init.Colored.."mb|r" or "%.1fmb", Total / 1024)
+			return format(C.ClassColor and F.Hex(G.Ccolors)..ADDONS.."|r %.1f"..F.Hex(G.Ccolors).."mb|r" or ADDONS.."%.1fmb", Total / 1024)
 		else
-			return format(cfg.ColorClass and "%.1f"..init.Colored.."kb|r" or "%.1fkb", Total)
+			return format(C.ClassColor and F.Hex(G.Ccolors)..ADDONS.."|r %.1f"..F.Hex(G.Ccolors).."kb|r" or ADDONS.."%.1fkb", Total)
 		end
 	end
 
@@ -91,9 +84,8 @@ if cfg.Memory == true then
 		Text:SetText(formatTotal(tTotal))
 	end
 
-
 	if diminfo.AutoCollect == nil then diminfo.AutoCollect = true end
-
+	
 	-- click function
 	Stat:SetScript("OnMouseDown", function(self,btn)
 		if btn == "LeftButton" then
@@ -103,7 +95,7 @@ if cfg.Memory == true then
 			RefreshMem(self)
 			print(format("|cff66C6FF%s|r%s", infoL["Garbage collected"], formatMem(before - gcinfo())))
 		elseif btn == "RightButton" then
-			diminfo.AutoCollect = not diminfo.AutoCollect
+			diminfo.AutoCollect = not diminfo.AutoCollect					  
 		end
 		self:GetScript("OnEnter")(self)
 		RefreshText()
@@ -113,7 +105,7 @@ if cfg.Memory == true then
 	Stat:SetScript("OnEnter", function(self)
 		RefreshMem(self)
 		
-		GameTooltip:SetOwner(self, "ANCHOR_TOP", 0, 10);
+		GameTooltip:SetOwner(self, "ANCHOR_BOTTOM", 0, -10);
 		GameTooltip:ClearAllPoints()
 		GameTooltip:SetPoint("BOTTOM", self, "TOP", 0, 1)
 		GameTooltip:ClearLines()
@@ -124,7 +116,7 @@ if cfg.Memory == true then
 		if IsShiftKeyDown() then
 			maxAddOns = #Memory
 		else
-			maxAddOns = math.min(cfg.MaxAddOns, #Memory)
+			maxAddOns = math.min(C.MaxAddOns, #Memory)
 		end
 
 		for i = 1, maxAddOns do
@@ -142,7 +134,7 @@ if cfg.Memory == true then
 			local more = 0
 			local moreMem = 0
 			if not IsShiftKeyDown() then
-				for i = (cfg.MaxAddOns + 1), #Memory do
+				for i = (C.MaxAddOns + 1), #Memory do
 					if Memory[i][3] then
 						more = more + 1
 						moreMem = moreMem + Memory[i][2]
@@ -153,7 +145,7 @@ if cfg.Memory == true then
 
 			GameTooltip:AddLine(" ")
 			GameTooltip:AddDoubleLine(infoL["Default UI Memory Usage:"],formatMem(gcinfo() - Total),.6,.8,1,1,1,1)
-			GameTooltip:AddDoubleLine(infoL["Total Memory Usage:"],formatMem(collectgarbage'count'),.6,.8,1,1,1,1)
+			GameTooltip:AddDoubleLine(infoL["Total Memory Usage:"],formatMem(collectgarbage"count"),.6,.8,1,1,1,1)
 			GameTooltip:AddDoubleLine(" ","--------------",1,1,1,0.5,0.5,0.5)
 			GameTooltip:AddDoubleLine(" ",infoL["AutoCollect"]..(diminfo.AutoCollect and "|cff55ff55"..ENABLE or "|cffff5555"..DISABLE),1,1,1,.4,.78,1)
 			GameTooltip:Show()
@@ -177,4 +169,3 @@ if cfg.Memory == true then
 			end
 		end
 	end)
-end
