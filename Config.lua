@@ -39,6 +39,7 @@ local MediaFolder = "Interface\\AddOns\\diminfo\\Media\\"
 	-- anchor, parent, x, y, width, height, shadow
 	-- 錨點，父級框體，x座標，y座標，寬度，高度，陰影
 	C.Panel1 = {"TOPLEFT", UIParent, 10, -5, 630, 8, 3}
+	--C.Panel1 = {"TOPLEFT", UIParent, 10, -5, 710, 8, 3}
 	
 	-- add if you need, max to C.Panel5 / 自己加，最多到C.Panel5
 	--C.Panel2 = {"TOP", UIParent, 10, -5, 200, 8, 3}
