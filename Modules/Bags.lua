@@ -78,7 +78,7 @@ if not C.Bags then return end
 				end
 			end
 			if c > 0 then
-				print(format("|cff99CCFF"..infoL["Trash sold, earned "].."|r|cffFFFFFF%.1f|r|cffffd700%s|r", c * 0.0001, GOLD_AMOUNT_SYMBOL))
+				print(format("|cff99CCFF"..infoL["Trash sold, earned "].."|r%s", GetMoneyString(c)))
 			end
 		end
 	end)

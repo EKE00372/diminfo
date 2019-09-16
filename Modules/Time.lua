@@ -30,7 +30,7 @@ if not C.Time then return end
 			if GetCVarBool("timeMgrUseMilitaryTime") then
 				Text:SetText(format(TIMEMANAGER_TICKER_24HOUR, hour, minute))
 			else
-				Text:SetText(format(TIMEMANAGER_TICKER_12HOUR..init.Colored..(hour < 12 and "AM" or "PM"), hour, minute))
+				Text:SetText(format(TIMEMANAGER_TICKER_12HOUR..(hour < 12 and "AM" or "PM"), hour, minute))
 			end
 	
 			self.timer = 0
@@ -52,8 +52,8 @@ if not C.Time then return end
 		
 		GameTooltip:SetOwner(self, "ANCHOR_BOTTOM", 0, -10)
 		GameTooltip:ClearLines()
-		GameTooltip:AddDoubleLine(TIMEMANAGER_TOOLTIP_LOCALTIME, zsub(GameTime_GetLocalTime(true), "%s*AM", "am", "%s*PM", "pm"), .6, .8, 1, 1, 1, 1)
-		GameTooltip:AddDoubleLine(TIMEMANAGER_TOOLTIP_REALMTIME, zsub(GameTime_GetGameTime(true), "%s*AM", "am", "%s*PM", "pm"), .6, .8, 1, 1, 1, 1)
+		GameTooltip:AddDoubleLine(TIMEMANAGER_TOOLTIP_LOCALTIME, zsub(GameTime_GetLocalTime(true), "%s*AM", " am", "%s*PM", " pm"), .6, .8, 1, 1, 1, 1)
+		GameTooltip:AddDoubleLine(TIMEMANAGER_TOOLTIP_REALMTIME, zsub(GameTime_GetGameTime(true), "%s*AM", " am", "%s*PM", " pm"), .6, .8, 1, 1, 1, 1)
 		
 		local title
 		local function addTitle(text)
