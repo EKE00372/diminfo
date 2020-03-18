@@ -41,7 +41,7 @@ F.addIcon = function(texture, size, cut1, cut2)
 end
 
 -- 創建框架
-F.CreatePanel = function(anchor, parent, x, y, w, h, size, a1, a2)
+F.CreatePanel = function(anchor, parent, x, y, w, h, size, a)
 	local panel = CreateFrame("Frame", nil, parent)
 	local framelvl = parent:GetFrameLevel()
 	
@@ -55,67 +55,53 @@ F.CreatePanel = function(anchor, parent, x, y, w, h, size, a1, a2)
 	panel.bg = panel:CreateTexture(nil, "BACKGROUND")
 	panel.bg:SetAllPoints(panel)
 	panel.bg:SetTexture(G.Tex)
-	panel.bg:SetGradientAlpha("HORIZONTAL", .1,.1,.1, a1, .1,.1,.1, a2)
-
-	--[[
-	panel.bg = panel:CreateTexture(nil, "BACKGROUND")
+	panel.bg:SetVertexColor(.1, .1, .1, .8)
 	
-	panel.bg:SetSize(h, w)
-	panel.bg:SetTexture(G.Glow)
-	panel.bg:SetTexCoord(0, .0875, 0, 1)
-	panel.bg:SetRotation(math.rad(90))
-	panel.bg:SetGradientAlpha("HORIZONTAL", .1,.1,.1, a1, .1,.1,.1, a2)
-	panel.bg:SetPoint("TOP", panel, "BOTTOM", 0, 0)]]--
-	--[[
-	panel.bg = panel:CreateTexture(nil, "BACKGROUND")
-	panel.bg:SetAllPoints(panel)
-	panel.bg:SetTexture(G.Tex)
-	panel.bg:SetGradientAlpha("HORIZONTAL", .1,.1,.1, a1, .1,.1,.1, a2)
+	local left = CreateFrame("Frame", nil, parent)
+	left:SetSize(40, h)
+	left:ClearAllPoints()
+	left:SetPoint("RIGHT", panel, "LEFT", 0, 0)
+	left:SetFrameStrata("BACKGROUND")
+	left:SetFrameLevel(framelvl == 0 and 0 or framelvl-1)
 	
-	panel.l1 = panel:CreateTexture(nil, "BACKGROUND")
-	panel.l1:SetPoint("TOP", panel, "BOTTOM")
-	panel.l1:SetSize(w, size)
-	panel.l1:SetTexture(G.Glow)
-	--panel.l1:SetGradientAlpha("HORIZONTAL", G.Ccolors.r, G.Ccolors.g, G.Ccolors.b, a1, G.Ccolors.r, G.Ccolors.g, G.Ccolors.b, a2)
-	panel.l1:SetGradientAlpha("HORIZONTAL", 0, 0, 0, a1, 0, 0, 0, a2)
+	left.bg = left:CreateTexture(nil, "BACKGROUND")
+	left.bg:SetAllPoints(left)
+	left.bg:SetTexture(G.Tex)
+	left.bg:SetGradientAlpha("HORIZONTAL", .1,.1,.1, 0, .1,.1,.1, a)
 	
-	panel.l2 = panel:CreateTexture(nil, "BACKGROUND")
-	panel.l2:SetPoint("BOTTOM", panel, "TOP")
-	panel.l2:SetSize(w, size)
-	panel.l2:SetTexture(G.Glow)
-	panel.l2:SetRotation(math.rad(180))
-	--panel.l2:SetGradientAlpha("HORIZONTAL", G.Ccolors.r, G.Ccolors.g, G.Ccolors.b, a2, G.Ccolors.r, G.Ccolors.g, G.Ccolors.b, a1)
-	panel.l2:SetGradientAlpha("HORIZONTAL", 0, 0, 0, a2, 0, 0, 0, a1)
-	]]--
-	--[[
-	panel:SetBackdrop({
-		bgFile = G.Tex,
-		edgeFile = G.Glow,
-		edgeSize = size,
-		--bgSize = 64, 
-		--edgeSize = 16, 
-		--insets = { left = size, right = size, top = size, bottom = size }
-		insets = { left = 0, right = 0, top = -size, bottom = -size }
-	})
-	panel:SetBackdropColor(.1, .1, .1, .6)
-	panel:SetBackdropBorderColor(0, 0, 0)
+	local right = CreateFrame("Frame", nil, parent)
+	right:SetSize(40, h)
+	right:ClearAllPoints()
+	right:SetPoint("LEFT", panel, "RIGHT", 0, 0)
+	right:SetFrameStrata("BACKGROUND")
+	right:SetFrameLevel(framelvl == 0 and 0 or framelvl-1)
 	
-	--panel.bg = panel:CreateTexture(nil, "BACKGROUND")
-	--panel.bg:SetPoint(panel)
-	--panel.bg:SetAllPoints(panel)
-	--panel.bg:SetTexture(G.Tex)
-	--panel.bg:SetVertexColor(.1, .1, .1, .6)
-	--panel.bg:SetGradientAlpha("HORIZONTAL", .1,.1,.1, a1, .1,.1,.1, a2)
-]]--
+	right.bg = right:CreateTexture(nil, "BACKGROUND")
+	right.bg:SetAllPoints(right)
+	right.bg:SetTexture(G.Tex)
+	right.bg:SetGradientAlpha("HORIZONTAL", .1,.1,.1, a, .1,.1,.1, 0)
 
 	return panel
 end
 
-if not C.Panel then return end
-
-F.CreatePanel(unpack(C.Panel1))
+if C.Panel1 then F.CreatePanel(unpack(C.Panel1)) end
 if C.Panel2 then F.CreatePanel(unpack(C.Panel2)) end
 if C.Panel3 then F.CreatePanel(unpack(C.Panel3)) end
 if C.Panel4 then F.CreatePanel(unpack(C.Panel4)) end
 if C.Panel5 then F.CreatePanel(unpack(C.Panel5)) end
 if C.Panel6 then F.CreatePanel(unpack(C.Panel6)) end
+
+G.Bags = G.MediaFolder.."bags.tga"
+G.Friends = G.MediaFolder.."friends.tga"
+G.Guild = G.MediaFolder.."guild.tga"
+G.Dura = G.MediaFolder.."dura.tga"
+G.Fps = G.MediaFolder.."fps.tga"
+G.Ping = G.MediaFolder.."ping.tga"
+G.Mem = G.MediaFolder.."spell.tga"
+	
+G.LeftButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:230:307|t "
+G.RightButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:333:411|t "
+G.MiddleButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:127:204|t "
+	
+G.AFK = "|T"..FRIENDS_TEXTURE_AFK..":14:14:0:0:16:16:1:15:1:15|t"
+G.DND = "|T"..FRIENDS_TEXTURE_DND..":14:14:0:0:16:16:1:15:1:15|t"

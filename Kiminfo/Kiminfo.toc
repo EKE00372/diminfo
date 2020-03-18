@@ -3,7 +3,7 @@
 ## Title: |cff00ffffKim|rinfo
 ## Notes: Info Data Bar
 ## Version: R1
-## SavedVariables: diminfo
+## SavedVariables: Kiminfo
 ## X-Credits: Tukz, Katae, Loshine, DDestruction, msylgj0, Siweia
 
 Config.lua

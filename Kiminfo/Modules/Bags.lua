@@ -40,8 +40,8 @@ end
 
 --[[ Data text update ]]--
 local function OnEvent(self)
-	if diminfo.AutoSell == nil then
-		diminfo.AutoSell = true
+	if Kiminfo.AutoSell == nil then
+		Kiminfo.AutoSell = true
 	end
 
 	local free = getBagSlots()
@@ -89,7 +89,7 @@ local function OnEnter(self)
 	-- options
 	GameTooltip:AddDoubleLine(" ", G.Line)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..WORLDMAP_BUTTON..G.LeftButton)
-	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.AutoSell..(diminfo.AutoSell and "|cff55ff55"..ENABLE or "|cffff5555"..DISABLE)..G.RightButton, 1, 1, 1, .4, .78, 1)
+	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.AutoSell..(Kiminfo.AutoSell and "|cff55ff55"..ENABLE or "|cffff5555"..DISABLE)..G.RightButton, 1, 1, 1, .4, .78, 1)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..CURRENCY..G.MiddleButton)
 	
 	GameTooltip:Show()
@@ -113,7 +113,7 @@ end
 	--[[ Options ]]--
 	Stat:SetScript("OnMouseDown", function(self,button)
 		if button == "RightButton" then
-			diminfo.AutoSell = not diminfo.AutoSell
+			Kiminfo.AutoSell = not Kiminfo.AutoSell
 			self:GetScript("OnEnter")(self)
 		elseif button == "MiddleButton" then
 			if InCombatLockdown() then
@@ -132,7 +132,7 @@ end
 
 local SellGray = CreateFrame("Frame")
 	SellGray:SetScript("OnEvent", function()
-		if diminfo.AutoSell == true then
+		if Kiminfo.AutoSell == true then
 			local c = 0
 			
 			for bag = 0, 4 do

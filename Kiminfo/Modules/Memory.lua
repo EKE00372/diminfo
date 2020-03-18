@@ -157,15 +157,15 @@ local function OnEnter(self)
 	-- options
 	GameTooltip:AddDoubleLine(" ", G.Line)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.ManualCollect..G.LeftButton)
-	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.AutoCollect..(diminfo.AutoCollect and "|cff55ff55"..ENABLE or "|cffff5555"..DISABLE)..G.RightButton)
+	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.AutoCollect..(Kiminfo.AutoCollect and "|cff55ff55"..ENABLE or "|cffff5555"..DISABLE)..G.RightButton)
 	
 	GameTooltip:Show()
 end
 
 --[[ Update setting ]]--
 local function OnEvent(self)
-	if diminfo.AutoCollect == nil then
-		diminfo.AutoCollect = true
+	if Kiminfo.AutoCollect == nil then
+		Kiminfo.AutoCollect = true
 	end
 end
 
@@ -185,7 +185,7 @@ end
 			-- 刷新一下TOOLTIP的總計
 			totalMemory = updateMemory()
 		elseif btn == "RightButton" then
-			diminfo.AutoCollect = not diminfo.AutoCollect
+			Kiminfo.AutoCollect = not Kiminfo.AutoCollect
 			self:GetScript("OnEnter")(self)
 		end
 		self:GetScript("OnEnter")(self)
@@ -209,7 +209,7 @@ local eventcount = 0
 local a = CreateFrame("Frame")
 	a:RegisterAllEvents()
 	a:SetScript("OnEvent", function(self, event)
-		if diminfo.AutoCollect == true then
+		if Kiminfo.AutoCollect == true then
 			eventcount = eventcount + 1
 			if InCombatLockdown() then return end
 			if eventcount > 15000 or event == "PLAYER_ENTERING_WORLD" or event == "PLAYER_REGEN_ENABLED" then
