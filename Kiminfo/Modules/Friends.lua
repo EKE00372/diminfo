@@ -128,15 +128,11 @@ local function buildBNetTable(num)
 
 	for i = 1, num do
 		local accountInfo = C_BattleNet.GetFriendAccountInfo(i)
-		--local bnetIDAccount, accountName, battleTag, isBattleTagPresence, charName, bnetIDGameAccount, client, isOnline, _, isAFK, isDND = BNGetFriendInfo(i)
-		--local _, _, _, realmName, _, faction, _, class, _, zoneName, level, gameText, _, _, _, _, _, isGameAFK, isGameBusy  = BNGetGameAccountInfo(bnetIDGameAccount)
 		if accountInfo then
 			local accountName = accountInfo.accountName
 			local battleTag = accountInfo.battleTag
 			local isAFK = accountInfo.isAFK
 			local isDND = accountInfo.isDND
-			--local note = accountInfo.note
-			--local rafLinkType = accountInfo.rafLinkType
 
 			local gameAccountInfo = accountInfo.gameAccountInfo
 			local isOnline = gameAccountInfo.isOnline
@@ -166,12 +162,7 @@ local function buildBNetTable(num)
 					status = ""
 				end
 				
-				--local infoText = GetOnlineInfoText(client, isMobile, gameText)
 				local infoText
-				--[[if client == BNET_CLIENT_WOW and wowProjectID == WOW_PROJECT_ID then
-					infoText = GetOnlineInfoText(client, isMobile, zoneName)
-				end]]--
-
 				if client == BNET_CLIENT_WOW then
 					if ( not zoneName or zoneName == "" ) then
 						infoText = UNKNOWN
@@ -189,7 +180,11 @@ local function buildBNetTable(num)
 						end
 					end
 				else
-					infoText = gameText
+					if gameText == "" then
+						infoText = UNKNOWN
+					else
+						infoText = gameText
+					end
 				end
 
 				if client == BNET_CLIENT_WOW and wowProjectID ~= WOW_PROJECT_ID then
@@ -211,18 +206,13 @@ end
 local function OnEvent(self, event, ...)
 	local onlineFriends = C_FriendList.GetNumOnlineFriends()
 	local _, numBNetOnline = BNGetNumFriends()
-		
+	
 	-- refresh when online and offline / 上下線時強制更新
 	if event == "CHAT_MSG_SYSTEM" then
 		local message = select(1, ...)
 		if not (string.find(message, friendOnline) or string.find(message, friendOffline)) then return end
-	--elseif event == "MODIFIER_STATE_CHANGED" and messgae == "LSHIFT" then
-		--self:GetScript("OnEnter")(self)
 	end
 
-	-- force refresh tooltip / 獲取列表時強制更新
-	dataValid = false
-	
 	Text:SetText(F.addIcon(G.Friends, 16, 0, 50)..format("%d", onlineFriends + numBNetOnline))
 	self:SetAllPoints(Text)
 end
@@ -232,9 +222,6 @@ local function OnEnter(self)
 	local numberOfFriends = C_FriendList.GetNumFriends()
 	local onlineFriends = C_FriendList.GetNumOnlineFriends()
 	local totalBNet, numBNetOnline = BNGetNumFriends()
-	
-	buildFriendTable(numberOfFriends)
-	buildBNetTable(totalBNet)
 	
 	local totalonline = onlineFriends + numBNetOnline
 	local totalfriends = numberOfFriends + totalBNet
@@ -253,13 +240,16 @@ local function OnEnter(self)
 	end
 	
 	if onlineFriends > 0 then
+		buildFriendTable(numberOfFriends)
+		
 		GameTooltip:AddLine(" ")
 		GameTooltip:AddLine("WOW")
 		
 		for i = 1, #friendTable do
 			local info = friendTable[i]
-			--tinsert(friendTable, {info.name, info.level, class, info.area, status})
+
 			if info[5] then
+				local zonec
 				if GetRealZoneText() == info[4] then
 					zonec = F.Hex(.3, 1, .3)
 				else
@@ -267,7 +257,7 @@ local function OnEnter(self)
 				end
 				
 				local levelc = F.Hex(GetQuestDifficultyColor(info[2]))
-				local classc = F.Hex((CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[info[7]])
+				local classc = F.Hex((CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[info[3]])
 				
 				if classc == nil then
 					classc = levelc
@@ -279,6 +269,8 @@ local function OnEnter(self)
 	end
 	
 	if numBNetOnline > 0 then
+		buildBNetTable(totalBNet)
+		
 		title = false
 		for i = 1, #bnetTable do
 			local info = bnetTable[i]
@@ -304,7 +296,6 @@ local function OnEnter(self)
 					GameTooltip:AddDoubleLine(F.addIcon(BNet_GetClientTexture(BNET_CLIENT_WOW), 14, 4, 46)..levelc..info[8].."|r "..classc..info[4].."|r"..info[6]..G.OptionColor.." ("..info[3]..")|r", zonec..info[9])
 				elseif info[5] == BNET_CLIENT_WOWC then
 					local icon = "|T"..BNet_GetClientTexture(BNET_CLIENT_WOW)..":14:14:0:0:50:50:4:46:4:46:180:180:180|t"
-					
 					GameTooltip:AddLine(icon..levelc..info[8].."|r "..classc..info[4].."|r"..info[6]..G.OptionColor.." ("..info[3]..")|r")
 				end
 			end
@@ -313,9 +304,14 @@ local function OnEnter(self)
 		title = false
 		for i = 1, #bnetTable do
 			local info = bnetTable[i]
+			--號 戰網，TAG，名字，程式，狀態，職業，等級，地點，魔獸好戰友
 			if F.Multicheck(info[5], "S2", "D3", "WTCG", "Hero", "Pro", "S1", "DST2", "VIPR", "ODIN", "W3") then
 				addTitle(OTHER)
-				GameTooltip:AddDoubleLine(F.addIcon(BNet_GetClientTexture(info[5]), 14, 4, 46)..G.OptionColor..info[3].."|r"..info[6], info[9])
+				if isShiftKeyDown then
+					GameTooltip:AddDoubleLine(F.addIcon(BNet_GetClientTexture(info[5]), 14, 4, 46)..G.OptionColor..info[3].."|r"..info[6], F.Hex(.65, .65, .65)..info[9])
+				else
+					GameTooltip:AddDoubleLine(F.addIcon(BNet_GetClientTexture(info[5]), 14, 4, 46)..G.OptionColor..info[4].."|r"..info[6], F.Hex(.65, .65, .65)..info[9])
+				end
 			end
 		end
 		
@@ -325,7 +321,11 @@ local function OnEnter(self)
 			
 			if F.Multicheck(info[5], "App", "BSAp") then
 				addTitle("Battle.Net")
-				GameTooltip:AddDoubleLine(F.addIcon(BNet_GetClientTexture(BNET_CLIENT_APP), 14, 4, 46)..G.OptionColor..info[3].."|r"..info[6], info[9])
+				if isShiftKeyDown then
+					GameTooltip:AddDoubleLine(F.addIcon(BNet_GetClientTexture(BNET_CLIENT_APP), 14, 4, 46)..G.OptionColor..info[3].."|r"..info[6], F.Hex(.65, .65, .65)..info[9])
+				else
+					GameTooltip:AddDoubleLine(F.addIcon(BNet_GetClientTexture(BNET_CLIENT_APP), 14, 4, 46)..G.OptionColor..info[4].."|r"..info[6], F.Hex(.65, .65, .65)..info[9])
+				end
 			end
 		end
 	end
@@ -342,7 +342,7 @@ end
 --================================================--
 	--[[ Tooltip ]]--
 	Stat:SetScript("OnEnter", OnEnter)
-	Stat:SetScript("OnLeave", function()
+	Stat:SetScript("OnLeave", function(self)
 		GameTooltip:Hide()
 	end)
 	
