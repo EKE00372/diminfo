@@ -34,25 +34,24 @@ local guildTable = {}
 local name, rank, level, zone, connected, status, class, mobile
 
 -- sort by/排序
---[[
 local function SortGuildTable(shift)
 		sort(guildTable, function(a, b)
 			if a and b then
 				if shift then
-					return a[10] < b[10]
+					return a[3] > b[3]
 				else
-					return a[C.Sortingby] < b[C.Sortingby]
+					return a[3] < b[3]
 				end
 			end
 		end)
 	end
-	]]--
+
 local function BuildGuildTable()
 	wipe(guildTable)
 	
 	local count = 0
 	for i = 1, GetNumGuildMembers() do
-		local name, rank, _, level, _, zone, _, _, connected, status, class, _, _, mobile = GetGuildRosterInfo(i)
+		local name, rank, rankindex, level, _, zone, _, _, connected, status, class, _, _, mobile = GetGuildRosterInfo(i)
 			
 		-- we are only interested in online members/只顯示線上成員
 		if mobile and not connected then
@@ -80,11 +79,11 @@ local function BuildGuildTable()
 		
 		if connected then
 			count = count + 1
-			guildTable[count] = { name, rank, level, zone, connected, status, class, mobile }
+			guildTable[count] = { name, rank, rankindex, level, zone, connected, status, class, mobile }
 		end
 	end
 	
-	--SortGuildTable(IsShiftKeyDown())
+	SortGuildTable(IsShiftKeyDown())
 end	
 --================================================--
 ---------------    [[ Updates ]]     ---------------
@@ -156,17 +155,17 @@ local function OnEnter(self)
 			if shown <= maxShown then
 				-- check zone
 				local zonec
-				if GetRealZoneText() == info[4] then
+				if GetRealZoneText() == info[5] then
 					zonec = F.Hex(.3, 1, .3)
 				else
 					zonec = F.Hex(.65, .65, .65)
 				end
 				
-				local levelc = F.Hex(GetQuestDifficultyColor(info[3]))
-				local classc = F.Hex((CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[info[7]])
+				local levelc = F.Hex(GetQuestDifficultyColor(info[4]))
+				local classc = F.Hex((CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[info[8]])
 				
-				--guildTable[count] = { name, rank, level, zone, connected, status, class, mobile }
-				GameTooltip:AddDoubleLine(levelc..info[3].."|r "..classc..info[1].."|r"..info[6], zonec..info[4])
+				--guildTable[count] = { name, rank, rankindex, level, zone, connected, status, class, mobile }
+				GameTooltip:AddDoubleLine(levelc..info[4].."|r "..classc..info[1].."|r"..info[7], zonec..info[5])
 			end
 		end
 	end
