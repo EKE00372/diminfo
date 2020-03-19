@@ -109,20 +109,6 @@ local function sortBNFriends(a, b)
 	end
 end
 
-local function GetOnlineInfoText(client, isMobile, locationText)
-	if not locationText or locationText == "" then
-		return UNKNOWN
-	end
-	if isMobile then
-		--return LOCATION_MOBILE_APP
-		return L.Mobile
-	else
-		return L.Desktop
-	end
-	
-	return locationText
-end
-
 local function buildBNetTable(num)
 	wipe(bnetTable)
 

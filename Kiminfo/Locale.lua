@@ -59,7 +59,7 @@ local getLocale = GetLocale()
 		L.XY = "发送座标"
 		
 		L.Spec = "专精"
-		L.Loot = LOOT
+		L.Loot = "拾取"
 		
 		L.Home = "本地"
 		L.World = "世界"
@@ -98,9 +98,9 @@ local getLocale = GetLocale()
 		L.Home = "Home"
 		L.World = "World"
 		L.Latency = "Latency"
-		L.CPU = "Show CPU Usage"
-		L.ReloadOn = "|cff777777Kim|rinfo[|cff00ff00System|r]: You would see addon's CPU usage after reloding UI.",
-		L.ReloadOff = "|cff777777Kim|rinfo[|cff00ff00System|r]: You could hide the addon's CPU usage table after reloding UI.",
+		L.CPU = "Show CPU Usage: "
+		L.ReloadOn = "|cff777777Kim|rinfo[|cff00ff00System|r]: You would see addon's CPU usage after reloding UI."
+		L.ReloadOff = "|cff777777Kim|rinfo[|cff00ff00System|r]: You could hide the addon's CPU usage table after reloding UI."
 		
 		L.App = "Companion"
 		L.Mobile = "Mobile"
