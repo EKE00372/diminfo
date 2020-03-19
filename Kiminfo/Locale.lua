@@ -31,8 +31,8 @@ local getLocale = GetLocale()
 		L.World = "世界"
 		L.Latency = "延遲："
 		L.CPU = "顯示 CPU 占用比例："
-		L.ReloadOn = "|cff777777dim|rinfo[|cff00ff00System|r]：重載介面後顯示插件的 CPU 佔用。"
-		L.ReloadOff = "|cff777777dim|rinfo[|cff00ff00System|r]：重載介面後隱藏插件的 CPU 佔用。"
+		L.ReloadOn = "|cff00ffffKim|rinfo[|cff00ff00System|r]：重載介面後顯示插件的 CPU 占用。"
+		L.ReloadOff = "|cff00ffffKim|rinfo[|cff00ff00System|r]：重載介面後隱藏插件的 CPU 占用。"
 		
 		L.App = "魔獸好戰友"
 		L.Mobile = "行動裝置"

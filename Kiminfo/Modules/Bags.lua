@@ -88,7 +88,7 @@ local function OnEnter(self)
 	
 	-- options
 	GameTooltip:AddDoubleLine(" ", G.Line)
-	GameTooltip:AddDoubleLine(" ", G.OptionColor..WORLDMAP_BUTTON..G.LeftButton)
+	GameTooltip:AddDoubleLine(" ", G.OptionColor..BAGSLOT..G.LeftButton)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.AutoSell..(Kiminfo.AutoSell and "|cff55ff55"..ENABLE or "|cffff5555"..DISABLE)..G.RightButton, 1, 1, 1, .4, .78, 1)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..CURRENCY..G.MiddleButton)
 	
