@@ -5,10 +5,10 @@ if not C.Friends then return end
 -- localized references for global functions (about 50% faster)
 local format = string.format
 local sort = table.sort
-local friendTable, bnetTable = {}, {}
-local friendOnline = gsub(ERR_FRIEND_ONLINE_SS, ".+h", "")
+local friendTable, bnetTable = {}, {}	-- build table
+local friendOnline = gsub(ERR_FRIEND_ONLINE_SS, ".+h", "")	-- get string
 local friendOffline = gsub(ERR_FRIEND_OFFLINE_S, "%%s", "")
-local BNET_CLIENT_WOWC = "WoV"
+local BNET_CLIENT_WOWC = "WoC"	-- custom string for classic
 
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
