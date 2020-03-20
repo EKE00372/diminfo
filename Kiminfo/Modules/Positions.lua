@@ -156,8 +156,6 @@ end
 		else
 			if not IsInInstance() then
 				ChatFrame_OpenChat(format("%s (%s)", zone, formatCoords()), chatFrame)
-			else
-				ChatFrame_OpenChat(format("%s", zone), chatFrame)
 			end
 		end
 	end)
