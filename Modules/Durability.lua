@@ -95,9 +95,9 @@ local function OnEvent(self)
 	
 	if numSlots > 0 then
 		if C.ClassColor then
-			Text:SetText(F.Hex(G.Ccolors)..L.Dura.." |r"..dcolor..math.floor(localSlots[1][3]*100).."|r%")
+			Text:SetText(F.Hex(G.Ccolors)..DURABILITY.." |r"..dcolor..math.floor(localSlots[1][3]*100).."|r%")
 		else
-			Text:SetText(L.Dura..dcolor..math.floor(localSlots[1][3]*100).."|r%")
+			Text:SetText(DURABILITY..dcolor..math.floor(localSlots[1][3]*100).."|r%")
 		end
 	else
 		Text:SetText(C.ClassColor and F.Hex(G.Ccolors)..L.None or L.None)

@@ -1,6 +1,6 @@
 ﻿local addon, ns = ... 
 local C, F, G, L = unpack(ns)
-if not C.System == true then return end
+if not C.System then return end
 
 local format = string.format
 local loginTime = GetTime()	-- to get log in time at all of first
