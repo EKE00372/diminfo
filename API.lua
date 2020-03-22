@@ -54,6 +54,7 @@ F.Wrap = function(str, limit, indent, indent1)
 end
 
 -- 創建框架
+
 F.CreatePanel = function(anchor, parent, x, y, w, h, size)
 	local panel = CreateFrame("Frame", nil, parent)
 	local framelvl = parent:GetFrameLevel()
@@ -85,13 +86,51 @@ F.CreatePanel = function(anchor, parent, x, y, w, h, size)
 	return panel
 end
 
+F.CreateFullPanel = function(anchor, parent, x, y, w, h, size, a)
+	local panel = CreateFrame("Frame", nil, parent)
+	local framelvl = parent:GetFrameLevel()
+	
+	-- 中間
+    panel:SetWidth(w)
+	panel:SetHeight(h)
+	panel:ClearAllPoints()
+	panel:SetPoint(anchor, parent, x, y)
+	panel:SetFrameStrata("BACKGROUND")
+	panel:SetFrameLevel(framelvl == 0 and 0 or framelvl-1)
+	
+	panel.bg = panel:CreateTexture(nil, "BACKGROUND")
+	panel.bg:SetAllPoints(panel)
+	panel.bg:SetTexture(G.Tex)
+	panel.bg:SetVertexColor(.1, .1, .1, a)
+	
+	-- 左側漸變
+	local left = CreateFrame("Frame", nil, parent)
+	left:SetSize(40, h)
+	left:ClearAllPoints()
+	left:SetPoint("RIGHT", panel, "LEFT", 0, 0)
+	left:SetFrameStrata("BACKGROUND")
+	left:SetFrameLevel(framelvl == 0 and 0 or framelvl-1)
+	
+	left.bg = left:CreateTexture(nil, "BACKGROUND")
+	left.bg:SetAllPoints(left)
+	left.bg:SetTexture(G.Tex)
+	left.bg:SetGradientAlpha("HORIZONTAL", .1, .1, .1, 0, .1, .1, .1, a)
+	
+	-- 右側漸變
+	local right = CreateFrame("Frame", nil, parent)
+	right:SetSize(40, h)
+	right:ClearAllPoints()
+	right:SetPoint("LEFT", panel, "RIGHT", 0, 0)
+	right:SetFrameStrata("BACKGROUND")
+	right:SetFrameLevel(framelvl == 0 and 0 or framelvl-1)
+	
+	right.bg = right:CreateTexture(nil, "BACKGROUND")
+	right.bg:SetAllPoints(right)
+	right.bg:SetTexture(G.Tex)
+	right.bg:SetGradientAlpha("HORIZONTAL", .1, .1, .1, a, .1, .1, .1, 0)
 
-	F.CreatePanel(unpack(C.Panel1))
-	if C.Panel2 then F.CreatePanel(unpack(C.Panel2)) end
-	if C.Panel3 then F.CreatePanel(unpack(C.Panel3)) end
-	if C.Panel4 then F.CreatePanel(unpack(C.Panel4)) end
-	if C.Panel5 then F.CreatePanel(unpack(C.Panel5)) end
-
+	return panel
+end
 
 G.LeftButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:230:307|t "
 G.RightButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:333:411|t "
@@ -99,3 +138,17 @@ G.MiddleButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:
 	
 G.AFK = "|T"..FRIENDS_TEXTURE_AFK..":14:14:0:0:16:16:1:15:1:15|t"
 G.DND = "|T"..FRIENDS_TEXTURE_DND..":14:14:0:0:16:16:1:15:1:15|t"
+
+if not C.Panel then return end
+
+if C.Panel1 then F.CreatePanel(unpack(C.Panel1)) end
+if C.Panel2 then F.CreatePanel(unpack(C.Panel2)) end
+if C.Panel3 then F.CreatePanel(unpack(C.Panel3)) end
+if C.Panel4 then F.CreatePanel(unpack(C.Panel4)) end
+if C.Panel5 then F.CreatePanel(unpack(C.Panel5)) end
+
+if C.FullPanel1 then F.CreateFullPanel(unpack(C.FullPanel1)) end
+if C.FullPanel2 then F.CreateFullPanel(unpack(C.FullPanel2)) end
+if C.FullPanel3 then F.CreateFullPanel(unpack(C.FullPanel3)) end
+if C.FullPanel4 then F.CreateFullPanel(unpack(C.FullPanel4)) end
+if C.FullPanel5 then F.CreateFullPanel(unpack(C.FullPanel5)) end

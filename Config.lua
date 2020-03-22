@@ -27,7 +27,8 @@ local C, F, G, L = unpack(ns)
 -- Media --
 -----------
 
-	G.Tex = "Interface\\Buttons\\WHITE8x8"
+	--G.Tex = "Interface\\Buttons\\WHITE8x8"
+	G.Tex = G.MediaFolder.."bar.tga"
 	G.Glow = G.MediaFolder.."glow.tga"
 	G.Fonts = STANDARD_TEXT_FONT		-- 字型 / Font
 	G.FontSize = 16						-- 大小 / Font size
@@ -44,54 +45,58 @@ local C, F, G, L = unpack(ns)
 
 	-- anchor, parent, x, y, width, height, shadow
 	-- 錨點，父級框體，x座標，y座標，寬度，高度，陰影
-	C.Panel1 = {"TOPLEFT", UIParent, 10, -5, 670, 8, 3}
-	--C.Panel1 = {"TOPLEFT", UIParent, 10, -5, 710, 8, 3}
+	--C.Panel1 = {"TOPLEFT", UIParent, 10, -5, 670, 8, 3}
 	
 	-- add if you need, max to C.Panel5 / 自己加，最多到C.Panel5
-	C.Panel2 = {"TOP", UIParent, 0, -5, 200, 8, 3}
+	--C.Panel2 = {"TOP", UIParent, 0, -5, 200, 8, 3}
+	
+	-- anchor, parent, x, y, width, height, alpha
+	-- 錨點，父級框體，x座標，y座標，寬度，高度，透明度
+	C.FullPanel1 = {"TOPLEFT", UIParent, 0, -2, 730, 36, 32, .6}
 	
 --------------
 -- Settings --
 --------------
 	
-	-- Zone text and Position / 地名座標
-	C.Positions = true
-	C.PositionsPoint = {"TOP", UIParent, 0, -6}
-	
 	-- Bags / 背包
 	C.Bags = true
-	C.BagsPoint = {"TOPLEFT", UIParent, 24, -6}
+	C.BagsPoint = {"TOPLEFT", UIParent, 18, -12}
 	
 	-- Memory / 記憶體占用列表
 	C.Memory = true
 	C.MaxAddOns = 30
 	C.MemoryPoint = {"LEFT", "diminfo_Bags", "RIGHT", 16, 0}
-	--C.MemoryPoint = {"TOPLEFT", UIParent, 120, -6}
+	--C.MemoryPoint = {"TOPLEFT", UIParent, 120, -12}
 	
 	-- System: Fps and latency / 幀數與延遲
 	C.System = true
 	C.SystemPoint = {"LEFT", "diminfo_Mem", "RIGHT", 16, 0}
-	--C.SystemPoint = {"TOPLEFT", UIParent, 220, -6}
+	--C.SystemPoint = {"TOPLEFT", UIParent, 220, -12}
 	
 	-- 好友
 	C.Friends = true
 	C.FriendsPoint =  {"LEFT", "diminfo_System", "RIGHT", 16, 0}
-	--C.FriendsPoint =  {"TOPLEFT", UIParent, 320, -6}
+	--C.FriendsPoint =  {"TOPLEFT", UIParent, 320, -12}
 	
 	-- 公會
 	C.Guild = true
 	C.GuildPoint = {"LEFT", "diminfo_Friends", "RIGHT", 16, 0}
-	--C.GuildPoint = {"TOPLEFT", UIParent, 420, -6}
+	--C.GuildPoint = {"TOPLEFT", UIParent, 420, -12}
 	
 	-- Durability / 耐久
 	C.Durability = true
 	C.DurabilityPoint = {"LEFT", "diminfo_Guild", "RIGHT", 16, 0}
-	--C.DurabilityPoint = {"TOPLEFT", UIParent, 520, -6}
+	--C.DurabilityPoint = {"TOPLEFT", UIParent, 520, -12}
 
 	-- Timer / 時鐘
 	C.Time = true
 	C.TimePoint =  {"LEFT", "diminfo_Dura", "RIGHT", 16, 0}
-	--C.TimePoint =  {"TOPLEFT", UIParent, 620, -6}
+	--C.TimePoint =  {"TOPLEFT", UIParent, 620, -12}
+	
+	-- Zone text and Position / 地名座標
+	C.Positions = true
+	C.PositionsPoint = {"LEFT", "diminfo_Time", "RIGHT", 16, 0}
+	--C.PositionsPoint = {"TOP", UIParent, 0, -12}
 	
 -------------
 -- Credits --

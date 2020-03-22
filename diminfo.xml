@@ -1,5 +1,4 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<Script file="Modules/Positions.lua"/>
 	<Script file="Modules/Bags.lua"/>
 	<Script file="Modules/Memory.lua"/>
 	<Script file="Modules/System.lua"/>
@@ -7,4 +6,5 @@
 	<Script file="Modules/Guild.lua"/>
 	<Script file="Modules/Durability.lua"/>
 	<Script file="Modules/Time.lua"/>
+	<Script file="Modules/Positions.lua"/>
 </Ui>
