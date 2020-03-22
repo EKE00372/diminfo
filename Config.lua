@@ -27,7 +27,6 @@ local C, F, G, L = unpack(ns)
 -- Media --
 -----------
 
-	--G.Tex = "Interface\\Buttons\\WHITE8x8"
 	G.Tex = G.MediaFolder.."bar.tga"
 	G.Glow = G.MediaFolder.."glow.tga"
 	G.Fonts = STANDARD_TEXT_FONT		-- 字型 / Font
@@ -43,16 +42,10 @@ local C, F, G, L = unpack(ns)
 -- Panel --
 -----------
 
-	-- anchor, parent, x, y, width, height, shadow
-	-- 錨點，父級框體，x座標，y座標，寬度，高度，陰影
-	--C.Panel1 = {"TOPLEFT", UIParent, 10, -5, 670, 8, 3}
-	
-	-- add if you need, max to C.Panel5 / 自己加，最多到C.Panel5
-	--C.Panel2 = {"TOP", UIParent, 0, -5, 200, 8, 3}
-	
 	-- anchor, parent, x, y, width, height, alpha
 	-- 錨點，父級框體，x座標，y座標，寬度，高度，透明度
-	C.FullPanel1 = {"TOPLEFT", UIParent, 0, -2, 730, 36, 32, .6}
+	C.Panel1 = {"TOPLEFT", UIParent, 0, -2, 730, 36, 32, .6}
+	-- add if you need, max to C.Panel5 / 自己加，最多到C.Panel5
 	
 --------------
 -- Settings --

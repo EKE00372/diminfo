@@ -7,7 +7,6 @@ local getLocale = GetLocale()
 		L.AutoSell = "自動賣垃圾："
 		L.TrashSold = "垃圾售出："
 		
-		L.Dura = DURABILITY
 		L.AutoRepair = "自動修理："
 		L.None = "無裝備"
 		
@@ -29,7 +28,6 @@ local getLocale = GetLocale()
 		
 		L.Home = "本地"
 		L.World = "世界"
-		L.Latency = "延遲："
 		L.CPU = "顯示 CPU 占用比例："
 		L.ReloadOn = "|cff00ffffKim|rinfo[|cff00ff00System|r]：重載介面後顯示插件的 CPU 占用。"
 		L.ReloadOff = "|cff00ffffKim|rinfo[|cff00ff00System|r]：重載介面後隱藏插件的 CPU 占用。"
@@ -43,7 +41,6 @@ local getLocale = GetLocale()
 		L.AutoSell = "自动卖垃圾："
 		L.TrashSold = "垃圾售出："
 		
-		L.Dura = DURABILITY
 		L.AutoRepair = "自动修理："
 		L.None = "无装备"
 		
@@ -65,20 +62,19 @@ local getLocale = GetLocale()
 		
 		L.Home = "本地"
 		L.World = "世界"
-		L.Latency = "延迟："
 		L.CPU = "显示CPU占用比例："
 		L.ReloadOn = "|cff777777Kim|rinfo[|cff00ff00System|r]：重载界面后显示插件的 CPU 占用。"
 		L.ReloadOff = "|cff777777Kim|rinfo[|cff00ff00System|r]：重载界面后隐藏插件的 CPU 占用。"
 		
 		L.App = "随身助手"
 		L.Mobile = "移动装置"
-		L.Desktop = "桌面应用"
-		
+		L.Desktop = "桌面应用"	
+	
 	else
+		
 		L.AutoSell = "Auto Sell junk: "
 		L.TrashSold = "Trash sold, earned "
 		
-		L.Dura = "Dura"
 		L.AutoRepair = "Auto Repair: "
 		L.None = "None"
 		
@@ -100,7 +96,6 @@ local getLocale = GetLocale()
 		
 		L.Home = "Home"
 		L.World = "World"
-		L.Latency = "Latency"
 		L.CPU = "Show CPU Usage: "
 		L.ReloadOn = "|cff777777Kim|rinfo[|cff00ff00System|r]: You would see addon's CPU usage after reloding UI."
 		L.ReloadOff = "|cff777777Kim|rinfo[|cff00ff00System|r]: You could hide the addon's CPU usage table after reloding UI."
