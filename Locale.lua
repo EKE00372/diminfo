@@ -1,88 +1,111 @@
-﻿if GetLocale() == "zhTW" then
-	infoL = {
-		["AutoSell junk"] = "自動賣垃圾：",
-		["Trash sold, earned "] = "垃圾售出：",
-	
-		["AutoRepair"] = "自動修理：",
-		["Repair cost covered by G-Bank"] = "修理花費公款：",
-		["Repair cost"] = "修理花費：",
-		["Go farm, newbie"] = "你真窮。",
-		["none"] = "無裝備",	
-	
-		["No Guild"] = "沒人要",
-		["Sorting"] = "排序",
-		["Sorting by:"] = "排序方式：",
-	
-		["Shift"] = "Shift展開",
-		["Hidden"] = HIDE,
-	
-		["Default UI Memory Usage:"] = "内建插件資源占用：",
-		["Total Memory Usage:"] = "總資源占用：",
-		["Garbage collected"] = "釋放記憶體：",
-		["AutoCollect"] = "自動整理暫存記憶體：",
+﻿local addon, ns = ... 
+local C, F, G, L = unpack(ns)
 
-		["Home"] = "本地",
-		["Latency"] = "延遲：",
-		["CPU Usage"] = "顯示CPU占用比例：",
-		["Reload UI(on)"] = "|cff777777dim|rinfo[|cff00ff00System|r]：重載介面後顯示插件的CPU佔用。",
-		["Reload UI(off)"] = "|cff777777dim|rinfo[|cff00ff00System|r]：重載介面後隱藏插件的CPU佔用。",
-	}
-elseif GetLocale() == "zhCN" then
-	infoL = {
-		["AutoSell junk"] = "自动卖垃圾：",
-		["Trash sold, earned "] = "垃圾售出：",
-	
-		["AutoRepair"] = "自动修理：",
-		["Repair cost covered by G-Bank"] = "修理花费公款：",
-		["Repair cost"] = "修理花费：",
-		["Go farm, newbie"] = "你真穷。",
-		["none"] = "无装备",
-	
-		["No Guild"] = "没人要",
-		["Sorting"] = "排序",
-		["Sorting by:"] = "排序方式：",
-	
-		["Shift"] = "Shift展开",
-		["Hidden"] = HIDE,
-	
-		["Default UI Memory Usage:"] = "内建插件资源占用：",
-		["Total Memory Usage:"] = "总资源占用：",
-		["Garbage collected"] = "释放记忆体：",
-		["AutoCollect"] = "自动整理暂存记忆体：",
-
-		["Home"] = "本地",
-		["Latency"] = "延迟：",
-		["CPU Usage"] = "显示CPU占用比例：",
-		["Reload UI(on)"] = "|cff777777dim|rinfo[|cff00ff00System|r]：重载界面后显示插件的CPU佔用。",
-		["Reload UI(off)"] = "|cff777777dim|rinfo[|cff00ff00System|r]：重载界面后隐藏插件的CPU佔用。",
-	}
-else
-	infoL = {
-		["AutoSell junk"] = "Auto Sell junk: ",
-		["Trash sold, earned "] = "Trash sold, earned: ",
-
-		["AutoRepair"] = "Auto Repair: ",
-		["Repair cost covered by G-Bank"] = "Repair cost covered by Guild Bank: ",
-		["Repair cost"] = "Repair cost: ",
-		["Go farm, newbie"] = "Go farm, newbie.",
-		["none"] = "None",
-	
-		["No Guild"] = "Lonely",
-		["Sorting"] = "Sorting",
-		["Sorting by:"] = "Sorting by: ",
-	
-		["Shift"] = "Shift show all",
-		["Hidden"] = "Hidden",
-	
-		["Default UI Memory Usage:"] = "Default UI Memory Usage: ",
-		["Total Memory Usage:"] = "Total Memory Usage: ",
-		["Garbage collected"] = "Garbage collected: ",
-		["AutoCollect"] = "AutoCollect: ",
-	
-		["Home"] = "Home",
-		["Latency"] = "Latency",
-		["CPU Usage"] = "Show CPU Usage",
-		["Reload UI(on)"] = "|cff777777dim|rinfo[|cff00ff00System|r]: You could see addon's CPU usage after reloding UI.",
-		["Reload UI(off)"] = "|cff777777dim|rinfo[|cff00ff00System|r]: You could hide the addon's CPU usage table after reloding UI.",
-	}
-end
+local getLocale = GetLocale()
+	if getLocale == "zhTW" then
+		
+		L.AutoSell = "自動賣垃圾："
+		L.TrashSold = "垃圾售出："
+		
+		L.Dura = DURABILITY
+		L.AutoRepair = "自動修理："
+		L.None = "無裝備"
+		
+		L.Lonely = "沒人要"
+		
+		L.Shift = "Shift 展開"
+		L.Hidden = HIDE
+		
+		L.DefaultUsage = "内建插件資源占用"
+		L.TotleUsage = "總資源占用"
+		L.Collected = "釋放記憶體："
+		L.ManualCollect = "手動釋放暫存記憶體"
+		L.AutoCollect = "自動整理暫存記憶體："
+		
+		L.XY = "發送座標"
+		
+		L.Spec = "專精"
+		L.Loot = LOOT
+		
+		L.Home = "本地"
+		L.World = "世界"
+		L.Latency = "延遲："
+		L.CPU = "顯示 CPU 占用比例："
+		L.ReloadOn = "|cff00ffffKim|rinfo[|cff00ff00System|r]：重載介面後顯示插件的 CPU 占用。"
+		L.ReloadOff = "|cff00ffffKim|rinfo[|cff00ff00System|r]：重載介面後隱藏插件的 CPU 占用。"
+		
+		L.App = "魔獸好戰友"
+		L.Mobile = "行動裝置"
+		L.Desktop = "應用程式"
+		
+	elseif getLocale == "zhCN" then
+		
+		L.AutoSell = "自动卖垃圾："
+		L.TrashSold = "垃圾售出："
+		
+		L.Dura = DURABILITY
+		L.AutoRepair = "自动修理："
+		L.None = "无装备"
+		
+		L.Lonely = "沒人要"
+		
+		L.Shift = "Shift 展开"
+		L.Hidden = HIDE
+		
+		L.DefaultUsage = "内置插件内存占用"
+		L.TotleUsage = "总内存占用"
+		L.Collected = "释放內存："
+		L.ManualCollect = "手动释放"
+		L.AutoCollect = "自动整理內存："
+		
+		L.XY = "发送座标"
+		
+		L.Spec = "专精"
+		L.Loot = "拾取"
+		
+		L.Home = "本地"
+		L.World = "世界"
+		L.Latency = "延迟："
+		L.CPU = "显示CPU占用比例："
+		L.ReloadOn = "|cff777777Kim|rinfo[|cff00ff00System|r]：重载界面后显示插件的 CPU 占用。"
+		L.ReloadOff = "|cff777777Kim|rinfo[|cff00ff00System|r]：重载界面后隐藏插件的 CPU 占用。"
+		
+		L.App = "随身助手"
+		L.Mobile = "移动装置"
+		L.Desktop = "桌面应用"
+		
+	else
+		L.AutoSell = "Auto Sell junk: "
+		L.TrashSold = "Trash sold, earned "
+		
+		L.Dura = "Dura"
+		L.AutoRepair = "Auto Repair: "
+		L.None = "None"
+		
+		L.Lonely = "Lonely"
+		
+		L.Shift = "Shift show all"
+		L.Hidden = "Hidden"
+		
+		L.DefaultUsage = "Default UI Memory Usage"
+		L.TotleUsage = "Total Memory Usage"
+		L.Collected = "Garbage collected: "
+		L.ManualCollect = "Manual Collect"
+		L.AutoCollect = "Auto Collect Memory: "
+		
+		L.XY = "Coordinates broadcast"
+		
+		L.Spec = "Spec"
+		L.Loot = LOOT
+		
+		L.Home = "Home"
+		L.World = "World"
+		L.Latency = "Latency"
+		L.CPU = "Show CPU Usage: "
+		L.ReloadOn = "|cff777777Kim|rinfo[|cff00ff00System|r]: You would see addon's CPU usage after reloding UI."
+		L.ReloadOff = "|cff777777Kim|rinfo[|cff00ff00System|r]: You could hide the addon's CPU usage table after reloding UI."
+		
+		L.App = "Companion"
+		L.Mobile = "Mobile"
+		L.Desktop = "Desktop"
+	end

@@ -1,84 +1,136 @@
 ﻿local addon, ns = ... 
-local C, F, G = unpack(ns)
-local panel = CreateFrame("Frame", nil, UIParent)
-
+local C, F, G, L = unpack(ns)
 if not C.Bags then return end
 
-	-- make addon frame anchor-able
-	local Stat = CreateFrame("Frame", "diminfo_Bag")
-	Stat:EnableMouse(true)
+local format = string.format
+
+--=================================================--
+---------------    [[ Elements ]]     ---------------
+--=================================================--
+
+--[[ Create elements ]]--
+local Stat = CreateFrame("Frame", G.addon.."Bags", UIParent)
+	Stat:SetHitRectInsets(-5, -5, -10, -10)
 	Stat:SetFrameStrata("BACKGROUND")
-	Stat:SetFrameLevel(3)
-	
-	-- setup text
-	local Text  = panel:CreateFontString(nil, "OVERLAY")
+
+--[[ Create text ]]--
+local Text  = Stat:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(G.Fonts, G.FontSize, G.FontFlag)
 	Text:SetPoint(unpack(C.BagsPoint))
 	Stat:SetAllPoints(Text)
+
+--==================================================--
+---------------    [[ Bag slots ]]     ---------------
+--==================================================--
+
+local function getBagSlots()
+	local free, total, used = 0, 0, 0
 	
-	local function OnEvent(self, event, ...)
-		if diminfo.AutoSell == nil then
-			diminfo.AutoSell = true
-		end
-		
-		-- text
-		local free, total, used = 0, 0, 0		
-		for i = 0, NUM_BAG_SLOTS do
-			free, total = free + GetContainerNumFreeSlots(i), total + GetContainerNumSlots(i)
-		end
-		used = total - free
-		Text:SetText(C.ClassColor and F.Hex(G.Ccolors)..BAGSLOT.." |r"..free.."/"..total or BACKPACK_TOOLTIP.." "..free.."/"..total)
-		self:SetAllPoints(Text)
-		
-		-- tooltip
-		Stat:SetScript("OnEnter", function()
-			GameTooltip:SetOwner(self, "ANCHOR_BOTTOM", 0, -10)
-			GameTooltip:ClearAllPoints()
-			GameTooltip:SetPoint("BOTTOM", self, "TOP", 0, 1)
-			GameTooltip:ClearLines()
-			GameTooltip:AddDoubleLine(BAGSLOT, free, 0, .6, 1, 0, .6, 1)
-			GameTooltip:AddLine(" ")
-			GameTooltip:AddDoubleLine(TOTAL, total, .6, .8, 1, 1, 1, 1)
-			GameTooltip:AddDoubleLine(USE, used, .6, .8, 1, 1, 1, 1)
-			GameTooltip:AddDoubleLine(" ","--------------", 1, 1, 1, 0.5, 0.5, 0.5)
-			GameTooltip:AddDoubleLine(" ",infoL["AutoSell junk"]..(diminfo.AutoSell and "|cff55ff55"..ENABLE or "|cffff5555"..DISABLE), 1, 1, 1, .6, .8, 1)
-			GameTooltip:Show()
-		end)
-		Stat:SetScript("OnLeave", function() GameTooltip:Hide() end)
+	for i = 0, NUM_BAG_SLOTS do
+		free, total = free + GetContainerNumFreeSlots(i), total + GetContainerNumSlots(i)
 	end
+	used = total - free
 	
+	return free, total, used
+end
+
+--================================================--
+---------------    [[ Updates ]]     ---------------
+--================================================--
+
+--[[ Data text update ]]--
+local function OnEvent(self)
+	if diminfo.AutoSell == nil then
+		diminfo.AutoSell = true
+	end
+
+	local free, total = getBagSlots()
+	Text:SetText(C.ClassColor and F.Hex(G.Ccolors)..BAGSLOT.." |r"..free.."/"..total or BAGSLOT.." "..free.."/"..total)
+	self:SetAllPoints(Text)
+end
+
+--[[ Tooltip update ]]--
+local function OnEnter(self)
+	local free, total, used = getBagSlots()
+	local money = GetMoney()
+	
+	-- title
+	GameTooltip:SetOwner(self, "ANCHOR_BOTTOM", 0, -10)
+	GameTooltip:ClearLines()
+	GameTooltip:AddDoubleLine(BAGSLOT, free.."/"..total, 0, .6, 1, 0, .6, 1)
+	GameTooltip:AddLine(" ")
+	
+	-- bag slot
+	GameTooltip:AddLine(G.OptionColor..BAGSLOT)
+	GameTooltip:AddDoubleLine(USE, used, 1, 1, 1, 1, 1, 1)
+	GameTooltip:AddDoubleLine(MONEY, format("%.f", (money * 0.0001)), 1, 1, 1, 1, 1, 1)
+	
+	-- options
+	GameTooltip:AddDoubleLine(" ", G.Line)
+	GameTooltip:AddDoubleLine(" ", G.OptionColor..BAGSLOT..G.LeftButton)
+	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.AutoSell..(diminfo.AutoSell and "|cff55ff55"..ENABLE or "|cffff5555"..DISABLE)..G.RightButton, 1, 1, 1, .4, .78, 1)
+	
+	GameTooltip:Show()
+end
+
+--================================================--
+---------------    [[ Scripts ]]     ---------------
+--================================================--
+	
+	--[[ Tooltip ]]--
+	Stat:SetScript("OnEnter", OnEnter)
+	Stat:SetScript("OnLeave", function()
+		GameTooltip:Hide()
+	end)
+	
+	--[[ Data text ]]--
 	Stat:RegisterEvent("PLAYER_LOGIN")
 	Stat:RegisterEvent("BAG_UPDATE")
 	Stat:SetScript("OnEvent", OnEvent)
+	
+	--[[ Options ]]--
 	Stat:SetScript("OnMouseDown", function(self,button)
 		if button == "RightButton" then
 			diminfo.AutoSell = not diminfo.AutoSell
 			self:GetScript("OnEnter")(self)
+		elseif button == "MiddleButton" then
+			if InCombatLockdown() then
+				UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT)
+				return
+			end
+			ToggleCharacter("TokenFrame")
 		else
 			ToggleAllBags()
 		end
 	end)
-	
-	-- Auto sell gray
-	local SellGray = CreateFrame("Frame")
+
+--=======================================================--
+---------------    [[ Auto sell gray ]]     ---------------
+--=======================================================--
+
+local SellGray = CreateFrame("Frame")
 	SellGray:SetScript("OnEvent", function()
 		if diminfo.AutoSell == true then
 			local c = 0
-			for b = 0, 4 do
-				for s = 1, GetContainerNumSlots(b) do
-					local l = GetContainerItemLink(b, s)
-					if l and (select(11, GetItemInfo(l)) ~= nil) and (select(2, GetContainerItemInfo(b, s)) ~= nil) then
-						local p = select(11, GetItemInfo(l)) * select(2, GetContainerItemInfo(b, s))
-						if select(3, GetItemInfo(l)) == 0 and p > 0 then
-							UseContainerItem(b, s)
+			
+			for bag = 0, 4 do
+				for slot = 1, GetContainerNumSlots(bag) do
+					local link = GetContainerItemLink(bag, slot)
+					
+					if link and (select(11, GetItemInfo(link)) ~= nil) and (select(2, GetContainerItemInfo(bag, slot)) ~= nil) then
+						local price = select(11, GetItemInfo(link)) * select(2, GetContainerItemInfo(bag, slot))
+						
+						if select(3, GetItemInfo(link)) == 0 and price > 0 then
+							UseContainerItem(bag, slot)
 							PickupMerchantItem()
-							c = c + p
+							c = c + price
 						end
 					end
 				end
 			end
+			
 			if c > 0 then
-				print(format("|cff99CCFF"..infoL["Trash sold, earned "].."|r%s", GetMoneyString(c)))
+				print(format("|cff99CCFF"..L.TrashSold.."|r%s", GetMoneyString(c)))
 			end
 		end
 	end)
