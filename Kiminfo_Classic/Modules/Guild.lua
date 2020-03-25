@@ -6,7 +6,8 @@ local LibQTip = LibStub('LibQTip-1.0')
 local format = string.format
 local sort = table.sort
 local guildTable = {}
-local name, rank, level, zone, connected, status, class, mobile
+local name, rank, rankindex, level, zone, connected, status, class
+local C_Timer_After = C_Timer.After
 
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
@@ -14,9 +15,16 @@ local name, rank, level, zone, connected, status, class, mobile
 
 --[[ Create elements ]]--
 local Stat = CreateFrame("Frame", G.addon.."Guild", UIParent)
-	Stat:SetHitRectInsets(-5, -5, -10, -10)
+	Stat:SetHitRectInsets(-35, -5, -10, -10)
 	Stat:SetFrameStrata("BACKGROUND")
 
+--[[ Create icon ]]--
+local Icon = Stat:CreateTexture(nil, "OVERLAY")
+	Icon:SetSize(G.FontSize+8, G.FontSize+8)
+	Icon:SetPoint("RIGHT", Stat, "LEFT", 0, 0)
+	Icon:SetTexture(G.Guild)
+	Icon:SetVertexColor(1, 1, 1)
+	
 --[[ Create text ]]--
 local Text  = Stat:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(G.Fonts, G.FontSize, G.FontFlag)
@@ -40,6 +48,7 @@ local function SortGuildTable(shift)
 		end)
 	end
 
+-- build guild info table
 local function BuildGuildTable()
 	wipe(guildTable)
 	
@@ -68,34 +77,72 @@ local function BuildGuildTable()
 	SortGuildTable(IsShiftKeyDown())
 end	
 
+-- Click function
+local function buttonOnClick(self, name, btn)
+	if btn == "LeftButton" then
+		if IsAltKeyDown() then
+			InviteToGroup(name)
+		elseif IsShiftKeyDown() then
+			ChatFrame_OpenChat("/w "..name.." ", SELECTED_DOCK_FRAME)
+		else
+			return
+		end
+	end
+end
+
 --================================================--
 ---------------    [[ Updates ]]     ---------------
 --================================================--
 
+-- Update data text
 local function OnEvent(self, event, ...)
 	local online = select(3, GetNumGuildMembers())
 	
 	if not IsInGuild() then
-		Text:SetText(C.ClassColor and F.Hex(G.Ccolors)..L.Lonely or L.Lonely)
+		Text:SetText(L.Lonely)
 	else
-		Text:SetText(format(C.ClassColor and F.Hex(G.Ccolors)..GUILD.." |r".."%d" or GUILD.." %d", online))
+		Text:SetText(online)
+	end
+	
+	self:SetAllPoints(Text)
+end
+
+-- hide QTip tooltip
+local function OnRelease(self)
+	LibQTip:Release(self.tooltip)
+	self.tooltip = nil  
+end  
+
+-- Update when mouseover tooltip
+local function OnUpdate(self, elapsed)
+	self.timer = (self.timer or 0) + elapsed
+	
+	if self.timer > .1 then
+		if not self:IsMouseOver() then
+			if not self.tooltip:IsMouseOver() then
+				OnRelease(self)
+				self:SetScript("OnUpdate", nil)
+			end
+		end
+		self.timer = 0
 	end
 end
 
+-- Update tooltip
 local function OnEnter(self)
+	-- 不在公會就不顯示tooltip
 	if not IsInGuild() then return end
-	
+	-- get local
 	local isShiftKeyDown = IsShiftKeyDown()
 	local total, online = GetNumGuildMembers()
 	local guildName, guildRank = GetGuildInfo("player")
 	local guildMotD = GetGuildRosterMOTD() or ""
-	
+	-- get table
 	BuildGuildTable()
 	
-	local tooltip = LibQTip:Acquire("diminfoGuildTooltip", 2, "LEFT", "RIGHT")
-	tooltip:SetAutoHideDelay(.1, self)
-	tooltip:SmartAnchorTo(self)
-	
+	-- create qtip
+	local tooltip = LibQTip:Acquire("KiminfoGuildTooltip", 2, "LEFT", "RIGHT")
+	tooltip:SetPoint("TOP", self, "BOTTOM", 0, -10)
 	tooltip:Clear()
 	tooltip:AddHeader(G.TitleColor..guildName, G.TitleColor..(format("%d/%d", online, total)))
 	tooltip:AddHeader(G.TitleColor..RANK, G.TitleColor..guildRank)
@@ -104,6 +151,7 @@ local function OnEnter(self)
 	if guildMotD then
 		tooltip:AddLine(" ")
 		tooltip:AddLine(GUILD_MOTD)
+		
 		local width
 		if tooltip:GetWidth() > 200 then
 			width = tooltip:GetWidth() + 100
@@ -138,17 +186,29 @@ local function OnEnter(self)
 			end
 			
 			local levelc = F.Hex(GetQuestDifficultyColor(info[4]))
-			local classc = F.Hex((CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[info[8]])
-			local name = info[1]:match("[^-]+")	-- hide realm
+			--local classc = F.Hex((CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[info[8]])
+			local classc
+			if info[8] == "SHAMAN" then
+				classc = F.Hex(0, .6, 1)
+			else
+				classc = F.Hex((CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[info[8]])
+			end
 			
-			--guildTable[count] = { name, rank, rankindex, level, zone, connected, status, class, mobile }
-			--tooltip:AddLine(levelc..info[4].."|r "..classc..info[1].."|r"..info[7], zonec..info[5])
+			if classc == nil then
+				classc = levelc
+			end
+			
+			local name = info[1]:match("[^-]+")	-- hide realm
 			tooltip:AddLine(levelc..info[4].."|r "..classc..name.."|r"..info[7], zonec..info[5])
+			
+			local line = tooltip:GetLineCount()
+			tooltip:SetLineScript(line, "OnMouseUp", buttonOnClick, info[1])
 		end
 	end
-		
+
 	tooltip:UpdateScrolling(600)
 	tooltip:Show()
+	
 	self.tooltip = tooltip
 end
 
@@ -157,10 +217,23 @@ end
 --================================================--
 	
 	--[[ Tooltip ]]--
-	Stat:SetScript("OnEnter", OnEnter)
-	--[[Stat:SetScript("OnLeave", function()
-		GameTooltip:Hide()
-	end)]]--
+	Stat:SetScript("OnEnter", function(self)
+		OnRelease(self)
+		-- mouseover color
+		Icon:SetVertexColor(0, 1, 1)
+		Text:SetTextColor(0, 1, 1)
+		-- tooltip show
+		OnEnter(self)
+	end)
+		
+	Stat:SetScript("OnLeave", function(self)
+		-- normal color
+		Icon:SetVertexColor(1, 1, 1)
+		Text:SetTextColor(1, 1, 1)
+		-- tooltip hide
+		if not self.tooltip then return end
+		self:SetScript("OnUpdate", OnUpdate)
+	end)
 	
 	--[[ Options ]]--
 	Stat:SetScript("OnMouseDown", function(self, button)

@@ -38,21 +38,6 @@ F.addIcon = function(texture, size, cut1, cut2)
 	return texture
 end
 
-F.Wrap = function(str, limit, indent, indent1)
-  indent = indent or ""
-  indent1 = indent1 or indent
-  limit = limit or 69
-  local here = 1-#indent1
-  
-  return indent1..str:gsub("(%s+)()(%S+)()",
-	function(sp, st, word, fi)
-		if fi-here > limit then
-			  here = st - #indent
-			  return "\n"..indent..word
-		end
-	end)
-end
-
 -- 創建框架
 F.CreatePanel = function(anchor, parent, x, y, w, h, size, a)
 	local panel = CreateFrame("Frame", nil, parent)
@@ -73,7 +58,7 @@ F.CreatePanel = function(anchor, parent, x, y, w, h, size, a)
 	
 	-- 左側漸變
 	local left = CreateFrame("Frame", nil, parent)
-	left:SetSize(40, h)
+	left:SetSize(60, h)
 	left:ClearAllPoints()
 	left:SetPoint("RIGHT", panel, "LEFT", 0, 0)
 	left:SetFrameStrata("BACKGROUND")
@@ -86,7 +71,7 @@ F.CreatePanel = function(anchor, parent, x, y, w, h, size, a)
 	
 	-- 右側漸變
 	local right = CreateFrame("Frame", nil, parent)
-	right:SetSize(40, h)
+	right:SetSize(60, h)
 	right:ClearAllPoints()
 	right:SetPoint("LEFT", panel, "RIGHT", 0, 0)
 	right:SetFrameStrata("BACKGROUND")

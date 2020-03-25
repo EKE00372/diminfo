@@ -11,8 +11,15 @@ local sort = table.sort
 
 --[[ Create elements ]]--
 local Stat = CreateFrame("Frame", G.addon.."Mem", UIParent)
-	Stat:SetHitRectInsets(-5, -5, -10, -10)
+	Stat:SetHitRectInsets(-35, -5, -10, -10)
 	Stat:SetFrameStrata("BACKGROUND")
+
+--[[ Create icon ]]--
+local Icon = Stat:CreateTexture(nil, "OVERLAY")
+	Icon:SetSize(G.FontSize+8, G.FontSize+8)
+	Icon:SetPoint("RIGHT", Stat, "LEFT", 0, 0)
+	Icon:SetTexture(G.Mem)
+	Icon:SetVertexColor(1, 1, 1)
 
 --[[ Create text ]]--
 local Text  = Stat:CreateFontString(nil, "OVERLAY")
@@ -101,19 +108,11 @@ local function OnUpdate(self, elapsed)
 	if self.timer > 5 then
 		updateMemoryTable()
 		totalMemory = updateMemory()
-		--[[
+		
 		if totalMemory >= 1024 then
-			local totalmb = format("%.1f", totalMemory/1024)
-			Text:SetText(C.ClassColor and totalmb..F.Hex(G.Ccolors).."mb|r" or totalmb.."mb")
+			Text:SetText(format("%.1fmb", totalMemory/1024))
 		else
-			local totalkb = format("%.1f", totalMemory)
-			Text:SetText(C.ClassColor and totalkb..F.Hex(G.Ccolors).."kb|r" or totalkb.."kb")
-		end
-		]]--
-		if totalMemory >= 1024 then
-			Text:SetText(F.addIcon(G.Mem, 16, 0, 50)..format("%.1fmb", totalMemory/1024))
-		else
-			Text:SetText(F.addIcon(G.Mem, 16, 0, 50)..format("%.1fkb", totalMemory/1024))
+			Text:SetText(format("%.1fkb", totalMemory/1024))
 		end
 		self.timer = 0
 	end
@@ -199,10 +198,15 @@ end
 	end)
 	
 	--[[ Tooltip ]]-- 
-	Stat:SetScript("OnEnter", OnEnter)
+	Stat:SetScript("OnEnter", function(self)
+		OnEnter(self)
+		Icon:SetVertexColor(0, 1, 1)
+		Text:SetTextColor(0, 1, 1)
+	end)
 	Stat:SetScript("OnLeave", function()
-		entered = false
 		GameTooltip:Hide()
+		Icon:SetVertexColor(1, 1, 1)
+		Text:SetTextColor(1, 1, 1)
 	end)
 	
 	--[[ Data text ]]--

@@ -10,9 +10,16 @@ local format = string.format
 
 --[[ Create elements ]]--
 local Stat = CreateFrame("Frame", G.addon.."Bags", UIParent)
-	Stat:SetHitRectInsets(-5, -5, -10, -10)
+	Stat:SetHitRectInsets(-35, -5, -10, -10)
 	Stat:SetFrameStrata("BACKGROUND")
 
+--[[ Create icon ]]--
+local Icon = Stat:CreateTexture(nil, "OVERLAY")
+	Icon:SetSize(G.FontSize, G.FontSize)
+	Icon:SetPoint("RIGHT", Stat, "LEFT", 0, 0)
+	Icon:SetTexture(G.Bags)
+	Icon:SetVertexColor(1, 1, 1)
+	
 --[[ Create text ]]--
 local Text  = Stat:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(G.Fonts, G.FontSize, G.FontFlag)
@@ -45,8 +52,8 @@ local function OnEvent(self)
 	end
 
 	local free, total = getBagSlots()
-	--Text:SetText(C.ClassColor and F.Hex(G.Ccolors)..BAGSLOT.." |r"..free.."/"..total or BAGSLOT.." "..free.."/"..total)
-	Text:SetText(F.addIcon(G.Bags, 12, 0, 50)..free)
+
+	Text:SetText(free)
 	self:SetAllPoints(Text)
 end
 
@@ -79,8 +86,19 @@ end
 --================================================--
 	
 	--[[ Tooltip ]]--
-	Stat:SetScript("OnEnter", OnEnter)
+	Stat:SetScript("OnEnter", function(self)
+		-- mouseover color
+		Icon:SetVertexColor(0, 1, 1)
+		Text:SetTextColor(0, 1, 1)
+		-- tooltip show
+		OnEnter(self)
+	end)
+	
 	Stat:SetScript("OnLeave", function()
+		-- normal color
+		Icon:SetVertexColor(1, 1, 1)
+		Text:SetTextColor(1, 1, 1)
+		-- tooltip hide
 		GameTooltip:Hide()
 	end)
 	

@@ -21,7 +21,6 @@ local C, F, G, L = unpack(ns)
 ------------
 
 	C.Panel = true			-- Enable panel / 啟用面板
-	C.ClassColor = true		-- Enable font color / 啟用職業染色
 
 -----------
 -- Media --
@@ -44,7 +43,7 @@ local C, F, G, L = unpack(ns)
 
 	-- anchor, parent, x, y, width, height, alpha
 	-- 錨點，父級框體，x座標，y座標，寬度，高度，透明度
-	C.Panel1 = {"TOPLEFT", UIParent, 0, -2, 530, 36, 32, .6}
+	C.Panel1 = {"TOPLEFT", UIParent, 0, -2, 560, 36, 32, .6}
 	-- add if you need, max to C.Panel5 / 自己加，最多到C.Panel5
 	
 --------------
@@ -58,13 +57,13 @@ local C, F, G, L = unpack(ns)
 	
 	-- Bags / 背包
 	C.Bags = true
-	C.BagsPoint = {"LEFT", "Kiminfo_Time", "RIGHT", 24, 0}
-	--C.BagsPoint = {"TOPLEFT", UIParent, 18, -12}
+	--C.BagsPoint = {"LEFT", "Kiminfo_Time", "RIGHT", 24, 0}
+	C.BagsPoint = {"TOPLEFT", UIParent, 100, -12}
 	
 	-- Memory / 記憶體占用列表
 	C.Memory = true
 	C.MaxAddOns = 30
-	C.MemoryPoint = {"LEFT", "Kiminfo_Bags", "RIGHT", 10, 0}
+	C.MemoryPoint = {"LEFT", "Kiminfo_Bags", "RIGHT", 30, 0}
 	--C.MemoryPoint = {"TOPLEFT", UIParent, 120, -12}
 	
 	-- System: Fps and latency / 幀數與延遲
@@ -72,19 +71,20 @@ local C, F, G, L = unpack(ns)
 	C.SystemPoint = {"LEFT", "Kiminfo_Mem", "RIGHT", 10, 0}
 	--C.SystemPoint = {"TOPLEFT", UIParent, 220, -12}
 	
-	-- 好友
+	-- Friends / 好友
 	C.Friends = true
-	C.FriendsPoint =  {"LEFT", "Kiminfo_System", "RIGHT", 10, 0}
+	C.FriendsPoint =  {"LEFT", "Kiminfo_System", "RIGHT", 30, 0}
 	--C.FriendsPoint =  {"TOPLEFT", UIParent, 320, -12}
 	
-	-- 公會
+	-- Guild / 公會
 	C.Guild = true
-	C.GuildPoint = {"LEFT", "Kiminfo_Friends", "RIGHT", 10, 0}
+	C.GuildPoint = {"LEFT", "Kiminfo_Friends", "RIGHT", 30, 0}
 	--C.GuildPoint = {"TOPLEFT", UIParent, 420, -12}
+	--C.GuildPoint = {"CENTER", UIParent, 0, -12}
 	
 	-- Durability / 耐久
 	C.Durability = true
-	C.DurabilityPoint = {"LEFT", "Kiminfo_Guild", "RIGHT", 10, 0}
+	C.DurabilityPoint = {"LEFT", "Kiminfo_Guild", "RIGHT", 30, 0}
 	--C.DurabilityPoint = {"TOPLEFT", UIParent, 520, -12}
 
 	-- Zone text and Position / 地名座標
@@ -97,6 +97,7 @@ local C, F, G, L = unpack(ns)
 -------------
 
 	-- NDui
-	-- Kiminfo
+	-- diminfo
 	-- Tukz
 	-- Aftermath
+	-- HopeASD
