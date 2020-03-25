@@ -68,7 +68,7 @@ local C, F, G, L = unpack(ns)
 	
 	-- System: Fps and latency / 幀數與延遲
 	C.System = true
-	C.SystemPoint = {"LEFT", "Kiminfo_Mem", "RIGHT", 10, 0}
+	C.SystemPoint = {"LEFT", "Kiminfo_Mem", "RIGHT", 70, 0}
 	--C.SystemPoint = {"TOPLEFT", UIParent, 220, -12}
 	
 	-- Friends / 好友

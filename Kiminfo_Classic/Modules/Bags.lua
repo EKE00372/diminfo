@@ -10,7 +10,7 @@ local format = string.format
 
 --[[ Create elements ]]--
 local Stat = CreateFrame("Frame", G.addon.."Bags", UIParent)
-	Stat:SetHitRectInsets(-35, -5, -10, -10)
+	Stat:SetHitRectInsets(-30, -5, -10, -10)
 	Stat:SetFrameStrata("BACKGROUND")
 
 --[[ Create icon ]]--

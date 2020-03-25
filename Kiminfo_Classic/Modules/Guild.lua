@@ -15,7 +15,7 @@ local C_Timer_After = C_Timer.After
 
 --[[ Create elements ]]--
 local Stat = CreateFrame("Frame", G.addon.."Guild", UIParent)
-	Stat:SetHitRectInsets(-35, -5, -10, -10)
+	Stat:SetHitRectInsets(-30, -5, -10, -10)
 	Stat:SetFrameStrata("BACKGROUND")
 
 --[[ Create icon ]]--
@@ -165,8 +165,8 @@ local function OnEnter(self)
 	
 	-- options
 	tooltip:AddLine(" ", G.Line)
-	tooltip:AddLine(" ", G.OptionColor..GUILD..G.LeftButton)
-	tooltip:AddLine(" ", G.OptionColor..COMMUNITIES_INVITATION_FRAME_TYPE..G.RightButton)
+	tooltip:AddLine(G.OptionColor..G.LeftButton.."+ Shift "..SLASH_WHISPER2:gsub("/(.*)","%1"), G.OptionColor..GUILD..G.LeftButton)
+	tooltip:AddLine(G.OptionColor..G.LeftButton.."+ Alt "..INVITE, G.OptionColor..COMMUNITIES_INVITATION_FRAME_TYPE..G.RightButton)
 
 	tooltip:AddLine(" ")
 	tooltip:AddLine(MEMBERS, ZONE)
