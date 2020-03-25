@@ -8,12 +8,12 @@ local addon, ns = ...
 	ns[3] = {} -- G, globals (Optionnal)
 	ns[4] = {} -- L, localization
 	
-	if diminfo == nil then diminfo = {} end
+	if Kiminfo == nil then Kiminfo = {} end
 	
 local C, F, G, L = unpack(ns)
 
-	G.addon = "diminfo_"
-	G.MediaFolder = "Interface\\AddOns\\diminfo\\Media\\"
+	G.addon = "Kiminfo_"
+	G.MediaFolder = "Interface\\AddOns\\Kiminfo\\Media\\"
 	G.Ccolors = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[select(2, UnitClass("player"))] -- Class color / 職業顏色
 
 ------------
@@ -44,51 +44,52 @@ local C, F, G, L = unpack(ns)
 
 	-- anchor, parent, x, y, width, height, alpha
 	-- 錨點，父級框體，x座標，y座標，寬度，高度，透明度
-	C.Panel1 = {"TOPLEFT", UIParent, 0, -2, 730, 36, 32, .6}
+	C.Panel1 = {"TOPLEFT", UIParent, 0, -2, 530, 36, 32, .6}
 	-- add if you need, max to C.Panel5 / 自己加，最多到C.Panel5
 	
 --------------
 -- Settings --
 --------------
 	
+	-- Timer / 時鐘
+	C.Time = true
+	C.TimePoint =  {"TOPLEFT", UIParent, 20, -12}
+	--C.TimePoint =  {"TOPLEFT", UIParent, 620, -12}
+	
 	-- Bags / 背包
 	C.Bags = true
-	C.BagsPoint = {"TOPLEFT", UIParent, 18, -12}
+	C.BagsPoint = {"LEFT", "Kiminfo_Time", "RIGHT", 24, 0}
+	--C.BagsPoint = {"TOPLEFT", UIParent, 18, -12}
 	
 	-- Memory / 記憶體占用列表
 	C.Memory = true
 	C.MaxAddOns = 30
-	C.MemoryPoint = {"LEFT", "diminfo_Bags", "RIGHT", 16, 0}
+	C.MemoryPoint = {"LEFT", "Kiminfo_Bags", "RIGHT", 10, 0}
 	--C.MemoryPoint = {"TOPLEFT", UIParent, 120, -12}
 	
 	-- System: Fps and latency / 幀數與延遲
 	C.System = true
-	C.SystemPoint = {"LEFT", "diminfo_Mem", "RIGHT", 16, 0}
+	C.SystemPoint = {"LEFT", "Kiminfo_Mem", "RIGHT", 10, 0}
 	--C.SystemPoint = {"TOPLEFT", UIParent, 220, -12}
 	
 	-- 好友
 	C.Friends = true
-	C.FriendsPoint =  {"LEFT", "diminfo_System", "RIGHT", 16, 0}
+	C.FriendsPoint =  {"LEFT", "Kiminfo_System", "RIGHT", 10, 0}
 	--C.FriendsPoint =  {"TOPLEFT", UIParent, 320, -12}
 	
 	-- 公會
 	C.Guild = true
-	C.GuildPoint = {"LEFT", "diminfo_Friends", "RIGHT", 16, 0}
+	C.GuildPoint = {"LEFT", "Kiminfo_Friends", "RIGHT", 10, 0}
 	--C.GuildPoint = {"TOPLEFT", UIParent, 420, -12}
 	
 	-- Durability / 耐久
 	C.Durability = true
-	C.DurabilityPoint = {"LEFT", "diminfo_Guild", "RIGHT", 16, 0}
+	C.DurabilityPoint = {"LEFT", "Kiminfo_Guild", "RIGHT", 10, 0}
 	--C.DurabilityPoint = {"TOPLEFT", UIParent, 520, -12}
 
-	-- Timer / 時鐘
-	C.Time = true
-	C.TimePoint =  {"LEFT", "diminfo_Dura", "RIGHT", 16, 0}
-	--C.TimePoint =  {"TOPLEFT", UIParent, 620, -12}
-	
 	-- Zone text and Position / 地名座標
 	C.Positions = true
-	C.PositionsPoint = {"LEFT", "diminfo_Time", "RIGHT", 16, 0}
+	C.PositionsPoint = {"LEFT", "Kiminfo_Dura", "RIGHT", 24, 0}
 	--C.PositionsPoint = {"TOP", UIParent, 0, -12}
 	
 -------------
@@ -96,6 +97,6 @@ local C, F, G, L = unpack(ns)
 -------------
 
 	-- NDui
-	-- diminfo
+	-- Kiminfo
 	-- Tukz
 	-- Aftermath

@@ -1,0 +1,15 @@
+## Interface: 11304
+## Author: Loshine, EK
+## Title: |cff00ffffKim|rinfo_Classic
+## Notes: Info Data Bar
+## Version: C1
+## SavedVariables: Kiminfo
+## X-Credits: Tukz, Katae, Loshine, DDestruction, msylgj0, Siweia
+
+Libs\Libs.xml
+
+Config.lua
+API.lua
+
+Locale.lua
+Modules\Modules.xml

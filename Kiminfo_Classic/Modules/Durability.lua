@@ -86,14 +86,14 @@ end
 
 --[[ Data text update ]]--
 local function OnEvent(self)
-	if diminfo.AutoRepair == nil then
-		diminfo.AutoRepair = true
+	if Kiminfo.AutoRepair == nil then
+		Kiminfo.AutoRepair = true
 	end
 	
 	local numSlots = getItemDurability()
 	local dcolor = gradientColor((floor(localSlots[1][3]*100)/100))
 	
-	if numSlots > 0 then
+	--[[if numSlots > 0 then
 		if C.ClassColor then
 			Text:SetText(F.Hex(G.Ccolors)..DURABILITY.." |r"..dcolor..math.floor(localSlots[1][3]*100).."|r%")
 		else
@@ -101,7 +101,13 @@ local function OnEvent(self)
 		end
 	else
 		Text:SetText(C.ClassColor and F.Hex(G.Ccolors)..L.None or L.None)
+	end]]--
+	if numSlots > 0 then
+		Text:SetText(F.addIcon(G.Dura, 16, 0, 50)..dcolor..floor(localSlots[1][3]*100))
+	else
+		Text:SetText(F.addIcon(G.Dura, 16, 0, 50)..L.None)
 	end
+	self:SetAllPoints(Text)
 end
 
 --[[ Tooltip update ]]--
@@ -130,7 +136,7 @@ local function OnEnter(self)
 	-- otpions
 	GameTooltip:AddDoubleLine(" ", G.Line)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..CHARACTER_INFO..G.LeftButton)
-	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.AutoRepair..(diminfo.AutoRepair and "|cff55ff55"..ENABLE or "|cffff5555"..DISABLE)..G.RightButton)
+	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.AutoRepair..(Kiminfo.AutoRepair and "|cff55ff55"..ENABLE or "|cffff5555"..DISABLE)..G.RightButton)
 	
 	GameTooltip:Show()
 end
@@ -148,7 +154,7 @@ end
 	--[[ Options ]]--
 	Stat:SetScript("OnMouseDown", function(self, button)
 		if button == "RightButton" then
-			diminfo.AutoRepair = not diminfo.AutoRepair
+			Kiminfo.AutoRepair = not Kiminfo.AutoRepair
 			self:GetScript("OnEnter")(self)
 		else
 			if InCombatLockdown() then
@@ -172,7 +178,7 @@ end
 local RepairGear = CreateFrame("Frame")
 	RepairGear:RegisterEvent("MERCHANT_SHOW")
 	RepairGear:SetScript("OnEvent", function()
-		if (diminfo.AutoRepair == true and CanMerchantRepair()) then
+		if (Kiminfo.AutoRepair == true and CanMerchantRepair()) then
 			local money = GetMoney()
 			local cost, canRepair = GetRepairAllCost()
 			
