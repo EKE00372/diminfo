@@ -131,18 +131,28 @@ local function OnEnter(self)
 	
 	GameTooltip:Show()
 end
+
 --================================================--
 ---------------    [[ Scripts ]]     ---------------
 --================================================--
 	
 	--[[ Tooltip ]]--
-	Stat:SetScript("OnEnter", OnEnter)
+	Stat:SetScript("OnEnter", function(self)
+		-- mouseover color
+		Text:SetTextColor(0, 1, 1)
+		-- tooltip show
+		OnEnter(self)
+	end)
+	
 	Stat:SetScript("OnLeave", function()
+		-- normal color
+		Text:SetTextColor(1, 1, 1)
+		-- tooltip hide
 		GameTooltip:Hide()
 	end)
 	
 	--[[ Data text ]]--
-	Stat:RegisterEvent("PLAYER_ENTERING_WORLD")
+	--Stat:RegisterEvent("PLAYER_ENTERING_WORLD")
 	--Stat:RegisterEvent("UPDATE_INSTANCE_INFO")
 	Stat:SetScript("OnUpdate", OnUpdate)
 	

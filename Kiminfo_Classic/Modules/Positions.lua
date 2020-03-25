@@ -3,6 +3,8 @@ local C, F, G, L = unpack(ns)
 if not C.Positions then return end
 
 local format = string.format
+local subzone, zone, pvp
+local coordX, coordY = 0, 0
 
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
@@ -22,9 +24,6 @@ local Text  = Stat:CreateFontString(nil, "OVERLAY")
 --==================================================--
 ---------------    [[ Functions ]]     ---------------
 --==================================================--
-
-local subzone, zone, pvp
-local coordX, coordY = 0, 0
 
 --[[ Zone text color ]]--
 local zoneColor = {
@@ -84,6 +83,7 @@ end
 --================================================--
 ---------------    [[ Updates ]]     ---------------
 --================================================--
+
 local function OnEvent(self)
 	subzone, zone, pvp = GetSubZoneText(), GetZoneText(), {GetZonePVPInfo()}
 	
