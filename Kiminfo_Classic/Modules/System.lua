@@ -12,32 +12,42 @@ local usageString = "%.3f ms"
 
 --[[ Create elements ]]--
 local Stat = CreateFrame("Frame", G.addon.."System", UIParent)
-	Stat:SetHitRectInsets(-5, -5, -10, -10)
+	Stat:SetHitRectInsets(-65, -5, -10, -10)
 	Stat:SetFrameStrata("BACKGROUND")
 
---[[ Create text ]]--
-local Text  = Stat:CreateFontString(nil, "OVERLAY")
-	Text:SetFont(G.Fonts, G.FontSize, G.FontFlag)
-	Text:SetPoint(unpack(C.SystemPoint))
-	Stat:SetAllPoints(Text)
+-- 反著錨點：PING值會爆，FPS最多只有三位數
+
+--[[ Create ping text ]]--
+local Text1  = Stat:CreateFontString(nil, "OVERLAY")
+	Text1:SetFont(G.Fonts, G.FontSize, G.FontFlag)
+	Text1:SetPoint(unpack(C.SystemPoint))
+	Stat:SetAllPoints(Text1)
+
+--[[ Create ping icon ]]--
+local Icon1 = Stat:CreateTexture(nil, "OVERLAY")
+	Icon1:SetSize(G.FontSize, G.FontSize)
+	Icon1:SetPoint("RIGHT", Stat, "LEFT", 0, 0)
+	Icon1:SetTexture(G.Ping)
+	Icon1:SetVertexColor(1, 1, 1)
+	
+--[[ Create fps text ]]--
+local Text2  = Stat:CreateFontString(nil, "OVERLAY")
+	Text2:SetFont(G.Fonts, G.FontSize, G.FontFlag)
+	Text2:SetPoint("RIGHT", Icon1, "LEFT", 0, 0)
+	
+--[[ Create ping icon ]]--
+local Icon2 = Stat:CreateTexture(nil, "OVERLAY")
+	Icon2:SetSize(G.FontSize, G.FontSize)
+	Icon2:SetPoint("RIGHT", Text2, "LEFT", 0, 0)
+	Icon2:SetTexture(G.Fps)
+	Icon2:SetVertexColor(1, 1, 1)
 
 --==============================================--
 ---------------    [[ Color ]]     ---------------
 --==============================================--
 
---[[ latency color on tooltip ]]--
-local function colorLatencyTooltip(latency)
-	if latency < 300 then
-		return "|cff0CD809"..latency
-	elseif (latency >= 300 and latency < 500) then
-		return "|cffE8DA0F"..latency
-	else
-		return "|cffD80909"..latency
-	end
-end
-
 --[[ latency color on data text ]]--
-local function colorLatency(latency)
+local function colorLatencyTooltip(latency)
 	if latency < 300 then
 		return "|cffffffff"..latency
 	elseif (latency > 300 and latency < 500) then
@@ -47,15 +57,49 @@ local function colorLatency(latency)
 	end
 end
 
+--[[ latency color on data text ]]--
+--[[local function colorLatency(latency)
+	if latency < 300 then
+		return "|cff93FF93"..latency
+	elseif (latency > 300 and latency < 500) then
+		return "|cffFFFF93"..latency
+	else
+		return "|cffFF8040"..latency
+	end
+end]]--
+
+local function colorLatency(latency)
+	if latency < 300 then
+		return .57, 1, .57
+	elseif (latency > 300 and latency < 500) then
+		return 1, 1, .43
+	else
+		return 1, .5, 25
+	end
+	
+	return r, g, b
+end
+
 --[[ fps color on data text ]]--
+--[[local function colorFPS(fps)
+	if fps < 15 then
+		return "|cffFF8040"..fps
+	elseif fps < 30 then
+		return "|cffFFFF93"..fps
+	else
+		return "|cff93FF93"..fps
+	end
+end]]--
 local function colorFPS(fps)
 	if fps < 15 then
-		return "|cffD80909"..fps
+		return 1, .5, 25
 	elseif fps < 30 then
-		return "|cffE8DA0F"..fps
+		return 1, 1, .43
 	else
-		return "|cffffffff"..fps
+		return .57, 1, .57
 	end
+	
+	return r, g, b
 end
 
 --==================================================--
@@ -102,16 +146,30 @@ end
 local function OnUpdate(self, elapsed)
 	self.timer = (self.timer or 0) + elapsed
 	
-	if self.timer > 1 then
-		local _, _, latencyHome, latencyWorld = GetNetStats()
-		
-		local fps = floor(GetFramerate())
-		local lat = math.max(latencyHome, latencyWorld)
-		
-		--Text:SetText(colorFPS(fps).."|rfps "..colorLatency(lat).."|rms")
-		Text:SetText(F.addIcon(G.Fps, 14, 0, 50)..colorFPS(fps).."|r"..F.addIcon(G.Ping, 14, 0, 50)..colorLatency(lat).."|r")
-		
-		self.timer = 0
+	if self.isHover == true then
+		Text1:SetTextColor(0, 1, 1)
+		Text2:SetTextColor(0, 1, 1)
+		Icon1:SetVertexColor(0, 1, 1)
+		Icon2:SetVertexColor(0, 1, 1)
+	else
+		if self.timer > 1 then
+			local _, _, latencyHome, latencyWorld = GetNetStats()
+			
+			local fps = floor(GetFramerate())
+			local lat = math.max(latencyHome, latencyWorld)
+			local fr, fb, fg = colorFPS(fps)
+			local lr, lb, lg = colorLatency(lat)
+			--Text1:SetText(colorLatency(lat))
+			Text1:SetText(lat)
+			Text1:SetTextColor(lr, lb, lg)
+			Icon1:SetVertexColor(lr, lb, lg)
+			--Text2:SetText(colorFPS(fps))
+			Text2:SetText(fps)
+			Text2:SetTextColor(fr, fb, fg)
+			Icon2:SetVertexColor(fr, fb, fg)
+			
+			self.timer = 0
+		end
 	end
 end
 
@@ -173,6 +231,7 @@ end
 ---------------    [[ Scripts ]]     ---------------
 --================================================--
 	
+	
 	--[[ Options ]]--
 	Stat:SetScript("OnMouseDown", function(self, btn)
 		if btn == "RightButton" then
@@ -187,11 +246,25 @@ end
 		self:GetScript("OnEnter")(self)
 	end)
 	
-	--[[ Tooltip ]]--
-	Stat:SetScript("OnEnter", OnEnter)
-	Stat:SetScript("OnLeave", function()
+	--[[ Tooltip ]]-- 
+	Stat:SetScript("OnEnter", function(self)
+		self.isHover = true
+		OnEnter(self)
+		--Icon1:SetVertexColor(0, 1, 1)
+		--Icon2:SetVertexColor(0, 1, 1)
+		--Text1:SetTextColor(0, 1, 1)
+		--Text2:SetTextColor(0, 1, 1)
+		self:GetScript("OnUpdate")
+	end)
+	Stat:SetScript("OnLeave", function(self)
+		self.isHover = false
 		GameTooltip:Hide()
+		--Icon1:SetVertexColor(1, 1, 1)
+		--Icon2:SetVertexColor(1, 1, 1)
+		--Text1:SetTextColor(1, 1, 1)
+		--Text2:SetTextColor(1, 1, 1)
+		self:GetScript("OnUpdate")
 	end)
 	
 	--[[ Data text ]]--
-	Stat:SetScript("OnUpdate", OnUpdate)
+	Stat:SetScript("OnUpdate", OnUpdate)	

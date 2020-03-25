@@ -16,7 +16,7 @@ local BNET_CLIENT_WOWC = "WoC"	-- custom string for classic
 
 --[[ Create elements ]]--
 local Stat = CreateFrame("Frame", G.addon.."Friends", UIParent)
-	Stat:SetHitRectInsets(-35, -5, -10, -10)
+	Stat:SetHitRectInsets(-30, -5, -10, -10)
 	Stat:SetFrameStrata("BACKGROUND")
 
 --[[ Create icon ]]--
@@ -277,8 +277,8 @@ local function OnEnter(self)
 	
 	-- options
 	tooltip:AddLine(" ", " ", G.Line)
-	tooltip:AddLine(" ", " ", G.OptionColor..FRIENDS..G.LeftButton)
-	tooltip:AddLine(" ", " ", G.OptionColor..BATTLENET_BROADCAST..G.RightButton)
+	tooltip:AddLine(G.OptionColor..G.LeftButton.."+ Shift "..SLASH_WHISPER2:gsub("/(.*)","%1"), " ", G.OptionColor..FRIENDS..G.LeftButton)
+	tooltip:AddLine(G.OptionColor..G.LeftButton.."+ Alt "..INVITE, " ", G.OptionColor..BATTLENET_BROADCAST..G.RightButton)
 	
 	if onlineFriends > 0 then
 		buildFriendTable(numberOfFriends)
@@ -308,7 +308,7 @@ local function OnEnter(self)
 					classc = levelc
 				end
 				
-				tooltip:AddLine(levelc..info[2].."|r "..classc..info[1].." |r"..info[5], "",  zonec..info[4])
+				tooltip:AddLine(levelc..info[2].."|r "..classc..info[1].."|r"..info[5], "",  zonec..info[4])
 				
 				local line = tooltip:GetLineCount()
 				tooltip:SetLineScript(line, "OnMouseUp", buttonOnClick, info)
