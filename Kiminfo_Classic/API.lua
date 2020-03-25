@@ -100,10 +100,19 @@ F.CreatePanel = function(anchor, parent, x, y, w, h, size, a)
 	return panel
 end
 
+-- 材質，為免被瞎改還是藏起來吧
+G.Bags = G.MediaFolder.."bags.tga"
+G.Friends = G.MediaFolder.."friends.tga"
+G.Guild = G.MediaFolder.."guild.tga"
+G.Dura = G.MediaFolder.."dura.tga"
+G.Fps = G.MediaFolder.."fps.tga"
+G.Ping = G.MediaFolder.."ping.tga"
+G.Mem = G.MediaFolder.."spell.tga"
+
 G.LeftButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:230:307|t "
 G.RightButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:333:411|t "
 G.MiddleButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:127:204|t "
-	
+
 G.AFK = "|T"..FRIENDS_TEXTURE_AFK..":14:14:0:0:16:16:1:15:1:15|t"
 G.DND = "|T"..FRIENDS_TEXTURE_DND..":14:14:0:0:16:16:1:15:1:15|t"
 
