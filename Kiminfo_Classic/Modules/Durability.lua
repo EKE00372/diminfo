@@ -36,10 +36,9 @@ local function gradientColor(perc)
 	perc = perc > 1 and 1 or perc < 0 and 0 or perc -- Stay between 0-1
 		
 	local seg, relperc = math.modf(perc*2)
-	local r1, g1, b1, r2, g2, b2 = select(seg*3+1, 1, .5, .25, 1, 1, .43, .57, 1, .57, 0, 0, 0) -- R -> Y -> White
+	local r1, g1, b1, r2, g2, b2 = select(seg*3+1, 1, .5, .25, 1, 1, .43, .57, 1, .57, 0, 0, 0) -- R -> Y -> G
 	local r, g, b = r1+(r2-r1)*relperc, g1+(g2-g1)*relperc, b1+(b2-b1)*relperc
 	
-	--return format("|cff%02x%02x%02x", r*255, g*255, b*255), r, g, b
 	return r, g, b
 end
 
@@ -100,10 +99,8 @@ local function OnEvent(self)
 	
 	local numSlots = getItemDurability()
 	local r, g, b = gradientColor((floor(localSlots[1][3]*100)/100))
-	--local hex = format("|cff%02x%02x%02x", r*255, g*255, b*255)
 	
 	if numSlots > 0 then
-		--Text:SetText(hex..floor(localSlots[1][3]*100))
 		Text:SetText(floor(localSlots[1][3]*100))
 		Text:SetTextColor(r, g, b)
 		Icon:SetVertexColor(r, g, b)

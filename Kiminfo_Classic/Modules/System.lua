@@ -58,16 +58,6 @@ local function colorLatencyTooltip(latency)
 end
 
 --[[ latency color on data text ]]--
---[[local function colorLatency(latency)
-	if latency < 300 then
-		return "|cff93FF93"..latency
-	elseif (latency > 300 and latency < 500) then
-		return "|cffFFFF93"..latency
-	else
-		return "|cffFF8040"..latency
-	end
-end]]--
-
 local function colorLatency(latency)
 	if latency < 300 then
 		return .57, 1, .57
@@ -81,15 +71,6 @@ local function colorLatency(latency)
 end
 
 --[[ fps color on data text ]]--
---[[local function colorFPS(fps)
-	if fps < 15 then
-		return "|cffFF8040"..fps
-	elseif fps < 30 then
-		return "|cffFFFF93"..fps
-	else
-		return "|cff93FF93"..fps
-	end
-end]]--
 local function colorFPS(fps)
 	if fps < 15 then
 		return 1, .5, 25
@@ -159,11 +140,11 @@ local function OnUpdate(self, elapsed)
 			local lat = math.max(latencyHome, latencyWorld)
 			local fr, fb, fg = colorFPS(fps)
 			local lr, lb, lg = colorLatency(lat)
-			--Text1:SetText(colorLatency(lat))
+
 			Text1:SetText(lat)
 			Text1:SetTextColor(lr, lb, lg)
 			Icon1:SetVertexColor(lr, lb, lg)
-			--Text2:SetText(colorFPS(fps))
+
 			Text2:SetText(fps)
 			Text2:SetTextColor(fr, fb, fg)
 			Icon2:SetVertexColor(fr, fb, fg)
@@ -250,20 +231,12 @@ end
 	Stat:SetScript("OnEnter", function(self)
 		self.isHover = true
 		OnEnter(self)
-		--Icon1:SetVertexColor(0, 1, 1)
-		--Icon2:SetVertexColor(0, 1, 1)
-		--Text1:SetTextColor(0, 1, 1)
-		--Text2:SetTextColor(0, 1, 1)
-		self:GetScript("OnUpdate")
+		--self:GetScript("OnUpdate")
 	end)
 	Stat:SetScript("OnLeave", function(self)
 		self.isHover = false
 		GameTooltip:Hide()
-		--Icon1:SetVertexColor(1, 1, 1)
-		--Icon2:SetVertexColor(1, 1, 1)
-		--Text1:SetTextColor(1, 1, 1)
-		--Text2:SetTextColor(1, 1, 1)
-		self:GetScript("OnUpdate")
+		--self:GetScript("OnUpdate")
 	end)
 	
 	--[[ Data text ]]--
