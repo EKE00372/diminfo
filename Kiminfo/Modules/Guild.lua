@@ -69,7 +69,7 @@ local function BuildGuildTable()
 			elseif status == 2 then
 				status = G.DND
 			else 
-				status = " "
+				status = ""
 			end
 		end
 		

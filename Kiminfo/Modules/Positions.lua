@@ -155,7 +155,7 @@ end
 			ToggleFrame(WorldMapFrame)
 		else
 			if not IsInInstance() then
-				ChatFrame_OpenChat(format("%s (%s)", zone, formatCoords()), chatFrame)
+				ChatFrame_OpenChat(format("%s - %s (%s)", zone, subzone, formatCoords()), chatFrame)
 			end
 		end
 	end)
