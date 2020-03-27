@@ -2,6 +2,8 @@
 
 A Info Bar.
 
+PS. 本插件僅在Curse、Github和Wowinterface發佈，其他網站均非經過我同意的轉載；並**拒絕wowcat/60addons轉載**，先前委託時光請站點撤除未果，加上去年就帶給我很多麻煩了，特此聲明；我不想這玩意被搬到牆裡，一切非授權搬運之內容與言論均與我無關，意思是有什麼問題都別來找我。
+
 ## Credits
 
 * [Origin](http://www.wowinterface.com/downloads/info20899-diminfo.html#info) by Loshine
@@ -15,7 +17,7 @@ A Info Bar.
 * Class color on names and Config-able panel.
 * No in-game config.
 * Bags
-    * Show bag slot, gold and currency
+    * Show bag slot and gold
 	* Option: auto sell gray
 	* Left click: open bag, right click: auto sell config
 * Durability
