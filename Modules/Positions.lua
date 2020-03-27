@@ -148,10 +148,6 @@ end
 	--[[ Options ]]--
 	Stat:SetScript("OnMouseUp", function(_, btn)
 		if btn == "LeftButton" then
-			if InCombatLockdown() then
-				UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT)
-				return
-			end
 			ToggleFrame(WorldMapFrame)
 		else
 			if not IsInInstance() then
