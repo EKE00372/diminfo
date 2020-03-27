@@ -1,10 +1,12 @@
 ## Interface: 80300
-## Author: Loshine, EK
+## Author: EK
 ## Title: |cff00ffffKim|rinfo
 ## Notes: Info Data Bar
-## Version: R1
+## Version: R2
 ## SavedVariables: Kiminfo
-## X-Credits: Tukz, Katae, Loshine, DDestruction, msylgj0, Siweia
+## X-Credits: Tukz, Katae, Loshine, DDestruction, msylgj0, Siweia, Peter
+
+Libs\Libs.xml
 
 Config.lua
 API.lua

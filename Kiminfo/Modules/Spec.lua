@@ -18,6 +18,7 @@ local Stat = CreateFrame("Frame", G.addon.."Spec", UIParent)
 local Text  = Stat:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(G.Fonts, G.FontSize, G.FontFlag)
 	Text:SetPoint(unpack(C.SpecPoint))
+	Text:SetTextColor(1, 1, 1)
 	Stat:SetAllPoints(Text)
 
 --================================================--
@@ -78,7 +79,7 @@ local function OnEnter(self)
 	
 	-- spec
 	local _, specName, _, specIcon = GetSpecializationInfo(SpecID)
-	GameTooltip:AddLine(F.addIcon(specIcon, 14, 4, 46).." "..specName.."|r")
+	GameTooltip:AddLine(F.addIcon(specIcon, 14, 4, 46).." "..G.OptionColor..specName.."|r")
 	
 	-- telent
 	for t = 1, MAX_TALENT_TIERS do
@@ -126,8 +127,17 @@ end
 --================================================--
 	
 	--[[ Tooltip ]]--
-	Stat:SetScript("OnEnter", OnEnter)
+	Stat:SetScript("OnEnter", function(self)
+		-- mouseover color
+		Text:SetTextColor(0, 1, 1)
+		-- tooltip show
+		OnEnter(self)
+	end)
+	
 	Stat:SetScript("OnLeave", function()
+		-- normal color
+		Text:SetTextColor(1, 1, 1)
+		-- tooltip hide
 		GameTooltip:Hide()
 	end)
 	

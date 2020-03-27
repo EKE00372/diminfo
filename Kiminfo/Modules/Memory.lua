@@ -11,13 +11,21 @@ local sort = table.sort
 
 --[[ Create elements ]]--
 local Stat = CreateFrame("Frame", G.addon.."Mem", UIParent)
-	Stat:SetHitRectInsets(-5, -5, -10, -10)
+	Stat:SetHitRectInsets(-30, -5, -10, -10)
 	Stat:SetFrameStrata("BACKGROUND")
+
+--[[ Create icon ]]--
+local Icon = Stat:CreateTexture(nil, "OVERLAY")
+	Icon:SetSize(G.FontSize+8, G.FontSize+8)
+	Icon:SetPoint("RIGHT", Stat, "LEFT", 0, 0)
+	Icon:SetTexture(G.Mem)
+	Icon:SetVertexColor(1, 1, 1)
 
 --[[ Create text ]]--
 local Text  = Stat:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(G.Fonts, G.FontSize, G.FontFlag)
 	Text:SetPoint(unpack(C.MemoryPoint))
+	Text:SetTextColor(1, 1, 1)
 	Stat:SetAllPoints(Text)
 
 --===============================================--
@@ -192,10 +200,15 @@ end
 	end)
 	
 	--[[ Tooltip ]]-- 
-	Stat:SetScript("OnEnter", OnEnter)
+	Stat:SetScript("OnEnter", function(self)
+		OnEnter(self)
+		Icon:SetVertexColor(0, 1, 1)
+		Text:SetTextColor(0, 1, 1)
+	end)
 	Stat:SetScript("OnLeave", function()
-		entered = false
 		GameTooltip:Hide()
+		Icon:SetVertexColor(1, 1, 1)
+		Text:SetTextColor(1, 1, 1)
 	end)
 	
 	--[[ Data text ]]--

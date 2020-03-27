@@ -13,6 +13,7 @@ local addon, ns = ...
 local C, F, G, L = unpack(ns)
 
 	G.addon = "Kiminfo_"
+	G.MediaFolder = "Interface\\AddOns\\Kiminfo\\Media\\"
 	G.Ccolors = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[select(2, UnitClass("player"))] -- Class color / 職業顏色
 
 ------------
@@ -20,19 +21,18 @@ local C, F, G, L = unpack(ns)
 ------------
 
 	C.Panel = true			-- Enable panel / 啟用面板
-	C.ClassColor = true		-- Enable font color / 啟用職業染色
 
 -----------
 -- Media --
 -----------
 
-	G.MediaFolder = "Interface\\AddOns\\Kiminfo\\Media\\"
 	G.Tex = G.MediaFolder.."bar.tga"
 	G.Fonts = STANDARD_TEXT_FONT		-- 字型 / Font
 	G.FontSize = 16						-- 大小 / Font size
 	G.FontFlag = "OUTLINE"				-- 描邊 / Font outline
 
 	G.Line = "|cff7b8489---------------|r"
+	G.TitleColor = "|cff0099ff"		-- .6, .8, 1 /or .4, .78, .1
 	G.OptionColor = "|cff99ccff"		-- .6, .8, 1 /or .4, .78, .1
 	G.ErrColor = "|cffff0000"			-- 1, 0, 0
 	
@@ -51,24 +51,23 @@ local C, F, G, L = unpack(ns)
 	
 	-- Timer / 時鐘
 	C.Time = true
-	--C.TimePoint = {"TOP", Minimap, "BOTTOM", 0, 8}
 	C.TimePoint =  {"TOPLEFT", UIParent, 185, -30}
 	
 	-- Friends / 好友
 	C.Friends = true
-	C.FriendsPoint =  {"LEFT", "Kiminfo_Time", "RIGHT", 20, 0}
+	C.FriendsPoint =  {"LEFT", "Kiminfo_Time", "RIGHT", 30, 0}
 	
 	-- Guild / 公會
 	C.Guild = true
-	C.GuildPoint = {"LEFT", "Kiminfo_Friends", "RIGHT", 10, 0}
+	C.GuildPoint = {"LEFT", "Kiminfo_Friends", "RIGHT", 30, 0}
 	
 	-- Bags / 背包
 	C.Bags = true
-	C.BagsPoint = {"LEFT", "Kiminfo_Guild", "RIGHT", 10, 0}
+	C.BagsPoint = {"LEFT", "Kiminfo_Guild", "RIGHT", 30, 0}
 	
 	-- Durability / 耐久
 	C.Durability = true
-	C.DurabilityPoint = {"LEFT", "Kiminfo_Bags", "RIGHT", 10, 0}
+	C.DurabilityPoint = {"LEFT", "Kiminfo_Bags", "RIGHT", 30, 0}
 
 	-- Zone and Position / 地名座標
 	C.Positions = true
@@ -81,9 +80,9 @@ local C, F, G, L = unpack(ns)
 	
 	-- System: Fps and latency / 幀數與延遲
 	C.System = true
-	C.SystemPoint = {"LEFT", "Kiminfo_Mem", "RIGHT", 10, 0}
+	C.SystemPoint = {"LEFT", "Kiminfo_Mem", "RIGHT", 70, 0}
 	
-	-- Spec and Loot Spec
+	-- Spec: Spec and Loot Spec
 	C.Spec = true
 	C.SpecPoint =  {"LEFT", "Kiminfo_System", "RIGHT", 15, 0}
 	
@@ -92,9 +91,10 @@ local C, F, G, L = unpack(ns)
 -------------
 
 	-- NDui
-	-- Kiminfo
+	-- diminfo
 	-- Tukz
 	-- Aftermath
+	-- HopeASD
 	
 	-- C_Map.GetPlayerMapPosition Memory Usage
 	-- https://www.wowinterface.com/forums/showthread.php?t=56290
