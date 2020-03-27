@@ -26,11 +26,11 @@ local Text  = Stat:CreateFontString(nil, "OVERLAY")
 --==================================================--
 
 --[[ Data text color gardient ]]--
-local function GradientColor(perc, r, g, b)
+local function GradientColor(perc)
 	perc = perc > 1 and 1 or perc < 0 and 0 or perc -- Stay between 0-1
 	
 	local seg, relperc = math.modf(perc*2)
-	local r1, g1, b1, r2, g2, b2 = select(seg*3+1, 1, 0, 0, 1, 1, 0, r, g, b, 0, 0, 0) -- R -> Y -> r, g, b
+	local r1, g1, b1, r2, g2, b2 = select(seg*3+1, 1, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0) -- R -> Y -> White
 	local r, g, b = r1+(r2-r1)*relperc, g1+(g2-g1)*relperc, b1+(b2-b1)*relperc
 	
 	return format("|cff%02x%02x%02x", r*255, g*255, b*255), r, g, b
@@ -91,7 +91,7 @@ local function OnEvent(self)
 	end
 	
 	local numSlots = getItemDurability()
-	local dcolor = GradientColor((floor(localSlots[1][3]*100)/100), 1, 1, 1)
+	local dcolor = GradientColor((floor(localSlots[1][3]*100)/100))
 	
 	if numSlots > 0 then
 		Text:SetText(F.addIcon(G.Dura, 16, 0, 50)..dcolor..floor(localSlots[1][3]*100))
