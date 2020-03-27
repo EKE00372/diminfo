@@ -12,8 +12,15 @@ local sort = table.sort
 
 --[[ Create elements ]]--
 local Stat = CreateFrame("Frame", G.addon.."Dura", UIParent)
-	Stat:SetHitRectInsets(-5, -5, -10, -10)
+	Stat:SetHitRectInsets(-30, -5, -10, -10)
 	Stat:SetFrameStrata("BACKGROUND")
+
+--[[ Create icon ]]--
+local Icon = Stat:CreateTexture(nil, "OVERLAY")
+	Icon:SetSize(G.FontSize+8, G.FontSize+8)
+	Icon:SetPoint("RIGHT", Stat, "LEFT", 0, 0)
+	Icon:SetTexture(G.Dura)
+	Icon:SetVertexColor(1, 1, 1)
 
 --[[ Create text ]]--
 local Text  = Stat:CreateFontString(nil, "OVERLAY")
@@ -30,10 +37,10 @@ local function GradientColor(perc)
 	perc = perc > 1 and 1 or perc < 0 and 0 or perc -- Stay between 0-1
 	
 	local seg, relperc = math.modf(perc*2)
-	local r1, g1, b1, r2, g2, b2 = select(seg*3+1, 1, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0) -- R -> Y -> White
+	local r1, g1, b1, r2, g2, b2 = select(seg*3+1, 1, .5, .25, 1, 1, .43, .57, 1, .57, 0, 0, 0) -- R -> Y -> G
 	local r, g, b = r1+(r2-r1)*relperc, g1+(g2-g1)*relperc, b1+(b2-b1)*relperc
 	
-	return format("|cff%02x%02x%02x", r*255, g*255, b*255), r, g, b
+	return r, g, b
 end
 
 --[[ Slots ]]--
@@ -91,13 +98,18 @@ local function OnEvent(self)
 	end
 	
 	local numSlots = getItemDurability()
-	local dcolor = GradientColor((floor(localSlots[1][3]*100)/100))
+	local r, g, b = GradientColor((floor(localSlots[1][3]*100)/100))
 	
 	if numSlots > 0 then
-		Text:SetText(F.addIcon(G.Dura, 16, 0, 50)..dcolor..floor(localSlots[1][3]*100))
+		Text:SetText(floor(localSlots[1][3]*100))
+		Text:SetTextColor(r, g, b)
+		Icon:SetVertexColor(r, g, b)
 	else
-		Text:SetText(F.addIcon(G.Dura, 16, 0, 50)..L.None)
+		Text:SetText(L.None)
+		Text:SetTextColor(1, 1, 1)
+		Icon:SetVertexColor(1, 1, 1)
 	end
+	self:SetAllPoints(Text)
 end
 
 --[[ Tooltip update ]]--
@@ -134,8 +146,18 @@ end
 --================================================--
 	
 	--[[ Tooltip ]]--
-	Stat:SetScript("OnEnter", OnEnter)
-	Stat:SetScript("OnLeave", function()
+	Stat:SetScript("OnEnter", function(self)
+		-- mouseover color
+		Icon:SetVertexColor(0, 1, 1)
+		Text:SetTextColor(0, 1, 1)
+		-- tooltip show
+		OnEnter(self)
+	end)
+	
+	Stat:SetScript("OnLeave", function(self)
+		-- refresh data text color
+		self:GetScript("OnEvent")(self)
+		-- tooltip hide
 		GameTooltip:Hide()
 	end)
 	

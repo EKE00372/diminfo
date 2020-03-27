@@ -10,13 +10,21 @@ local format = string.format
 
 --[[ Create elements ]]--
 local Stat = CreateFrame("Frame", G.addon.."Bags", UIParent)
-	Stat:SetHitRectInsets(-5, -5, -10, -10)
+	Stat:SetHitRectInsets(-30, -5, -10, -10)
 	Stat:SetFrameStrata("BACKGROUND")
+
+--[[ Create icon ]]--
+local Icon = Stat:CreateTexture(nil, "OVERLAY")
+	Icon:SetSize(G.FontSize, G.FontSize)
+	Icon:SetPoint("RIGHT", Stat, "LEFT", 0, 0)
+	Icon:SetTexture(G.Bags)
+	Icon:SetVertexColor(1, 1, 1)
 
 --[[ Create text ]]--
 local Text  = Stat:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(G.Fonts, G.FontSize, G.FontFlag)
 	Text:SetPoint(unpack(C.BagsPoint))
+	Text:SetTextColor(1, 1, 1)
 	Stat:SetAllPoints(Text)
 
 --==================================================--
@@ -45,7 +53,7 @@ local function OnEvent(self)
 	end
 
 	local free = getBagSlots()
-	Text:SetText(F.addIcon(G.Bags, 12, 0, 50)..free)
+	Text:SetText(free)
 	self:SetAllPoints(Text)
 end
 
@@ -63,7 +71,7 @@ local function OnEnter(self)
 	-- bag slot
 	GameTooltip:AddLine(G.OptionColor..BAGSLOT)
 	GameTooltip:AddDoubleLine(USE, used, 1, 1, 1, 1, 1, 1)
-	GameTooltip:AddDoubleLine(MONEY, format("%.f", (money * 0.0001)), 1, 1, 1, 1, 1, 1)
+	GameTooltip:AddDoubleLine(MONEY, GetMoneyString(money), 1, 1, 1, 1, 1, 1)
 	
 	-- currency
 	for i = 1, GetNumWatchedTokens() do
@@ -100,8 +108,19 @@ end
 --================================================--
 	
 	--[[ Tooltip ]]--
-	Stat:SetScript("OnEnter", OnEnter)
+	Stat:SetScript("OnEnter", function(self)
+		-- mouseover color
+		Icon:SetVertexColor(0, 1, 1)
+		Text:SetTextColor(0, 1, 1)
+		-- tooltip show
+		OnEnter(self)
+	end)
+	
 	Stat:SetScript("OnLeave", function()
+		-- normal color
+		Icon:SetVertexColor(1, 1, 1)
+		Text:SetTextColor(1, 1, 1)
+		-- tooltip hide
 		GameTooltip:Hide()
 	end)
 	

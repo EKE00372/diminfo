@@ -17,6 +17,7 @@ local Stat = CreateFrame("Frame", G.addon.."Time", UIParent)
 local Text  = Stat:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(G.Fonts, G.FontSize, G.FontFlag)
 	Text:SetPoint(unpack(C.TimePoint))
+	Text:SetTextColor(1, 1, 1)
 	Stat:SetAllPoints(Text)
 	
 --==================================================--
@@ -216,8 +217,17 @@ end
 --================================================--
 	
 	--[[ Tooltip ]]--
-	Stat:SetScript("OnEnter", OnEnter)
+	Stat:SetScript("OnEnter", function(self)
+		-- mouseover color
+		Text:SetTextColor(0, 1, 1)
+		-- tooltip show
+		OnEnter(self)
+	end)
+	
 	Stat:SetScript("OnLeave", function()
+		-- normal color
+		Text:SetTextColor(1, 1, 1)
+		-- tooltip hide
 		GameTooltip:Hide()
 	end)
 	

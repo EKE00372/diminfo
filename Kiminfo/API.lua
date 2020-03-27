@@ -1,6 +1,13 @@
 local addon, ns = ... 
 local C, F, G, L = unpack(ns)
 
+-- localized references for global functions (about 50% faster)
+local format = string.format
+
+--================================================--
+---------------    [[ Convert ]]     ---------------
+--================================================--
+
 F.Hex = function(r, g, b)
 	-- 未定義則白色
 	if not r then return "|cffFFFFFF" end
@@ -16,13 +23,15 @@ F.Hex = function(r, g, b)
 	return ("|cff%02x%02x%02x"):format(r * 255, g * 255, b * 255)
 end
 
+-- 職業列表轉換
 F.ClassList = {}
-for k,v in pairs(LOCALIZED_CLASS_NAMES_MALE) do
-	--[[if F.ClassList == v then
-		F.ClassList = k
-	end]]
+for k, v in pairs(LOCALIZED_CLASS_NAMES_MALE) do
 	F.ClassList[v] = k
 end
+
+--===================================================--
+---------------    [[ Custom api ]]     ---------------
+--===================================================--
 
 -- 多重條件
 F.Multicheck = function(check, ...)
@@ -31,6 +40,7 @@ F.Multicheck = function(check, ...)
 			return true
 		end
 	end
+	
 	return false
 end
 
@@ -40,11 +50,16 @@ F.addIcon = function(texture, size, cut1, cut2)
 	return texture
 end
 
+--==============================================--
+---------------    [[ Panel ]]     ---------------
+--==============================================--
+
 -- 創建框架
 F.CreatePanel = function(anchor, parent, x, y, w, h, size, a)
 	local panel = CreateFrame("Frame", nil, parent)
 	local framelvl = parent:GetFrameLevel()
 	
+	-- 中間
     panel:SetWidth(w)
 	panel:SetHeight(h)
 	panel:ClearAllPoints()
@@ -55,8 +70,9 @@ F.CreatePanel = function(anchor, parent, x, y, w, h, size, a)
 	panel.bg = panel:CreateTexture(nil, "BACKGROUND")
 	panel.bg:SetAllPoints(panel)
 	panel.bg:SetTexture(G.Tex)
-	panel.bg:SetVertexColor(.1, .1, .1, .8)
+	panel.bg:SetVertexColor(.1, .1, .1, a)
 	
+	-- 左側漸變
 	local left = CreateFrame("Frame", nil, parent)
 	left:SetSize(40, h)
 	left:ClearAllPoints()
@@ -67,8 +83,9 @@ F.CreatePanel = function(anchor, parent, x, y, w, h, size, a)
 	left.bg = left:CreateTexture(nil, "BACKGROUND")
 	left.bg:SetAllPoints(left)
 	left.bg:SetTexture(G.Tex)
-	left.bg:SetGradientAlpha("HORIZONTAL", .1,.1,.1, 0, .1,.1,.1, a)
+	left.bg:SetGradientAlpha("HORIZONTAL", .1, .1, .1, 0, .1, .1, .1, a)
 	
+	-- 右側漸變
 	local right = CreateFrame("Frame", nil, parent)
 	right:SetSize(40, h)
 	right:ClearAllPoints()
@@ -79,18 +96,16 @@ F.CreatePanel = function(anchor, parent, x, y, w, h, size, a)
 	right.bg = right:CreateTexture(nil, "BACKGROUND")
 	right.bg:SetAllPoints(right)
 	right.bg:SetTexture(G.Tex)
-	right.bg:SetGradientAlpha("HORIZONTAL", .1,.1,.1, a, .1,.1,.1, 0)
+	right.bg:SetGradientAlpha("HORIZONTAL", .1, .1, .1, a, .1, .1, .1, 0)
 
 	return panel
 end
 
-if C.Panel1 then F.CreatePanel(unpack(C.Panel1)) end
-if C.Panel2 then F.CreatePanel(unpack(C.Panel2)) end
-if C.Panel3 then F.CreatePanel(unpack(C.Panel3)) end
-if C.Panel4 then F.CreatePanel(unpack(C.Panel4)) end
-if C.Panel5 then F.CreatePanel(unpack(C.Panel5)) end
-if C.Panel6 then F.CreatePanel(unpack(C.Panel6)) end
+--================================================--
+---------------    [[ Texture ]]     ---------------
+--================================================--
 
+-- 材質，為免被瞎改還是藏起來吧
 G.Bags = G.MediaFolder.."bags.tga"
 G.Friends = G.MediaFolder.."friends.tga"
 G.Guild = G.MediaFolder.."guild.tga"
@@ -105,3 +120,11 @@ G.MiddleButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:
 	
 G.AFK = "|T"..FRIENDS_TEXTURE_AFK..":14:14:0:0:16:16:1:15:1:15|t"
 G.DND = "|T"..FRIENDS_TEXTURE_DND..":14:14:0:0:16:16:1:15:1:15|t"
+
+if not C.Panel then return end
+
+if C.Panel1 then F.CreatePanel(unpack(C.Panel1)) end
+if C.Panel2 then F.CreatePanel(unpack(C.Panel2)) end
+if C.Panel3 then F.CreatePanel(unpack(C.Panel3)) end
+if C.Panel4 then F.CreatePanel(unpack(C.Panel4)) end
+if C.Panel5 then F.CreatePanel(unpack(C.Panel5)) end
