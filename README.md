@@ -2,6 +2,8 @@
 
 A Info Bar.
 
+PS. 本插件僅在Curse、Github和Wowinterface發佈，其他網站均非經過我同意的轉載；並**拒絕wowcat/60addons轉載**，先前委託時光請站點撤掉我的插件不要轉載沒有回應，加上去年就帶給我很多麻煩了，所以我不想這玩意被搬到牆裡。
+
 ## Credits
 
 * [Origin](http://www.wowinterface.com/downloads/info20899-diminfo.html#info) by Loshine
