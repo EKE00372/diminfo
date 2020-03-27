@@ -108,7 +108,7 @@ local function OnUpdate(self, elapsed)
 		local fps = floor(GetFramerate())
 		local lat = math.max(latencyHome, latencyWorld)
 		
-		Text:SetText(colorFPS(fps).."|rfps "..colorLatency(lat).."|rms")
+		Text:SetText(colorFPS(fps).."|rfps"..colorLatency(lat).."|rms")
 		
 		self.timer = 0
 	end

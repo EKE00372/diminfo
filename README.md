@@ -4,25 +4,45 @@ A Info Bar.
 
 ## Credits
 
-*   [Origin](http://www.wowinterface.com/downloads/info20899-diminfo.html#info) by Loshine
-*   [2015 Fix](http://bbs.ngacn.cc/read.php?tid=7873497) by DDestruction
-*   [2016 fix](http://bbs.ngacn.cc/read.php?tid=9139695) by msylgj0
-*   [NDui](https://github.com/siweia/NDui)
-*   [AftermathUI](https://git.tukui.org/Aftermathhqt/AftermathhUI/tree/master)
+* [Origin](http://www.wowinterface.com/downloads/info20899-diminfo.html#info) by Loshine
+* [NDui](https://github.com/siweia/NDuiClassic/tree/master/Interface/AddOns/NDui/Modules/Infobar)
+* Code support: HopeASD
+* Texture provide: Peterodox
 
 ## Modules
 
-*   8 Modules:
-    * Bags: auto sell gray
-    * Durability: talent on tooltip
-	* Friends
-	* Guild
-	* Memory: auto collect garbage
-	* Positions: coordinate on tooltip
-	* System
-	* Time
-*   With tooltip and some frame toggle when click.
-*   make addon frame anchor-able.
-*   use global strings on translate if it's possible.
-*   class color on names.
-*   Config-able panel.
+* 8 Modules: Bags, Durability, Friends, Guild, Memory, System, Time and Positions
+* Class color on names and Config-able panel.
+* No in-game config.
+* Bags
+    * Show bag slot, gold and currency
+	* Option: auto sell gray
+	* Left click: open bag, right click: auto sell config
+* Durability
+    * Show durability and talents, color gardient to red when low durability
+	* Option: auto repair
+	* Left click: charactor frmae, right click: auto repair config
+* Friends
+    * Show online friends
+	* List retail wow friends as desaturate icon, shift when mouseover to show full BattleTag
+	* Left click: friends frame, right click: post battle.net broadcast
+	* Shift + Left click: send message, Alt + left click: invite
+* Guild
+    * Show online guild members
+	* List as guild rank, shift when mouseover to reverse sequence
+	* Left click: guild frame, right click: community frame
+	* Shift + Left click: send massage, Alt + left click: invite
+* Memory
+    * Show addon memory usage, list all addon usage
+	* Option: auto collect
+	* Left click: collect memory manually, right click: auto collect config
+* Positions
+    * Show zone text and update xy coord when mouseover
+	* Left click: world map, right click: post coord
+* System
+    * Show latency and fps, color gardient to red when low fps and high latency
+	* Option: List addon cpu usage
+	* Right click: enable addon cpu usage monitor
+* Time
+    * Show time, list dungeon CDs when mouseover
+	* Left click: calender, right click: time manager

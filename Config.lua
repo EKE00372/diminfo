@@ -28,7 +28,6 @@ local C, F, G, L = unpack(ns)
 -----------
 
 	G.Tex = G.MediaFolder.."bar.tga"
-	G.Glow = G.MediaFolder.."glow.tga"
 	G.Fonts = STANDARD_TEXT_FONT		-- 字型 / Font
 	G.FontSize = 16						-- 大小 / Font size
 	G.FontFlag = "OUTLINE"				-- 描邊 / Font outline
@@ -66,12 +65,12 @@ local C, F, G, L = unpack(ns)
 	C.SystemPoint = {"LEFT", "diminfo_Mem", "RIGHT", 16, 0}
 	--C.SystemPoint = {"TOPLEFT", UIParent, 220, -12}
 	
-	-- 好友
+	-- 好友 / Friends
 	C.Friends = true
 	C.FriendsPoint =  {"LEFT", "diminfo_System", "RIGHT", 16, 0}
 	--C.FriendsPoint =  {"TOPLEFT", UIParent, 320, -12}
 	
-	-- 公會
+	-- 公會 / Guild
 	C.Guild = true
 	C.GuildPoint = {"LEFT", "diminfo_Friends", "RIGHT", 16, 0}
 	--C.GuildPoint = {"TOPLEFT", UIParent, 420, -12}
@@ -96,6 +95,7 @@ local C, F, G, L = unpack(ns)
 -------------
 
 	-- NDui
+	-- https://github.com/siweia/NDuiClassic/tree/master/Interface/AddOns/NDui/Modules/Infobar
 	-- diminfo
-	-- Tukz
-	-- Aftermath
+	-- https://www.wowinterface.com/downloads/info20899-diminfo.html
+	-- HopeASD, Peterodox

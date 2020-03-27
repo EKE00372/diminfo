@@ -1,17 +1,16 @@
 ## Interface: 11304
-## Author: Loshine, EK
+## Author: Loshine, funupdate by EK
 ## Title: |cff777777dim|rinfo_Classic
-## Notes: Info Data Bar
-## Version: C1.4
+## Notes: Info Bar
+## Version: C2
 ## SavedVariables: diminfo
-## X-Credits: Tukz, Katae, Loshine, DDestruction, msylgj0, Siweia
+## X-Credits: Siweia, HopeASD, Peterodox
 
-Libs\LibStub.lua
-Libs\LibQTip-1.0.lua
+Libs\Libs.xml
 
 Config.lua
 API.lua
 
 Locale.lua
 diminfo.xml
-Panel.lua
+

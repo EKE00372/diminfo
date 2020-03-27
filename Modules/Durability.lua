@@ -95,9 +95,9 @@ local function OnEvent(self)
 	
 	if numSlots > 0 then
 		if C.ClassColor then
-			Text:SetText(F.Hex(G.Ccolors)..DURABILITY.." |r"..dcolor..math.floor(localSlots[1][3]*100).."|r%")
+			Text:SetText(F.Hex(G.Ccolors)..DURABILITY.."|r "..dcolor..math.floor(localSlots[1][3]*100).."|r%")
 		else
-			Text:SetText(DURABILITY..dcolor..math.floor(localSlots[1][3]*100).."|r%")
+			Text:SetText(DURABILITY..dcolor.." "..math.floor(localSlots[1][3]*100).."|r%")
 		end
 	else
 		Text:SetText(C.ClassColor and F.Hex(G.Ccolors)..L.None or L.None)
@@ -151,10 +151,6 @@ end
 			diminfo.AutoRepair = not diminfo.AutoRepair
 			self:GetScript("OnEnter")(self)
 		else
-			if InCombatLockdown() then
-				UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT)
-				return
-			end
 			ToggleCharacter("PaperDollFrame")
 		end
 	end)

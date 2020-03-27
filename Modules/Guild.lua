@@ -27,6 +27,19 @@ local Text  = Stat:CreateFontString(nil, "OVERLAY")
 ---------------    [[ Functions ]]     ---------------
 --==================================================--
 
+-- Click function
+local function OnClick(self, name, btn)
+	if btn == "LeftButton" then
+		if IsAltKeyDown() then
+			InviteToGroup(name)
+		elseif IsShiftKeyDown() then
+			ChatFrame_OpenChat("/w "..name.." ", SELECTED_DOCK_FRAME)
+		else
+			return
+		end
+	end
+end
+
 -- sort by/排序
 local function SortGuildTable(shift)
 		sort(guildTable, function(a, b)
@@ -82,6 +95,27 @@ local function OnEvent(self, event, ...)
 	end
 end
 
+-- hide QTip tooltip
+local function OnRelease(self)
+	LibQTip:Release(self.tooltip)
+	self.tooltip = nil  
+end  
+
+-- Update when mouseover tooltip
+local function OnUpdate(self, elapsed)
+	self.timer = (self.timer or 0) + elapsed
+	
+	if self.timer > .1 then
+		if not self:IsMouseOver() then
+			if not self.tooltip:IsMouseOver() then
+				OnRelease(self)
+				self:SetScript("OnUpdate", nil)
+			end
+		end
+		self.timer = 0
+	end
+end
+
 local function OnEnter(self)
 	if not IsInGuild() then return end
 	
@@ -93,9 +127,7 @@ local function OnEnter(self)
 	BuildGuildTable()
 	
 	local tooltip = LibQTip:Acquire("diminfoGuildTooltip", 2, "LEFT", "RIGHT")
-	tooltip:SetAutoHideDelay(.1, self)
-	tooltip:SmartAnchorTo(self)
-	
+	tooltip:SetPoint("TOP", self, "BOTTOM", 0, -10)
 	tooltip:Clear()
 	tooltip:AddHeader(G.TitleColor..guildName, G.TitleColor..(format("%d/%d", online, total)))
 	tooltip:AddHeader(G.TitleColor..RANK, G.TitleColor..guildRank)
@@ -117,13 +149,13 @@ local function OnEnter(self)
 	
 	-- options
 	tooltip:AddLine(" ", G.Line)
-	tooltip:AddLine(" ", G.OptionColor..GUILD..G.LeftButton)
-	tooltip:AddLine(" ", G.OptionColor..COMMUNITIES_INVITATION_FRAME_TYPE..G.RightButton)
+	tooltip:AddLine(G.OptionColor..G.LeftButton.."+ Shift "..SLASH_WHISPER2:gsub("/(.*)","%1"), G.OptionColor..GUILD..G.LeftButton)
+	tooltip:AddLine(G.OptionColor..G.LeftButton.."+ Alt "..INVITE, G.OptionColor..COMMUNITIES_INVITATION_FRAME_TYPE..G.RightButton)
 
 	tooltip:AddLine(" ")
 	tooltip:AddLine(MEMBERS, ZONE)
 	tooltip:AddSeparator(2, .6, .8, 1)
-	
+
 	for i = 1, #guildTable do
 		-- get table
 		local info = guildTable[i]
@@ -137,18 +169,29 @@ local function OnEnter(self)
 				zonec = F.Hex(.65, .65, .65)
 			end
 			
-			local levelc = F.Hex(GetQuestDifficultyColor(info[4]))
-			local classc = F.Hex((CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[info[8]])
 			local name = info[1]:match("[^-]+")	-- hide realm
+			local levelc = F.Hex(GetQuestDifficultyColor(info[4]))
+			local classc
+			if info[8] == "SHAMAN" then
+				classc = F.Hex(0, .6, 1)
+			else
+				classc = F.Hex((CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[info[8]])
+			end
 			
-			--guildTable[count] = { name, rank, rankindex, level, zone, connected, status, class, mobile }
-			--tooltip:AddLine(levelc..info[4].."|r "..classc..info[1].."|r"..info[7], zonec..info[5])
+			if classc == nil then
+				classc = levelc
+			end
+
 			tooltip:AddLine(levelc..info[4].."|r "..classc..name.."|r"..info[7], zonec..info[5])
+			
+			local line = tooltip:GetLineCount()
+			tooltip:SetLineScript(line, "OnMouseUp", OnClick, info[1])
 		end
 	end
 		
 	tooltip:UpdateScrolling(600)
 	tooltip:Show()
+	
 	self.tooltip = tooltip
 end
 
@@ -158,9 +201,11 @@ end
 	
 	--[[ Tooltip ]]--
 	Stat:SetScript("OnEnter", OnEnter)
-	--[[Stat:SetScript("OnLeave", function()
-		GameTooltip:Hide()
-	end)]]--
+	Stat:SetScript("OnLeave", function(self)
+		-- tooltip hide
+		if not self.tooltip then return end
+		self:SetScript("OnUpdate", OnUpdate)
+	end)
 	
 	--[[ Options ]]--
 	Stat:SetScript("OnMouseDown", function(self, button)
