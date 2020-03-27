@@ -17,7 +17,7 @@ PS. 本插件僅在Curse、Github和Wowinterface發佈，其他網站均非經�
 * Class color on names and Config-able panel.
 * No in-game config.
 * Bags
-    * Show bag slot, gold and currency
+    * Show bag slot and gold
 	* Option: auto sell gray
 	* Left click: open bag, right click: auto sell config
 * Durability
