@@ -3,7 +3,6 @@ local C, F, G, L = unpack(ns)
 
 local getLocale = GetLocale()
 	if getLocale == "zhTW" then
-		
 		L.AutoSell = "自動賣垃圾："
 		L.TrashSold = "垃圾售出："
 		
@@ -23,9 +22,6 @@ local getLocale = GetLocale()
 		
 		L.XY = "發送座標"
 		
-		L.Spec = "專精"
-		L.Loot = LOOT
-		
 		L.Home = "本地"
 		L.World = "世界"
 		L.CPU = "顯示 CPU 占用比例："
@@ -35,9 +31,7 @@ local getLocale = GetLocale()
 		L.App = "魔獸好戰友"
 		L.Mobile = "行動裝置"
 		L.Desktop = "應用程式"
-		
 	elseif getLocale == "zhCN" then
-		
 		L.AutoSell = "自动卖垃圾："
 		L.TrashSold = "垃圾售出："
 		
@@ -57,9 +51,6 @@ local getLocale = GetLocale()
 		
 		L.XY = "发送座标"
 		
-		L.Spec = "专精"
-		L.Loot = "拾取"
-		
 		L.Home = "本地"
 		L.World = "世界"
 		L.CPU = "显示CPU占用比例："
@@ -69,9 +60,7 @@ local getLocale = GetLocale()
 		L.App = "随身助手"
 		L.Mobile = "移动装置"
 		L.Desktop = "桌面应用"	
-	
 	else
-		
 		L.AutoSell = "Auto Sell junk: "
 		L.TrashSold = "Trash sold, earned "
 		
@@ -90,9 +79,6 @@ local getLocale = GetLocale()
 		L.AutoCollect = "Auto Collect Memory: "
 		
 		L.XY = "Coordinates broadcast"
-		
-		L.Spec = "Spec"
-		L.Loot = LOOT
 		
 		L.Home = "Home"
 		L.World = "World"
