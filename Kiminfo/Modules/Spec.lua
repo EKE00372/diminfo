@@ -26,17 +26,21 @@ local Text  = Stat:CreateFontString(nil, "OVERLAY")
 --================================================--
 
 --[[ right-click menu ]]--
-local menuFrame = CreateFrame("Frame", "LootSpecMenu", UIParent, "UIDropDownMenuTemplate")
-local menuList = {
+local lootMenuFrame = CreateFrame("Frame", "LootSpecMenu", UIParent, "UIDropDownMenuTemplate")
+local lootMenuList = {
 	-- title
 	{ text = SELECT_LOOT_SPECIALIZATION, isTitle = true, notCheckable = true },
-	-- default
-	{notCheckable = true, func = function() SetLootSpecialization(0) end },
+	-- default and 4 spec
+	{},	{},	{},	{},	{},
+}
+
+--[[ middle-click menu ]]--
+local specMenuFrame = CreateFrame("Frame", "SpecMenu", UIParent, "UIDropDownMenuTemplate")
+local specMenuList = {
+	-- title
+	{ text = SPECIALIZATION, isTitle = true, notCheckable = true },
 	-- 4 spec
-	{notCheckable = true},
-	{notCheckable = true},
-	{notCheckable = true},
-	{notCheckable = true},
+	{},	{},	{},	{},
 }
 
 --================================================--
@@ -149,23 +153,47 @@ end
 	
 	--[[ Options ]]--
 	Stat:SetScript("OnMouseDown", function(self, button)
-		local SpecID = GetSpecialization()
-		if not SpecID then return end
+		-- hide tooltip when dropdown menu pop
+		GameTooltip:Hide()
+		
+		-- to get current spec id index
+		local ID = GetSpecialization()
+		if not ID then return end
+		-- to get current spec info
+		local specID, specName = GetSpecializationInfo(ID)
+		-- to get currnet loot spec
+		local LootSpec = GetLootSpecialization()
 		
 		if button == "RightButton" then
-			local specID, specName = GetSpecializationInfo(SpecID)
 			for i = 1, 4 do
-				menuList[2].text = format(LOOT_SPECIALIZATION_DEFAULT, specName)
-				local id, name = GetSpecializationInfo(i)
+				lootMenuList[2].text = format(LOOT_SPECIALIZATION_DEFAULT, specName)
+				lootMenuList[2].func = function() SetLootSpecialization(0) end
+				lootMenuList[2].checked = LootSpec == 0 and true or false
 				
+				local id, name = GetSpecializationInfo(i)
 				if id then
-					menuList[i+2].text = name
-					menuList[i+2].func = function() SetLootSpecialization(id) end
+					lootMenuList[i+2].text = name
+					lootMenuList[i+2].func = function() SetLootSpecialization(id) end
+					lootMenuList[i+2].checked = id == LootSpec and true or false
 				else
-					menuList[i+2] = nil
+					lootMenuList[i+2] = nil
 				end
 			end
-			EasyMenu(menuList, menuFrame, "cursor", 0, 0, "MENU", 3)
+			EasyMenu(lootMenuList, lootMenuFrame, "cursor", 0, 0, "MENU", 3)
+		elseif button == "MiddleButton" then
+			for i = 1, 4 do
+				specMenuList[1].text = SPECIALIZATION
+				
+				local id, name = GetSpecializationInfo(i)
+				if id then
+					specMenuList[i+1].text = name
+					specMenuList[i+1].func = function() SetSpecialization(i) end
+					specMenuList[i+1].checked = id == specID and true or false
+				else
+					specMenuList[i+1] = nil
+				end
+			end
+			EasyMenu(specMenuList, specMenuFrame, "cursor", 0, 0, "MENU", 3)
 		else
 			if InCombatLockdown() then
 				UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT)

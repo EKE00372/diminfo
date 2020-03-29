@@ -12,15 +12,12 @@ local addon, ns = ...
 	
 local C, F, G, L = unpack(ns)
 
-	G.addon = "Kiminfo_"
-	G.MediaFolder = "Interface\\AddOns\\Kiminfo\\Media\\"
-	G.Ccolors = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[select(2, UnitClass("player"))] -- Class color / 職業顏色
-
 ------------
 -- Golbal --
 ------------
 
-	C.Panel = true			-- Enable panel / 啟用面板
+	G.addon = "Kiminfo_"
+	G.MediaFolder = "Interface\\AddOns\\Kiminfo\\Media\\"
 
 -----------
 -- Media --
@@ -40,10 +37,13 @@ local C, F, G, L = unpack(ns)
 -- Panel --
 -----------
 
+	C.Panel = true			-- Enable panel / 啟用面板
+	
 	-- anchor, parent, x, y, width, height, alpha
 	-- 錨點，父級框體，x座標，y座標，寬度，高度，透明度
-	C.Panel1 = {"TOPLEFT", UIParent, 170, -20, 410, 36, 32, .8}
-	C.Panel2 = {"TOPLEFT", UIParent, 170, -60, 316, 36, 32, .8}
+	C.Panel1 = {"TOPLEFT", UIParent, 165, -20, 420, 36, 32, .8}
+	C.Panel2 = {"TOPLEFT", UIParent, 165, -60, 320, 36, 32, .8}
+	-- add if you need, max to C.Panel5 / 自己加，最多到C.Panel5
 
 --------------
 -- Settings --
@@ -76,7 +76,7 @@ local C, F, G, L = unpack(ns)
 	-- Memory / 記憶體占用列表
 	C.Memory = true
 	C.MaxAddOns = 30
-	C.MemoryPoint = {"TOPLEFT", UIParent, 180, -68}
+	C.MemoryPoint = {"TOPLEFT", UIParent, 200, -68}
 	
 	-- System: Fps and latency / 幀數與延遲
 	C.System = true

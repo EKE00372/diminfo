@@ -50,7 +50,7 @@ local Icon2 = Stat:CreateTexture(nil, "OVERLAY")
 --[[ latency color on data text ]]--
 local function colorLatencyTooltip(latency)
 	if latency < 300 then
-		return "|cffffffff"..latency
+		return "|cff0CD809"..latency
 	elseif (latency > 300 and latency < 500) then
 		return "|cffE8DA0F"..latency
 	else
@@ -197,6 +197,9 @@ local function OnEnter(self)
 				end
 				GameTooltip:AddDoubleLine(format("%d %s (%s)", numEnabled - maxAddOns, L.Hidden, L.Shift), format(usageString, hiddenUsage), .6, .8, 1, .6, .8, 1)
 			end
+			
+			GameTooltip:AddLine(" ")
+			GameTooltip:AddDoubleLine(TOTAL, format(usageString, totalCPU/ max(1, GetTime() - loginTime)), .6, .8, 1, 1, 1, 1)
 		end
 	end
 	
