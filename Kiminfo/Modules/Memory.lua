@@ -16,7 +16,7 @@ local Stat = CreateFrame("Frame", G.addon.."Mem", UIParent)
 
 --[[ Create icon ]]--
 local Icon = Stat:CreateTexture(nil, "OVERLAY")
-	Icon:SetSize(G.FontSize+8, G.FontSize+8)
+	Icon:SetSize(G.FontSize+6, G.FontSize+6)
 	Icon:SetPoint("RIGHT", Stat, "LEFT", 0, 0)
 	Icon:SetTexture(G.Mem)
 	Icon:SetVertexColor(1, 1, 1)
@@ -111,9 +111,9 @@ local function OnUpdate(self, elapsed)
 		totalMemory = updateMemory()
 		
 		if totalMemory >= 1024 then
-			Text:SetText(F.addIcon(G.Mem, 16, 0, 50)..format("%.1fmb", totalMemory/1024))
+			Text:SetText(format("%.1fmb", totalMemory/1024))
 		else
-			Text:SetText(F.addIcon(G.Mem, 16, 0, 50)..format("%.1fkb", totalMemory/1024))
+			Text:SetText(format("%.1fkb", totalMemory/1024))
 		end
 
 		self.timer = 0

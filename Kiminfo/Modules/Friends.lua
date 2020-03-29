@@ -350,7 +350,7 @@ local function OnEnter(self)
 				end
 				
 				if isShiftKeyDown then
-					tooltip:AddLine(icon..levelc..info[8].."|r "..classc..info[4].."|r"..info[6]..G.OptionColor.." ("..info[3], zonec..info[9])
+					tooltip:AddLine(icon..levelc..info[8].."|r "..classc..info[4].."|r"..info[6]..G.OptionColor.." ("..info[3]..")", zonec..info[9])
 				else
 					tooltip:AddLine(icon..levelc..info[8].."|r "..classc..info[4].."|r"..info[6]..G.OptionColor.." ("..info[2]..")", zonec..info[9])
 				end
