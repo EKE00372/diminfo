@@ -198,9 +198,10 @@ local function OnEnter(self)
 				GameTooltip:AddDoubleLine(format("%d %s (%s)", numEnabled - maxAddOns, L.Hidden, L.Shift), format(usageString, hiddenUsage), .6, .8, 1, .6, .8, 1)
 			end
 			
-			GameTooltip:AddLine(" ")
-			GameTooltip:AddDoubleLine(TOTAL, format(usageString, totalCPU/ max(1, GetTime() - loginTime)), .6, .8, 1, 1, 1, 1)
 		end
+		
+		GameTooltip:AddLine(" ")
+		GameTooltip:AddDoubleLine(TOTAL, format(usageString, totalCPU/ max(1, GetTime() - loginTime)), .6, .8, 1, 1, 1, 1)
 	end
 	
 	-- options

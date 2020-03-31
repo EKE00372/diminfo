@@ -120,6 +120,7 @@ local function OnEnter(self)
 	end
 	
 	GameTooltip:AddDoubleLine(" ", G.Line)
+	GameTooltip:AddDoubleLine(" ", G.OptionColor..SPECIALIZATION..G.MiddleButton)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..TALENTS..G.LeftButton)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..SELECT_LOOT_SPECIALIZATION..G.RightButton)
 	
