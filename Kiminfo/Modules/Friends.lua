@@ -75,34 +75,34 @@ local function addLine(tooltip)
 	end
 end
 
--- Click function
-local function OnClick(self, info, btn)
+-- Click function for in-game friends
+local function gameOnClick(self, info, btn)
 	if btn == "LeftButton" then
 		if IsAltKeyDown() then
-			if isBNet then
-				-- 戰網邀請
-				if info[5] == BNET_CLIENT_WOW then
-					InviteToGroup(info[4].."-"..info[10])
-				else 
-					return
-				end
-			else
-				-- 遊戲好友邀請
-				InviteToGroup(info[1])
-			end
+			InviteToGroup(info[1])
 		elseif IsShiftKeyDown() then
-			if isBNet then
-				-- 戰網聊天
-				ChatFrame_SendBNetTell(info[2])
-			else
-				-- 遊戲內密語
-				ChatFrame_OpenChat("/w "..info[1].." ", SELECTED_DOCK_FRAME)
-			end
+			-- 遊戲內密語
+			ChatFrame_OpenChat("/w "..info[1].." ", SELECTED_DOCK_FRAME)
 		else
 			return
 		end
-		
-		isBNet = true
+	end
+end
+
+-- Click function for bn friends
+local function bnOnClick(self, info, btn)
+	if btn == "LeftButton" then
+		if IsAltKeyDown() then
+			-- 戰網邀請
+			if info[5] == BNET_CLIENT_WOW then
+				InviteToGroup(info[4].."-"..info[10])
+			end
+		elseif IsShiftKeyDown() then
+			-- 戰網聊天
+			ChatFrame_SendBNetTell(info[2])
+		else
+			return
+		end
 	end
 end
 
@@ -288,7 +288,6 @@ local function OnEnter(self)
 		tooltip:AddLine(GAME, ZONE)
 		
 		title = false
-		isBNet = false
 		for i = 1, #friendTable do
 			local info = friendTable[i]
 			
@@ -311,7 +310,7 @@ local function OnEnter(self)
 			tooltip:AddLine(levelc..info[2].."|r "..classc..info[1].."|r"..info[5], zonec..info[4])
 			
 			local line = tooltip:GetLineCount()
-			tooltip:SetLineScript(line, "OnMouseUp", OnClick, info)
+			tooltip:SetLineScript(line, "OnMouseUp", gameOnClick, info)
 		end
 	end
 	
@@ -321,7 +320,6 @@ local function OnEnter(self)
 		tooltip:AddLine(" ")
 		tooltip:AddLine(NAME, ZONE)
 		
-		isBNet = true
 		title = false
 		for i = 1, #bnetTable do
 			local info = bnetTable[i]
@@ -363,7 +361,7 @@ local function OnEnter(self)
 			end
 			
 			local line = tooltip:GetLineCount()
-			tooltip:SetLineScript(line, "OnMouseUp", OnClick, info)
+			tooltip:SetLineScript(line, "OnMouseUp", bnOnClick, info)
 		end
 	end
 	
