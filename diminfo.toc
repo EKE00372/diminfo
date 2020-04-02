@@ -2,7 +2,7 @@
 ## Author: Loshine, funupdate by EK
 ## Title: |cff777777dim|rinfo_Classic
 ## Notes: Info Bar
-## Version: C2
+## Version: C2.1
 ## SavedVariables: diminfo
 ## X-Credits: Siweia, HopeASD, Peterodox
 
