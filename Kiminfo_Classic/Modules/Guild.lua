@@ -7,7 +7,6 @@ local format = string.format
 local sort = table.sort
 local guildTable = {}
 local name, rank, rankindex, level, zone, connected, status, class
-local C_Timer_After = C_Timer.After
 
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
@@ -29,6 +28,7 @@ local Icon = Stat:CreateTexture(nil, "OVERLAY")
 local Text  = Stat:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(G.Fonts, G.FontSize, G.FontFlag)
 	Text:SetPoint(unpack(C.GuildPoint))
+	Text:SetTextColor(1, 1, 1)
 	Stat:SetAllPoints(Text)
 	
 --==================================================--
@@ -186,7 +186,6 @@ local function OnEnter(self)
 			end
 			
 			local levelc = F.Hex(GetQuestDifficultyColor(info[4]))
-			--local classc = F.Hex((CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[info[8]])
 			local classc
 			if info[8] == "SHAMAN" then
 				classc = F.Hex(0, .6, 1)

@@ -27,7 +27,6 @@ local C, F, G, L = unpack(ns)
 -----------
 
 	G.Tex = G.MediaFolder.."bar.tga"
-	G.Glow = G.MediaFolder.."glow.tga"
 	G.Fonts = STANDARD_TEXT_FONT		-- 字型 / Font
 	G.FontSize = 16						-- 大小 / Font size
 	G.FontFlag = "OUTLINE"				-- 描邊 / Font outline
@@ -80,7 +79,6 @@ local C, F, G, L = unpack(ns)
 	C.Guild = true
 	C.GuildPoint = {"LEFT", "Kiminfo_Friends", "RIGHT", 30, 0}
 	--C.GuildPoint = {"TOPLEFT", UIParent, 420, -12}
-	--C.GuildPoint = {"CENTER", UIParent, 0, -12}
 	
 	-- Durability / 耐久
 	C.Durability = true

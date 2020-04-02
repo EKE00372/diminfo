@@ -118,6 +118,8 @@ local function OnEnter(self)
 	-- title
 	GameTooltip:SetOwner(self, "ANCHOR_BOTTOM", 0, -10)
 	GameTooltip:ClearLines()
+	
+	-- talent
 	local p1 = select(3, GetTalentTabInfo(1))
 	local p2 = select(3, GetTalentTabInfo(2))
 	local p3 = select(3, GetTalentTabInfo(3))
@@ -157,6 +159,7 @@ end
 	end)
 	
 	Stat:SetScript("OnLeave", function(self)
+		-- refresh data text color
 		self:GetScript("OnEvent")(self)
 		-- tooltip hide
 		GameTooltip:Hide()

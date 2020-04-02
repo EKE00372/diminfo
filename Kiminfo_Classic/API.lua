@@ -29,6 +29,7 @@ F.Multicheck = function(check, ...)
 			return true
 		end
 	end
+	
 	return false
 end
 
