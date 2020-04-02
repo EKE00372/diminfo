@@ -24,6 +24,7 @@ local Icon = Stat:CreateTexture(nil, "OVERLAY")
 local Text  = Stat:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(G.Fonts, G.FontSize, G.FontFlag)
 	Text:SetPoint(unpack(C.BagsPoint))
+	Text:SetTextColor(1, 1, 1)
 	Stat:SetAllPoints(Text)
 
 --==================================================--
@@ -51,8 +52,7 @@ local function OnEvent(self)
 		Kiminfo.AutoSell = true
 	end
 
-	local free, total = getBagSlots()
-
+	local free = getBagSlots()
 	Text:SetText(free)
 	self:SetAllPoints(Text)
 end

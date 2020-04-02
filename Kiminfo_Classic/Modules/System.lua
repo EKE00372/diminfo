@@ -4,6 +4,7 @@ if not C.System then return end
 
 local format = string.format
 local loginTime = GetTime()	-- to get log in time at all of first
+local usageTable = {}
 local usageString = "%.3f ms"
 
 --=================================================--
@@ -49,7 +50,7 @@ local Icon2 = Stat:CreateTexture(nil, "OVERLAY")
 --[[ latency color on data text ]]--
 local function colorLatencyTooltip(latency)
 	if latency < 300 then
-		return "|cffffffff"..latency
+		return "|cff0CD809"..latency
 	elseif (latency > 300 and latency < 500) then
 		return "|cffE8DA0F"..latency
 	else
@@ -86,8 +87,6 @@ end
 --==================================================--
 ---------------    [[ Functions ]]     ---------------
 --==================================================--
-
-local usageTable = {}
 
 local function updateUsageTable()
 	local numAddons = GetNumAddOns()
@@ -231,12 +230,10 @@ end
 	Stat:SetScript("OnEnter", function(self)
 		self.isHover = true
 		OnEnter(self)
-		--self:GetScript("OnUpdate")
 	end)
 	Stat:SetScript("OnLeave", function(self)
 		self.isHover = false
 		GameTooltip:Hide()
-		--self:GetScript("OnUpdate")
 	end)
 	
 	--[[ Data text ]]--

@@ -30,6 +30,7 @@ local Icon = Stat:CreateTexture(nil, "OVERLAY")
 local Text  = Stat:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(G.Fonts, G.FontSize, G.FontFlag)
 	Text:SetPoint(unpack(C.FriendsPoint))
+	Text:SetTextColor(1, 1, 1)
 	Stat:SetAllPoints(Text)
 	
 --==================================================--
@@ -65,57 +66,37 @@ local Text  = Stat:CreateFontString(nil, "OVERLAY")
 		hideOnEscape = 1
 	}
 
--- Click function
---[[
-local function buttonOnClick(self, name, btn)
-	
+-- Click function for bn friends
+local function bnOnClick(self, info, btn)
 	if btn == "LeftButton" then
 		if IsAltKeyDown() then
-			--if not self.isBNet then 
-				--if self.isGame then 
-				InviteToGroup(name) --else end
+			-- 同服才有戰網邀請
+			if info[6] == BNET_CLIENT_WOWC and info[7] == GetRealmName() then
+				InviteToGroup(info[4])
+			else 
+				return
+			end
 		elseif IsShiftKeyDown() then
-		--if IsShiftKeyDown() then
-			--if self.isBNet then
-				-- 戰網聊天
-				ChatFrame_SendBNetTell(name)
-			--else
-				--ChatFrame_OpenChat("/w "..name.." ", SELECTED_DOCK_FRAME)
-			--end
+			-- 戰網聊天
+			ChatFrame_SendBNetTell(info[2])
 		else
 			return
 		end
 	end
 end
-]]--
 
-local function buttonOnClick(self, info, btn)
+-- Click function for in-game friends
+local function gameOnClick(self, info, btn)
 	if btn == "LeftButton" then
 		if IsAltKeyDown() then
-			if isBNet then
-				-- 同服才有戰網邀請
-				if info[6] == BNET_CLIENT_WOWC and info[7] == GetRealmName() then
-					InviteToGroup(info[4])
-				else 
-					return
-				end
-			else
-				-- 遊戲好友邀請
-				InviteToGroup(info[1])
-			end
+			-- 遊戲好友邀請
+			InviteToGroup(info[1])
 		elseif IsShiftKeyDown() then
-			if isBNet then
-				-- 戰網聊天
-				ChatFrame_SendBNetTell(info[2])
-			else
-				-- 遊戲內密語
-				ChatFrame_OpenChat("/w "..info[1].." ", SELECTED_DOCK_FRAME)
-			end
+			-- 遊戲內密語
+			ChatFrame_OpenChat("/w "..info[1].." ", SELECTED_DOCK_FRAME)
 		else
 			return
 		end
-		
-		isBNet = true
 	end
 end
 
@@ -246,19 +227,11 @@ local function OnEnter(self)
 	
 	local currentBroadcast = select(4, BNGetInfo(1))
 	
-	local tooltip = LibQTip:Acquire("KiminfoFriendsTooltip", 3, "LEFT", "LEFT", "RIGHT")
+	local tooltip = LibQTip:Acquire("KiminfoFriendsTooltip", 2, "LEFT", "RIGHT")
 	tooltip:SetPoint("TOP", self, "BOTTOM", 0, -10)
 	tooltip:Clear()
-	tooltip:AddHeader(G.TitleColor..FRIENDS, "", G.TitleColor..format("%s/%s", totalonline, totalfriends))
+	tooltip:AddHeader(G.TitleColor..FRIENDS, G.TitleColor..format("%s/%s", totalonline, totalfriends))
 
-	local title
-	local function addLine()
-		if not title then
-			tooltip:AddSeparator(2, .6, .8, 1)
-			title = true
-		end
-	end
-	
 	-- show my BN roadcast
 	if currentBroadcast and currentBroadcast ~= "" then
 		tooltip:AddLine(" ")
@@ -276,24 +249,21 @@ local function OnEnter(self)
 	end
 	
 	-- options
-	tooltip:AddLine(" ", " ", G.Line)
-	tooltip:AddLine(G.OptionColor..G.LeftButton.."+ Shift "..SLASH_WHISPER2:gsub("/(.*)","%1"), " ", G.OptionColor..FRIENDS..G.LeftButton)
-	tooltip:AddLine(G.OptionColor..G.LeftButton.."+ Alt "..INVITE, " ", G.OptionColor..BATTLENET_BROADCAST..G.RightButton)
+	tooltip:AddLine(" ", G.Line)
+	tooltip:AddLine(G.OptionColor..G.LeftButton.."+ Shift "..SLASH_WHISPER2:gsub("/(.*)","%1"), G.OptionColor..FRIENDS..G.LeftButton)
+	tooltip:AddLine(G.OptionColor..G.LeftButton.."+ Alt "..INVITE, G.OptionColor..BATTLENET_BROADCAST..G.RightButton)
 	
 	if onlineFriends > 0 then
 		buildFriendTable(numberOfFriends)
 		
 		tooltip:AddLine(" ")
-		tooltip:AddLine(GAME, "", ZONE)
+		tooltip:AddLine(GAME, ZONE)
+		tooltip:AddSeparator(2, .6, .8, 1)
 		
-		title = false
-		isBNet = false
 		for i = 1, #friendTable do
 			local info = friendTable[i]
 
 			if info[5] then
-				addLine()
-				
 				local zonec
 				if GetRealZoneText() == info[4] then
 					zonec = F.Hex(.3, 1, .3)
@@ -308,10 +278,10 @@ local function OnEnter(self)
 					classc = levelc
 				end
 				
-				tooltip:AddLine(levelc..info[2].."|r "..classc..info[1].."|r"..info[5], "",  zonec..info[4])
+				tooltip:AddLine(levelc..info[2].."|r "..classc..info[1].."|r"..info[5], zonec..info[4])
 				
 				local line = tooltip:GetLineCount()
-				tooltip:SetLineScript(line, "OnMouseUp", buttonOnClick, info)
+				tooltip:SetLineScript(line, "OnMouseUp", gameOnClick, info)
 			end
 		end
 	end
@@ -319,17 +289,14 @@ local function OnEnter(self)
 	if numBNetOnline > 0 then
 		buildBNetTable(totalBNet)
 
-		tooltip:AddLine(" ", "", "")
-		tooltip:AddLine(NAME, BATTLETAG, ZONE)
+		tooltip:AddLine(" ")
+		tooltip:AddLine(NAME, ZONE)
+		tooltip:AddSeparator(2, .6, .8, 1)
 		
-		isBNet = true
-		title = false
 		for i = 1, #bnetTable do
 			local info = bnetTable[i]
 			
 			if F.Multicheck(info[6], BNET_CLIENT_WOW, BNET_CLIENT_WOWC) then
-				addLine()
-				
 				local zonec
 				if GetRealZoneText() == info[11] then
 					zonec = F.Hex(.3, 1, .3)
@@ -338,69 +305,66 @@ local function OnEnter(self)
 				end
 				
 				local levelc = F.Hex(GetQuestDifficultyColor(info[10]))
-				--local classc = F.Hex((CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[info[9]])
+				
 				local classc
 				if info[9] == "SHAMAN" then
 					classc = F.Hex(0, .6, 1)
+				elseif info[9] == nil then
+					classc = F.Hex(.65, .65, .65)
 				else
 					classc = F.Hex((CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[info[9]])
 				end
 				
-				if classc == nil then
-					classc = levelc
-				end
-				
 				if info[6] == BNET_CLIENT_WOWC then
 					if isShiftKeyDown then
-						tooltip:AddLine(F.addIcon(BNet_GetClientTexture(BNET_CLIENT_WOW), 14, 8, 42)..levelc..info[10].."|r "..classc..info[4].."|r - "..info[7].."|r"..info[8], G.OptionColor..info[3], zonec..info[11])
+						tooltip:AddLine(F.addIcon(BNet_GetClientTexture(BNET_CLIENT_WOW), 14, 8, 42)..levelc..info[10].."|r "..classc..info[4].."|r"..info[8]..G.OptionColor.." ("..info[3]..")", zonec..info[11].." - "..info[7])
 					else
-						tooltip:AddLine(F.addIcon(BNet_GetClientTexture(BNET_CLIENT_WOW), 14, 8, 42)..levelc..info[10].."|r "..classc..info[4].."|r"..info[8], G.OptionColor..info[2], zonec..info[11])
+						tooltip:AddLine(F.addIcon(BNet_GetClientTexture(BNET_CLIENT_WOW), 14, 8, 42)..levelc..info[10].."|r "..classc..info[4].."|r"..info[8]..G.OptionColor.." ("..info[2]..")", zonec..info[11])
 					end
 				else
 					local icon = "|T"..BNet_GetClientTexture(BNET_CLIENT_WOW)..":14:14:0:0:50:50:4:46:4:46:160:160:160|t"
+					local noRealm = info[11]:match("[^ -]+")
+					
 					if isShiftKeyDown then
-						tooltip:AddLine(icon..levelc..info[10].."|r "..classc..info[4].."|r"..info[8], G.OptionColor..info[3], zonec..info[11])
+						tooltip:AddLine(icon..levelc..info[10].."|r "..classc..info[4].."|r"..info[8]..G.OptionColor.." ("..info[3]..")", zonec..info[11])
 					else
-						tooltip:AddLine(icon..levelc..info[10].."|r "..classc..info[4].."|r"..info[8], G.OptionColor..info[2], zonec..info[11])
+						tooltip:AddLine(icon..levelc..info[10].."|r "..classc..info[4].."|r"..info[8]..G.OptionColor.." ("..info[2]..")", zonec..noRealm)
 					end
 				end
-				
-				local line = tooltip:GetLineCount()
-				tooltip:SetLineScript(line, "OnMouseUp", buttonOnClick, info)
 			end
+			
+			local line = tooltip:GetLineCount()
+			tooltip:SetLineScript(line, "OnMouseUp", bnOnClick, info)
 		end
 		
-		title = false
 		for i = 1, #bnetTable do
-			
 			local info = bnetTable[i]
 
 			if F.Multicheck(info[6], "S2", "D3", "WTCG", "Hero", "Pro", "S1", "DST2", "VIPR", "ODIN", "W3") then
-				addLine()
 				if isShiftKeyDown then
-					tooltip:AddLine(F.addIcon(BNet_GetClientTexture(info[6]), 14, 8, 42)..G.OptionColor..info[4].."|r"..info[8], G.OptionColor..info[3], F.Hex(.65, .65, .65)..info[11])
+					tooltip:AddLine(F.addIcon(BNet_GetClientTexture(info[6]), 14, 8, 42)..G.OptionColor..info[3].."|r"..info[8], F.Hex(.65, .65, .65)..info[11])
 				else
-					tooltip:AddLine(F.addIcon(BNet_GetClientTexture(info[6]), 14, 8, 42)..G.OptionColor..info[4].."|r"..info[8], G.OptionColor..info[2], F.Hex(.65, .65, .65)..info[11])
+					tooltip:AddLine(F.addIcon(BNet_GetClientTexture(info[6]), 14, 8, 42)..G.OptionColor..info[2].."|r"..info[8], F.Hex(.65, .65, .65)..info[11])
 				end
-				local line = tooltip:GetLineCount()
-				tooltip:SetLineScript(line, "OnMouseUp", buttonOnClick, info)
 			end
+			
+			local line = tooltip:GetLineCount()
+			tooltip:SetLineScript(line, "OnMouseUp", bnOnClick, info)
 		end
 		
-		title = false
 		for i = 1, #bnetTable do
 			local info = bnetTable[i]
 			
 			if F.Multicheck(info[6], "App", "BSAp") then
-				addLine()
 				if isShiftKeyDown then
-					tooltip:AddLine(F.addIcon(BNet_GetClientTexture(BNET_CLIENT_APP), 14, 8, 42)..G.OptionColor..info[4].."|r"..info[8], G.OptionColor..info[3], F.Hex(.65, .65, .65)..info[11])
+					tooltip:AddLine(F.addIcon(BNet_GetClientTexture(info[6]), 14, 8, 42)..G.OptionColor..info[3].."|r"..info[8], F.Hex(.65, .65, .65)..info[11])
 				else
-					tooltip:AddLine(F.addIcon(BNet_GetClientTexture(BNET_CLIENT_APP), 14, 8, 42)..G.OptionColor..info[4].."|r"..info[8], G.OptionColor..info[2], F.Hex(.65, .65, .65)..info[11])
+					tooltip:AddLine(F.addIcon(BNet_GetClientTexture(info[6]), 14, 8, 42)..G.OptionColor..info[2].."|r"..info[8], F.Hex(.65, .65, .65)..info[11])
 				end
-				local line = tooltip:GetLineCount()
-				tooltip:SetLineScript(line, "OnMouseUp", buttonOnClick, info)
 			end
+			
+			local line = tooltip:GetLineCount()
+			tooltip:SetLineScript(line, "OnMouseUp", bnOnClick, info)
 		end
 	end
 	

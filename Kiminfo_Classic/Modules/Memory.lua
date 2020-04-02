@@ -25,6 +25,7 @@ local Icon = Stat:CreateTexture(nil, "OVERLAY")
 local Text  = Stat:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(G.Fonts, G.FontSize, G.FontFlag)
 	Text:SetPoint(unpack(C.MemoryPoint))
+	Text:SetTextColor(1, 1, 1)
 	Stat:SetAllPoints(Text)
 
 --===============================================--
