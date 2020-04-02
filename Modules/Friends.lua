@@ -58,34 +58,37 @@ local Text  = Stat:CreateFontString(nil, "OVERLAY")
 		hideOnEscape = 1
 	}
 
--- Click function
-local function OnClick(self, info, btn)
+-- Click function for bn friends
+local function bnOnClick(self, info, btn)
 	if btn == "LeftButton" then
 		if IsAltKeyDown() then
-			if isBNet then
-				-- 同服才有戰網邀請
-				if info[6] == BNET_CLIENT_WOWC and info[7] == GetRealmName() then
-					InviteToGroup(info[4])
-				else 
-					return
-				end
-			else
-				-- 遊戲好友邀請
-				InviteToGroup(info[1])
+			-- 同服才有戰網邀請
+			if info[6] == BNET_CLIENT_WOWC and info[7] == GetRealmName() then
+				InviteToGroup(info[4])
+			else 
+				return
 			end
 		elseif IsShiftKeyDown() then
-			if isBNet then
-				-- 戰網聊天
-				ChatFrame_SendBNetTell(info[2])
-			else
-				-- 遊戲內密語
-				ChatFrame_OpenChat("/w "..info[1].." ", SELECTED_DOCK_FRAME)
-			end
+			-- 戰網聊天
+			ChatFrame_SendBNetTell(info[2])
 		else
 			return
 		end
-		
-		isBNet = true
+	end
+end
+
+-- Click function for in-game friends
+local function gameOnClick(self, info, btn)
+	if btn == "LeftButton" then
+		if IsAltKeyDown() then
+			-- 遊戲好友邀請
+			InviteToGroup(info[1])
+		elseif IsShiftKeyDown() then
+			-- 遊戲內密語
+			ChatFrame_OpenChat("/w "..info[1].." ", SELECTED_DOCK_FRAME)
+		else
+			return
+		end
 	end
 end
 
@@ -217,9 +220,7 @@ local function OnEnter(self)
 	local currentBroadcast = select(4, BNGetInfo(1))
 	
 	local tooltip = LibQTip:Acquire("diminfoFriendsTooltip", 2, "LEFT", "RIGHT")
-	tooltip:SetPoint("TOP", self, "BOTTOM", 0, -10)
-	tooltip:SmartAnchorTo(self)
-	
+	tooltip:SetPoint("TOP", self, "BOTTOM", 0, -10)	
 	tooltip:Clear()
 	tooltip:AddHeader(G.TitleColor..FRIENDS, G.TitleColor..format("%s/%s", totalonline, totalfriends))
 	
@@ -251,7 +252,6 @@ local function OnEnter(self)
 		tooltip:AddLine(GAME, ZONE)
 		tooltip:AddSeparator(2, .6, .8, 1)
 		
-		isBNet = false
 		for i = 1, #friendTable do
 			local info = friendTable[i]
 
@@ -273,7 +273,7 @@ local function OnEnter(self)
 				tooltip:AddLine(levelc..info[2].."|r "..classc..info[1].." |r"..info[5], zonec..info[4])
 				
 				local line = tooltip:GetLineCount()
-				tooltip:SetLineScript(line, "OnMouseUp", OnClick, info)
+				tooltip:SetLineScript(line, "OnMouseUp", gameOnClick, info)
 			end
 		end
 	end
@@ -285,7 +285,6 @@ local function OnEnter(self)
 		tooltip:AddLine(NAME, ZONE)
 		tooltip:AddSeparator(2, .6, .8, 1)
 		
-		isBNet = true
 		for i = 1, #bnetTable do
 			local info = bnetTable[i]
 			
@@ -328,10 +327,9 @@ local function OnEnter(self)
 			end
 
 			local line = tooltip:GetLineCount()
-			tooltip:SetLineScript(line, "OnMouseUp", OnClick, info)
+			tooltip:SetLineScript(line, "OnMouseUp", bnOnClick, info)
 		end
 		
-		isBNet = true
 		for i = 1, #bnetTable do
 			local info = bnetTable[i]
 			
@@ -344,10 +342,9 @@ local function OnEnter(self)
 			end
 			
 			local line = tooltip:GetLineCount()
-			tooltip:SetLineScript(line, "OnMouseUp", OnClick, info)
+			tooltip:SetLineScript(line, "OnMouseUp", bnOnClick, info)
 		end
 		
-		isBNet = true
 		for i = 1, #bnetTable do
 			local info = bnetTable[i]
 			
@@ -360,7 +357,7 @@ local function OnEnter(self)
 			end
 			
 			local line = tooltip:GetLineCount()
-			tooltip:SetLineScript(line, "OnMouseUp", OnClick, info)
+			tooltip:SetLineScript(line, "OnMouseUp", bnOnClick, info)
 		end
 	end
 	

@@ -73,7 +73,7 @@ F.CreatePanel = function(anchor, parent, x, y, w, h, size, a)
 	
 	-- 左側漸變
 	local left = CreateFrame("Frame", nil, parent)
-	left:SetSize(40, h)
+	left:SetSize(60, h)
 	left:ClearAllPoints()
 	left:SetPoint("RIGHT", panel, "LEFT", 0, 0)
 	left:SetFrameStrata("BACKGROUND")
@@ -86,7 +86,7 @@ F.CreatePanel = function(anchor, parent, x, y, w, h, size, a)
 	
 	-- 右側漸變
 	local right = CreateFrame("Frame", nil, parent)
-	right:SetSize(40, h)
+	right:SetSize(80, h)
 	right:ClearAllPoints()
 	right:SetPoint("LEFT", panel, "RIGHT", 0, 0)
 	right:SetFrameStrata("BACKGROUND")
