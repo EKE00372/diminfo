@@ -49,6 +49,14 @@ local C, F, G, L = unpack(ns)
 -- Settings --
 --------------
 	
+	-- Tooltip showup direction / 滑鼠提示的顯示方向
+	-- if you put databar on screen botton, change true to false. / 如果你調整訊息列至畫面底部，將ture改為false
+	C.StickTop = true
+	
+	-- Show memory usage when only mouseover / 只在指向時顯示插件占用
+	-- if you have too many addons, enable this to avoid fps drop cause by memory refresh / 如果你用了很多插件，啟用它防止掉幀
+	C.MemHide = false
+	
 	-- Timer / 時鐘
 	C.Time = true
 	C.TimePoint =  {"TOPLEFT", UIParent, 185, -30}

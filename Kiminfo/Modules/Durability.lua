@@ -2,9 +2,9 @@ local addon, ns = ...
 local C, F, G, L = unpack(ns)
 if not C.Durability then return end
 
-local format = string.format
-local floor = math.floor
-local sort = table.sort
+local format, floor, max, sort, modf, select = string.format, math.floor, max, sort, math.modf, select
+local CreateFrame = CreateFrame
+local GetInventoryItemLink, GetInventoryItemDurability, GetInventoryItemTexture = GetInventoryItemLink, GetInventoryItemDurability, GetInventoryItemTexture
 
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
@@ -26,6 +26,7 @@ local Icon = Stat:CreateTexture(nil, "OVERLAY")
 local Text  = Stat:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(G.Fonts, G.FontSize, G.FontFlag)
 	Text:SetPoint(unpack(C.DurabilityPoint))
+	Text:SetTextColor(1, 1, 1)
 	Stat:SetAllPoints(Text)
 
 --==================================================--
@@ -36,7 +37,7 @@ local Text  = Stat:CreateFontString(nil, "OVERLAY")
 local function GradientColor(perc)
 	perc = perc > 1 and 1 or perc < 0 and 0 or perc -- Stay between 0-1
 	
-	local seg, relperc = math.modf(perc*2)
+	local seg, relperc = modf(perc*2)
 	local r1, g1, b1, r2, g2, b2 = select(seg*3+1, 1, .5, .25, 1, 1, .43, .57, 1, .57, 0, 0, 0) -- R -> Y -> G
 	local r, g, b = r1+(r2-r1)*relperc, g1+(g2-g1)*relperc, b1+(b2-b1)*relperc
 	
@@ -57,14 +58,14 @@ local localSlots = {
 	[10] = {17, INVTYPE_WEAPONOFFHAND, 1000},
 }	
 
---[[ Sort slots ]]--
+--[[ Sort slots by durability ]]--
 local function sortSlots(a, b)
 	if a and b then
 		return (a[3] == b[3] and a[1] < b[1]) or (a[3] < b[3])
 	end
 end
 
---[[ Custom api to get durability ]]--
+--[[ Get durability ]]--
 local function getItemDurability()
 	local numSlots = 0
 	
@@ -116,13 +117,13 @@ end
 local function OnEnter(self)
 	local total, equipped = GetAverageItemLevel()
 	
-	-- title
-	GameTooltip:SetOwner(self, "ANCHOR_BOTTOM", 0, -10)
+	-- Title
+	GameTooltip:SetOwner(self, C.StickTop and "ANCHOR_BOTTOM" or "ANCHOR_TOP", 0, C.StickTop and -10 or 10)
 	GameTooltip:ClearLines()
 	GameTooltip:AddDoubleLine(STAT_AVERAGE_ITEM_LEVEL, format("%d/%d", equipped, total), 0, .6, 1, 0, .6, 1)
 	GameTooltip:AddLine(" ")
 	
-	-- slot item list
+	-- Slot item list
 	for i = 1, 10 do
 		if localSlots[i][3] ~= 1000 then
 			local slot = localSlots[i][1]
@@ -133,10 +134,10 @@ local function OnEnter(self)
 		end
 	end
 	
-	-- otpions
+	-- Otpions
 	GameTooltip:AddDoubleLine(" ", G.Line)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..CHARACTER_INFO..G.LeftButton)
-	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.AutoRepair..(Kiminfo.AutoRepair and "|cff55ff55"..ENABLE or "|cffff5555"..DISABLE)..G.RightButton)
+	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.AutoRepair..(Kiminfo.AutoRepair and G.Enable or G.Disable)..G.RightButton)
 	
 	GameTooltip:Show()
 end
@@ -147,17 +148,17 @@ end
 	
 	--[[ Tooltip ]]--
 	Stat:SetScript("OnEnter", function(self)
-		-- mouseover color
+		-- Mouseover color
 		Icon:SetVertexColor(0, 1, 1)
 		Text:SetTextColor(0, 1, 1)
-		-- tooltip show
+		-- Tooltip show
 		OnEnter(self)
 	end)
 	
 	Stat:SetScript("OnLeave", function(self)
-		-- refresh data text color
-		self:GetScript("OnEvent")(self)
-		-- tooltip hide
+		-- Refresh data text color
+		OnEvent(self)
+		-- Tooltip hide
 		GameTooltip:Hide()
 	end)
 	
@@ -165,7 +166,7 @@ end
 	Stat:SetScript("OnMouseDown", function(self, button)
 		if button == "RightButton" then
 			Kiminfo.AutoRepair = not Kiminfo.AutoRepair
-			self:GetScript("OnEnter")(self)
+			OnEnter(self)
 		else
 			if InCombatLockdown() then
 				UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT)
@@ -192,16 +193,16 @@ local RepairGear = CreateFrame("Frame")
 			local money = GetMoney()
 			local cost, canRepair = GetRepairAllCost()
 			
-			-- 可以修裝而且花費大於零
+			-- Can repair and cost more than 0 / 可以修裝而且花費大於零
 			if canRepair and cost > 0 then
 				if IsInGuild() then
 					local guildMoney = GetGuildBankWithdrawMoney()
 					
-					-- 可提領金額大於公會餘額
+					-- When withdraw amount more than guild money / 可提領金額大於公會餘額
 					if guildMoney > GetGuildBankMoney() then
 						guildMoney = GetGuildBankMoney()
 					end
-					
+					-- Use guild repair if you can / 優先使用公會修理
 					if guildMoney >= cost and CanGuildBankRepair() then
 						RepairAllItems(1)
 						print(format("|cff99CCFF"..GUILDCONTROL_OPTION15.."|r%s", GetMoneyString(cost)))

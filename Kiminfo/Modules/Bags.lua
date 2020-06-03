@@ -2,7 +2,9 @@
 local C, F, G, L = unpack(ns)
 if not C.Bags then return end
 
-local format = string.format
+local format = format
+local CreateFrame = CreateFrame
+local GetContainerNumFreeSlots, GetContainerNumSlots = GetContainerNumFreeSlots, GetContainerNumSlots
 
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
@@ -28,9 +30,10 @@ local Text  = Stat:CreateFontString(nil, "OVERLAY")
 	Stat:SetAllPoints(Text)
 
 --==================================================--
----------------    [[ Bag slots ]]     ---------------
+---------------    [[ Functions ]]     ---------------
 --==================================================--
 
+--[[ Bag slots ]]--
 local function getBagSlots()
 	local free, total, used = 0, 0, 0
 	
@@ -62,18 +65,18 @@ local function OnEnter(self)
 	local free, total, used = getBagSlots()
 	local money = GetMoney()
 	
-	-- title
-	GameTooltip:SetOwner(self, "ANCHOR_BOTTOM", 0, -10)
+	-- Title
+	GameTooltip:SetOwner(self, C.StickTop and "ANCHOR_BOTTOM" or "ANCHOR_TOP", 0, C.StickTop and -10 or 10)
 	GameTooltip:ClearLines()
 	GameTooltip:AddDoubleLine(BAGSLOT, free.."/"..total, 0, .6, 1, 0, .6, 1)
 	GameTooltip:AddLine(" ")
 	
-	-- bag slot
+	-- Bag slot
 	GameTooltip:AddLine(G.OptionColor..BAGSLOT)
 	GameTooltip:AddDoubleLine(USE, used, 1, 1, 1, 1, 1, 1)
-	GameTooltip:AddDoubleLine(MONEY, GetMoneyString(money), 1, 1, 1, 1, 1, 1)
+	GameTooltip:AddDoubleLine(MONEY, GetMoneyString(money).."  ", 1, 1, 1, 1, 1, 1)
 	
-	-- currency
+	-- Currency
 	for i = 1, GetNumWatchedTokens() do
 		local name, count, icon, currencyID = GetBackpackCurrencyInfo(i)
 		
@@ -94,10 +97,10 @@ local function OnEnter(self)
 		end
 	end
 	
-	-- options
+	-- Options
 	GameTooltip:AddDoubleLine(" ", G.Line)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..BAGSLOT..G.LeftButton)
-	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.AutoSell..(Kiminfo.AutoSell and "|cff55ff55"..ENABLE or "|cffff5555"..DISABLE)..G.RightButton, 1, 1, 1, .4, .78, 1)
+	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.AutoSell..(Kiminfo.AutoSell and G.Enable or G.Disable)..G.RightButton, 1, 1, 1, .4, .78, 1)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..CURRENCY..G.MiddleButton)
 	
 	GameTooltip:Show()
@@ -109,18 +112,18 @@ end
 	
 	--[[ Tooltip ]]--
 	Stat:SetScript("OnEnter", function(self)
-		-- mouseover color
+		-- Mouseover color
 		Icon:SetVertexColor(0, 1, 1)
 		Text:SetTextColor(0, 1, 1)
-		-- tooltip show
+		-- Tooltip show
 		OnEnter(self)
 	end)
 	
 	Stat:SetScript("OnLeave", function()
-		-- normal color
+		-- Normal color
 		Icon:SetVertexColor(1, 1, 1)
 		Text:SetTextColor(1, 1, 1)
-		-- tooltip hide
+		-- Tooltip hide
 		GameTooltip:Hide()
 	end)
 	
@@ -133,12 +136,13 @@ end
 	Stat:SetScript("OnMouseDown", function(self,button)
 		if button == "RightButton" then
 			Kiminfo.AutoSell = not Kiminfo.AutoSell
-			self:GetScript("OnEnter")(self)
+			OnEnter(self)
 		elseif button == "MiddleButton" then
 			if InCombatLockdown() then
 				UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT)
 				return
 			end
+			
 			ToggleCharacter("TokenFrame")
 		else
 			ToggleAllBags()
@@ -149,8 +153,8 @@ end
 ---------------    [[ Auto sell gray ]]     ---------------
 --=======================================================--
 
-local SellGray = CreateFrame("Frame")
-	SellGray:SetScript("OnEvent", function()
+local sellGray = CreateFrame("Frame")
+	sellGray:SetScript("OnEvent", function()
 		if Kiminfo.AutoSell == true then
 			local c = 0
 			
@@ -175,4 +179,4 @@ local SellGray = CreateFrame("Frame")
 			end
 		end
 	end)
-	SellGray:RegisterEvent("MERCHANT_SHOW")
+	sellGray:RegisterEvent("MERCHANT_SHOW")

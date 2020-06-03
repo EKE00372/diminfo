@@ -3,6 +3,7 @@ local C, F, G, L = unpack(ns)
 
 -- localized references for global functions (about 50% faster)
 local format = string.format
+local CreateFrame = CreateFrame
 
 --================================================--
 ---------------    [[ Convert ]]     ---------------
@@ -113,13 +114,17 @@ G.Dura = G.MediaFolder.."dura.tga"
 G.Fps = G.MediaFolder.."fps.tga"
 G.Ping = G.MediaFolder.."ping.tga"
 G.Mem = G.MediaFolder.."spell.tga"
-	
+
 G.LeftButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:230:307|t "
 G.RightButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:333:411|t "
 G.MiddleButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:127:204|t "
 	
 G.AFK = "|T"..FRIENDS_TEXTURE_AFK..":14:14:0:0:16:16:1:15:1:15|t"
 G.DND = "|T"..FRIENDS_TEXTURE_DND..":14:14:0:0:16:16:1:15:1:15|t"
+
+G.Enable = "|cff55ff55"..ENABLE
+G.Disable = "|cffff5555"..DISABLE
+
 
 if not C.Panel then return end
 
