@@ -15,6 +15,8 @@ NO in-game config. If you need, try other else such like Titan Panel.
 
 這是一個沒有遊戲內控制台的插件，有此需求請用 Titan Panel。
 
+## More summary
+
 <details>
 <summary>English</summary>
 
@@ -101,6 +103,11 @@ Just edit config.lua to change them. I suggest use Notepad++, Notepads (Win10 on
 * Time
 	* 顯示時間，指向時顯示副本與每周任務進度
 	* 左鍵：行事曆；右鍵：碼錶
+
 </details>
 
+## Credits
 
+* Tukz, Loshine, Siweia, HopeASD
+* Bar texture support: Peterdox
+* Icon texture from SX Databar.
