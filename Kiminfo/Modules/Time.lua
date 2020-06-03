@@ -24,7 +24,7 @@ local Text  = Stat:CreateFontString(nil, "OVERLAY")
 ---------------    [[ Functions ]]     ---------------
 --==================================================--
 
---[[ format 24/12 hour clock ]]--
+--[[ Format 24/12 hour clock ]]--
 local function updateTimerFormat(color, hour, minute)
 	if GetCVarBool("timeMgrUseMilitaryTime") then
 		return format(color..TIMEMANAGER_TICKER_24HOUR, hour, minute)
@@ -47,7 +47,7 @@ local bonus = {
 }
 local bonusName = GetCurrencyInfo(1580)
 
---[[ custom api for add title line ]]--
+--[[ Custom api for add title line ]]--
 local title
 local function addTitle(text)
 	if not title then
@@ -64,12 +64,12 @@ end
 --[[ Update data text ]]--
 local function OnUpdate(self, elapsed)
 	self.timer = (self.timer or 3) + elapsed
-	-- 限制一下更新速率
+	-- Limit frequency / 限制一下更新速率
 	if self.timer > 5 then
-		-- 行事曆有邀請時變色
+		-- Calender color when get invite / 行事曆有邀請時變色
 		local color = C_Calendar.GetNumPendingInvites() > 0 and "|cffFF0000" or ""
 		
-		-- 本地時間
+		-- Local time / 本地時間
 		local hour, minute
 		if GetCVarBool("timeMgrUseLocalTime") then
 			hour, minute = tonumber(date("%H")), tonumber(date("%M"))
@@ -90,26 +90,26 @@ local function OnEnter(self)
 	local today = C_Calendar.GetDate()
 	local w, m, d, y = today.weekday, today.month, today.monthDay, today.year
 	
-	-- title
-	GameTooltip:SetOwner(self, "ANCHOR_BOTTOM", 0, -10)
+	-- Title
+	GameTooltip:SetOwner(self, C.StickTop and "ANCHOR_BOTTOM" or "ANCHOR_TOP", 0, C.StickTop and -10 or 10)
 	GameTooltip:ClearLines()
 	GameTooltip:AddLine(format(FULLDATE, CALENDAR_WEEKDAY_NAMES[w], CALENDAR_FULLDATE_MONTH_NAMES[m], d, y), 0, .6, 1)
 	GameTooltip:AddLine(" ")
 	
-	-- game time
+	-- Game time
 	GameTooltip:AddDoubleLine(TIMEMANAGER_TOOLTIP_LOCALTIME, GameTime_GetLocalTime(true), .6, .8, 1, 1, 1, 1)
 	GameTooltip:AddDoubleLine(TIMEMANAGER_TOOLTIP_REALMTIME, GameTime_GetGameTime(true), .6, .8, 1, 1, 1, 1)
 	
-	-- 副本進度
+	--[[ 副本進度 ]]--
 	
-	-- world boss
+	-- World boss
 	title = false
 	for i = 1, GetNumSavedWorldBosses() do
 		local name, id, reset = GetSavedWorldBossInfo(i)
 		
 		if not (id == 11 or id == 12 or id == 13) then
 			addTitle(RAID_INFO_WORLD_BOSS)
-			GameTooltip:AddDoubleLine(name, SecondsToTime(reset, true, nil, 3), 1, .82, 0, 1,1,1)
+			GameTooltip:AddDoubleLine(name, SecondsToTime(reset, true, nil, 3), 1, .82, 0, 1, 1, 1)
 		end
 	end
 	
@@ -127,7 +127,7 @@ local function OnEnter(self)
 				r, g, b = 1, 1, 1
 			end
 		
-		GameTooltip:AddDoubleLine(difficultyName.." - "..name, SecondsToTime(reset, true, nil, 3), 1, .82, 0, r,g,b)
+		GameTooltip:AddDoubleLine(difficultyName.." - "..name, SecondsToTime(reset, true, nil, 3), 1, .82, 0, r, g, b)
 		end
 	end
 
@@ -145,13 +145,13 @@ local function OnEnter(self)
 				r, g, b = 1, 1, 1
 			end
 		
-		GameTooltip:AddDoubleLine(difficultyName.." - "..name, SecondsToTime(reset, true, nil, 3), 1, .82, 0, r,g,b)
+		GameTooltip:AddDoubleLine(difficultyName.." - "..name, SecondsToTime(reset, true, nil, 3), 1, .82, 0, r, g, b)
 		end
 	end
 	
-	-- 每周任務
+	--[[ Weekly quest / 每周任務 ]]--
 	
-	-- 好運符任務
+	-- Bonus weekly / 好運符任務
 	title = false
 	local count, maxCoins = 0, 2
 	for _, id in pairs(bonus) do
@@ -170,7 +170,7 @@ local function OnEnter(self)
 		end
 	end
 	
-	-- 征服每周進度
+	-- Pvp weekly / 征服每周進度
 	do
 		local currentValue, maxValue, questID = PVPGetConquestLevelInfo()
 		local questDone = questID and questID == 0
@@ -186,7 +186,7 @@ local function OnEnter(self)
 		end
 	end
 	
-	-- 海嶼遠征周任
+	-- Island weekly / 海嶼遠征周任
 	local iwqID = C_IslandsQueue.GetIslandsWeeklyQuestID()
 	if iwqID and UnitLevel("player") >= 115 then
 		addTitle(QUESTS_LABEL)
@@ -241,11 +241,14 @@ end
 	Stat:SetScript("OnMouseDown", function(self, btn)
 		if btn == "RightButton"  then
 			ToggleTimeManager()
-		else
+		elseif btn == "LeftButton"  then
 			if InCombatLockdown() then
 				UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT)
 				return
 			end
+			
 			ToggleCalendar()
+		else
+			return
 		end
 	end)

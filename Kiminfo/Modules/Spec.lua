@@ -2,8 +2,10 @@ local addon, ns = ...
 local C, F, G, L = unpack(ns)
 if not C.Spec then return end
 
-local format = string.format
-local sort = table.sort
+local format, min, max, sort, wipe = format, min, max, sort, wipe
+local CreateFrame = CreateFrame
+
+local pvpTalents
 
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
@@ -25,19 +27,19 @@ local Text  = Stat:CreateFontString(nil, "OVERLAY")
 ---------------    [[ feature ]]     ---------------
 --================================================--
 
---[[ right-click menu ]]--
+--[[ Right-click menu ]]--
 local lootMenuFrame = CreateFrame("Frame", "LootSpecMenu", UIParent, "UIDropDownMenuTemplate")
 local lootMenuList = {
-	-- title
+	-- Title
 	{ text = SELECT_LOOT_SPECIALIZATION, isTitle = true, notCheckable = true },
 	-- default and 4 spec
 	{},	{},	{},	{},	{},
 }
 
---[[ middle-click menu ]]--
+--[[ Middle-click menu ]]--
 local specMenuFrame = CreateFrame("Frame", "SpecMenu", UIParent, "UIDropDownMenuTemplate")
 local specMenuList = {
-	-- title
+	-- Title
 	{ text = SPECIALIZATION, isTitle = true, notCheckable = true },
 	-- 4 spec
 	{},	{},	{},	{},
@@ -76,16 +78,16 @@ local function OnEnter(self)
 	local SpecID = GetSpecialization()
 	if not SpecID then return end
 	
-	GameTooltip:SetOwner(self, "ANCHOR_BOTTOM", 0, -10)
+	GameTooltip:SetOwner(self, C.StickTop and "ANCHOR_BOTTOM" or "ANCHOR_TOP", 0, C.StickTop and -10 or 10)
 	GameTooltip:ClearLines()
 	GameTooltip:AddLine(TALENTS_BUTTON, 0, .6, 1)
 	GameTooltip:AddLine(" ")
 	
-	-- spec
+	-- Spec
 	local _, specName, _, specIcon = GetSpecializationInfo(SpecID)
 	GameTooltip:AddLine(F.addIcon(specIcon, 14, 4, 46).." "..G.OptionColor..specName.."|r")
 	
-	-- telent
+	-- Telent
 	for t = 1, MAX_TALENT_TIERS do
 		for c = 1, 3 do
 			local _, name, icon, selected = GetTalentInfo(t, c, 1)
@@ -95,19 +97,18 @@ local function OnEnter(self)
 		end
 	end
 	
-	-- pvp telent
-	local pvpTalents
+	-- Pvp telent
 	if UnitLevel("player") >= SHOW_PVP_TALENT_LEVEL then
 		pvpTalents = C_SpecializationInfo.GetAllSelectedPvpTalentIDs()
 		
 		if #pvpTalents > 0 then
-			-- pvp title
+			-- Pvp title
 			local pvpTexture = select(3, GetCurrencyInfo(104))
 			
 			GameTooltip:AddLine(" ")
-			GameTooltip:AddLine(F.addIcon(pvpTexture, 14, 4, 46).." "..PVP_TALENTS, .6,.8,1)
+			GameTooltip:AddLine(F.addIcon(pvpTexture, 14, 4, 46).." "..PVP_TALENTS, .6, .8, 1)
 			
-			-- list
+			-- List
 			for _, talentID in next, pvpTalents do
 				local _, name, icon, _, _, _, unlocked = GetPvpTalentInfoByID(talentID)
 				if name and unlocked then
@@ -133,16 +134,16 @@ end
 	
 	--[[ Tooltip ]]--
 	Stat:SetScript("OnEnter", function(self)
-		-- mouseover color
+		-- Mouseover color
 		Text:SetTextColor(0, 1, 1)
-		-- tooltip show
+		-- Tooltip show
 		OnEnter(self)
 	end)
 	
 	Stat:SetScript("OnLeave", function()
-		-- normal color
+		-- Normal color
 		Text:SetTextColor(1, 1, 1)
-		-- tooltip hide
+		-- Tooltip hide
 		GameTooltip:Hide()
 	end)
 	
@@ -154,15 +155,15 @@ end
 	
 	--[[ Options ]]--
 	Stat:SetScript("OnMouseDown", function(self, button)
-		-- hide tooltip when dropdown menu pop
+		-- Hide tooltip when dropdown menu pop
 		GameTooltip:Hide()
 		
-		-- to get current spec id index
+		-- Get current spec id index
 		local ID = GetSpecialization()
 		if not ID then return end
-		-- to get current spec info
+		-- Get current spec info
 		local specID, specName = GetSpecializationInfo(ID)
-		-- to get currnet loot spec
+		-- Get currnet loot spec
 		local LootSpec = GetLootSpecialization()
 		
 		if button == "RightButton" then
@@ -183,8 +184,6 @@ end
 			EasyMenu(lootMenuList, lootMenuFrame, "cursor", 0, 0, "MENU", 3)
 		elseif button == "MiddleButton" then
 			for i = 1, 4 do
-				specMenuList[1].text = SPECIALIZATION
-				
 				local id, name = GetSpecializationInfo(i)
 				if id then
 					specMenuList[i+1].text = name

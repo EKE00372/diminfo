@@ -3,8 +3,11 @@ local C, F, G, L = unpack(ns)
 if not C.Guild then return end
 
 local LibQTip = LibStub('LibQTip-1.0')
-local format = string.format
-local sort = table.sort
+local format, sort, wipe = format, sort, wipe
+local CreateFrame = CreateFrame
+local GetNumGuildMembers, GetGuildRosterInfo = GetNumGuildMembers, GetGuildRosterInfo
+local GetGuildFactionInfo = GetGuildFactionInfo
+
 local guildTable = {}
 local name, rank, rankindex, level, zone, connected, status, class
 
@@ -36,11 +39,12 @@ local Text  = Stat:CreateFontString(nil, "OVERLAY")
 ---------------    [[ Functions ]]     ---------------
 --==================================================--
 
+--[[ Get daily massage ]]--
 local function UpdateGuildMessage()
 	guildMotD = GetGuildRosterMOTD()
 end
 
--- sort by/排序
+--[[ Sort by ]] --
 local function SortGuildTable(shift)
 		sort(guildTable, function(a, b)
 			if a and b then
@@ -53,6 +57,7 @@ local function SortGuildTable(shift)
 		end)
 	end
 
+--[[ Build guild member list table ]]--
 local function BuildGuildTable()
 	wipe(guildTable)
 	
@@ -60,7 +65,7 @@ local function BuildGuildTable()
 	for i = 1, GetNumGuildMembers() do
 		local name, rank, rankindex, level, _, zone, _, _, connected, status, class, _, _, mobile = GetGuildRosterInfo(i)
 			
-		-- we are only interested in online members/只顯示線上成員
+		-- Show only online members / 只顯示線上成員
 		if mobile and not connected then
 				zone = REMOTE_CHAT
 				if status == 1 then
@@ -86,14 +91,14 @@ local function BuildGuildTable()
 		
 		if connected then
 			count = count + 1
-			guildTable[count] = { name, rank, rankindex, level, zone, connected, status, class, mobile }
+			guildTable[count] = { Ambiguate(name, "guild"), rank, rankindex, level, zone, connected, status, class, mobile }
 		end
 	end
 	
 	SortGuildTable(IsShiftKeyDown())
 end
 
--- Click function
+--[[ Click function ]]--
 local function buttonOnClick(self, name, btn)
 	if btn == "LeftButton" then
 		if IsAltKeyDown() then
@@ -129,13 +134,13 @@ local function OnEvent(self, event, ...)
 	end
 end
 
--- hide QTip tooltip
+--[[ Hide QTip tooltip ]]--
 local function OnRelease(self)
 	LibQTip:Release(self.tooltip)
 	self.tooltip = nil  
 end
 
--- Update when mouseover tooltip
+--[[ Update mouseover tooltip ]]--
 local function OnUpdate(self, elapsed)
 	self.timer = (self.timer or 0) + elapsed
 	
@@ -146,25 +151,27 @@ local function OnUpdate(self, elapsed)
 				self:SetScript("OnUpdate", nil)
 			end
 		end
+		
 		self.timer = 0
 	end
 end
 
 local function OnEnter(self)
-	-- 不在公會就不顯示tooltip
+	-- No guild no tooltip / 不在公會就不顯示tooltip
 	if not IsInGuild() then return end
-	-- get local
+	-- Get local
 	local isShiftKeyDown = IsShiftKeyDown()
 	local total, online = GetNumGuildMembers()
 	local guildName, guildRank = GetGuildInfo("player")
 	local guildMotD = GetGuildRosterMOTD()
 	local _, _, standingID, barMin, barMax, barValue = GetGuildFactionInfo()
-	-- get table
+	
+	-- Get table
 	BuildGuildTable()
 	
-	-- create qtip
+	-- Create qtip
 	local tooltip = LibQTip:Acquire("KiminfoGuildTooltip", 2, "LEFT", "RIGHT")
-	tooltip:SetPoint("TOP", self, "BOTTOM", 0, -10)
+	tooltip:SetPoint(C.StickTop and "TOP" or "BOTTOM", self, C.StickTop and "BOTTOM" or "TOP", 0, C.StickTop and -10 or 10)
 	tooltip:Clear()
 	tooltip:AddHeader(G.TitleColor..guildName, G.TitleColor..(format("%d/%d", online, total)))
 	
@@ -172,18 +179,19 @@ local function OnEnter(self)
 	tooltip:AddLine(GUILD)
 	tooltip:AddLine(G.OptionColor..RANK, G.OptionColor..guildRank)
 		
-	-- guild reputation
+	-- Guild reputation
 	if standingID == 8 then
 		tooltip:AddLine(G.OptionColor..REPUTATION, G.OptionColor.._G["FACTION_STANDING_LABEL"..8])
 	else
 		tooltip:AddLine(G.OptionColor..REPUTATION, G.OptionColor.._G["FACTION_STANDING_LABEL"..standingID].." " ..(format("%.3f", (barValue/barMax))*100).."%")
 	end
 	
-	-- guild daily info
+	-- Guild daily info
 	if guildMotD then
 		tooltip:AddLine(" ")
 		tooltip:AddLine(GUILD_MOTD)
 		
+		-- Update width automatically
 		local width
 		if tooltip:GetWidth() > 200 then
 			width = tooltip:GetWidth() + 100
@@ -195,17 +203,16 @@ local function OnEnter(self)
 		tooltip:SetCell(y, 1, G.OptionColor..format(guildMotD), nil, "LEFT", 2, nil, 0, 0, width)
 	end
 	
-	-- options
+	-- Options
 	tooltip:AddLine(" ", G.Line)
 	tooltip:AddLine(G.OptionColor..G.LeftButton.."+ Shift "..SLASH_WHISPER2:gsub("/(.*)","%1"), G.OptionColor..GUILD..G.LeftButton)
-	tooltip:AddLine(G.OptionColor..G.LeftButton.."+ Alt "..INVITE, G.OptionColor..COMMUNITIES_INVITATION_FRAME_TYPE..G.RightButton)
+	tooltip:AddLine(G.OptionColor..G.LeftButton.."+ Alt "..INVITE, G.OptionColor..COMMUNITIES..G.RightButton)
 
 	tooltip:AddLine(" ")
 	tooltip:AddLine(MEMBERS, ZONE)
 	tooltip:AddSeparator(2, .6, .8, 1)
 	
 	for i = 1, #guildTable do
-		-- get table
 		local info = guildTable[i]
 		
 		if info then
@@ -244,18 +251,18 @@ end
 	--[[ Tooltip ]]--
 	Stat:SetScript("OnEnter", function(self)
 		OnRelease(self)
-		-- mouseover color
+		-- Mouseover color
 		Icon:SetVertexColor(0, 1, 1)
 		Text:SetTextColor(0, 1, 1)
-		-- tooltip show
+		-- Tooltip show
 		OnEnter(self)
 	end)
-		
+	
 	Stat:SetScript("OnLeave", function(self)
-		-- normal color
+		-- Normal color
 		Icon:SetVertexColor(1, 1, 1)
 		Text:SetTextColor(1, 1, 1)
-		-- tooltip hide
+		-- Tooltip hide
 		if not self.tooltip then return end
 		self:SetScript("OnUpdate", OnUpdate)
 	end)
@@ -266,12 +273,15 @@ end
 			UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT)
 			return
 		end
+		
 		if button == "RightButton" then
-			ToggleCommunitiesFrame()
-		else
 			if not IsInGuild() then return end
 			if not GuildFrame then LoadAddOn("Blizzard_GuildUI") end
 			ToggleFrame(GuildFrame)
+		elseif button == "LeftButton" then
+			ToggleCommunitiesFrame()
+		else
+			return
 		end
 	end)
 	
