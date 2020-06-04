@@ -41,8 +41,7 @@ local C, F, G, L = unpack(ns)
 	
 	-- anchor, parent, x, y, width, height, alpha
 	-- 錨點，父級框體，x座標，y座標，寬度，高度，透明度
-	C.Panel1 = {"TOPLEFT", UIParent, 165, -20, 420, 36, 32, .8}
-	C.Panel2 = {"TOPLEFT", UIParent, 165, -60, 320, 36, 32, .8}
+	C.Panel1 = {"TOPLEFT", UIParent, 0, -10, 720, 36, 32, .8}
 	-- add if you need, max to C.Panel5 / 自己加，最多到C.Panel5
 
 --------------
@@ -59,32 +58,16 @@ local C, F, G, L = unpack(ns)
 	
 	-- Timer / 時鐘
 	C.Time = true
-	C.TimePoint =  {"TOPLEFT", UIParent, 185, -30}
-	
-	-- Friends / 好友
-	C.Friends = true
-	C.FriendsPoint =  {"LEFT", "Kiminfo_Time", "RIGHT", 30, 0}
-	
-	-- Guild / 公會
-	C.Guild = true
-	C.GuildPoint = {"LEFT", "Kiminfo_Friends", "RIGHT", 30, 0}
+	C.TimePoint =  {"TOPLEFT", UIParent, 15, -20}
 	
 	-- Bags / 背包
 	C.Bags = true
-	C.BagsPoint = {"LEFT", "Kiminfo_Guild", "RIGHT", 30, 0}
-	
-	-- Durability / 耐久
-	C.Durability = true
-	C.DurabilityPoint = {"LEFT", "Kiminfo_Bags", "RIGHT", 30, 0}
-
-	-- Zone and Position / 地名座標
-	C.Positions = true
-	C.PositionsPoint = {"LEFT", "Kiminfo_Dura", "RIGHT", 20, 0}
+	C.BagsPoint = {"LEFT", "Kiminfo_Time", "RIGHT", 30, 0}
 	
 	-- Memory / 記憶體占用列表
 	C.Memory = true
 	C.MaxAddOns = 30
-	C.MemoryPoint = {"TOPLEFT", UIParent, 200, -68}
+	C.MemoryPoint =  {"LEFT", "Kiminfo_Bags", "RIGHT", 30, 0}
 	
 	-- System: Fps and latency / 幀數與延遲
 	C.System = true
@@ -93,6 +76,24 @@ local C, F, G, L = unpack(ns)
 	-- Spec: Spec and Loot Spec
 	C.Spec = true
 	C.SpecPoint =  {"LEFT", "Kiminfo_System", "RIGHT", 15, 0}
+	
+	-- Friends / 好友
+	C.Friends = true
+	C.FriendsPoint =  {"LEFT", "Kiminfo_Spec", "RIGHT", 35, 0}
+	
+	-- Guild / 公會
+	C.Guild = true
+	C.GuildPoint = {"LEFT", "Kiminfo_Friends", "RIGHT", 30, 0}
+	
+	-- Durability / 耐久
+	C.Durability = true
+	C.DurabilityPoint = {"LEFT", "Kiminfo_Guild", "RIGHT", 30, 0}
+
+	-- Zone and Position / 地名座標
+	C.Positions = true
+	C.PositionsPoint = {"LEFT", "Kiminfo_Dura", "RIGHT", 20, 0}
+	
+	
 	
 -------------
 -- Credits --
