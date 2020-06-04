@@ -4,7 +4,7 @@
 ## Notes: Info Data Bar
 ## Version: R3
 ## SavedVariables: Kiminfo
-## X-Credits: Tukz, Katae, Loshine, DDestruction, msylgj0, Siweia, Peter
+## X-Credits: Tukz, Loshine, Siweia, HopeASD, Peter
 
 Libs\Libs.xml
 
