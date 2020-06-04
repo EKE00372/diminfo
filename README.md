@@ -22,7 +22,7 @@ NO in-game config. If you need, try other else such like Titan Panel.
 
 ## Config
 
-Just edit config.lua to change them. I suggest use Notepad++, Notepads (Win10 only) or Akelpad to edit lua file. save file and /reload wow after change.
+Just edit config.lua to change them. I suggest use [Notepad++](https://notepad-plus-plus.org/), [otepads (Win10 only)](https://www.notepadsapp.com/) or [Akelpad](http://akelpad.sourceforge.net/en/index.php) to edit lua file. save file and /reload wow after change.
 
 ## Feature
 
@@ -66,7 +66,7 @@ Just edit config.lua to change them. I suggest use Notepad++, Notepads (Win10 on
 
 ## Config
 
-編輯 config.lua 以更改設定。推薦使用 Notepad++ Notepads (Win10 only) or Akelpa 來編輯 lua 檔案。編輯完存檔後 /reload 重載遊戲即可。
+編輯 config.lua 以更改設定。推薦使用 [Notepad++](https://notepad-plus-plus.org/)、[otepads (Win10 only)](https://www.notepadsapp.com/) 或 [Akelpad](http://akelpad.sourceforge.net/en/index.php) 來編輯 lua 檔案。編輯完存檔後 /reload 重載遊戲即可。
 
 ## Feature
 
