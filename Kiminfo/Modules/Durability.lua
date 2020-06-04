@@ -2,7 +2,7 @@ local addon, ns = ...
 local C, F, G, L = unpack(ns)
 if not C.Durability then return end
 
-local format, floor, max, sort, modf, select = string.format, math.floor, max, sort, math.modf, select
+local format, floor, max, sort, modf, select = string.format, math.floor, max, table.sort, math.modf, select
 local CreateFrame = CreateFrame
 local GetInventoryItemLink, GetInventoryItemDurability, GetInventoryItemTexture = GetInventoryItemLink, GetInventoryItemDurability, GetInventoryItemTexture
 

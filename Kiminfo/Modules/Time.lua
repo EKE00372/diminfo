@@ -2,7 +2,18 @@ local addon, ns = ...
 local C, F, G, L = unpack(ns)
 if not C.Time then return end
 
-local format = string.format
+local format, time, date = string.format, time, date
+local C_Calendar_GetNumPendingInvites = C_Calendar.GetNumPendingInvites
+local GetCVarBool = GetCVarBool
+local TIMEMANAGER_TICKER_24HOUR, TIMEMANAGER_TICKER_12HOUR = TIMEMANAGER_TICKER_24HOUR, TIMEMANAGER_TICKER_12HOUR
+
+local title
+local bonusName = GetCurrencyInfo(1580) -- Bonus roll
+local bonus = {
+	52834, 52838,	-- Gold
+	52835, 52839,	-- Honor
+	52837, 52840,	-- Resources
+}
 
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
@@ -19,15 +30,15 @@ local Text  = Stat:CreateFontString(nil, "OVERLAY")
 	Text:SetPoint(unpack(C.TimePoint))
 	Text:SetTextColor(1, 1, 1)
 	Stat:SetAllPoints(Text)
-	
+
 --==================================================--
 ---------------    [[ Functions ]]     ---------------
 --==================================================--
 
 --[[ Format 24/12 hour clock ]]--
-local function updateTimerFormat(color, hour, minute)
+local function updateTimerFormat(hour, minute)
 	if GetCVarBool("timeMgrUseMilitaryTime") then
-		return format(color..TIMEMANAGER_TICKER_24HOUR, hour, minute)
+		return format(TIMEMANAGER_TICKER_24HOUR, hour, minute)
 	else
 		local timerUnit = hour < 12 and " AM" or " PM"
 		
@@ -35,20 +46,11 @@ local function updateTimerFormat(color, hour, minute)
 			hour = hour - 12
 		end
 		
-		return format(color..TIMEMANAGER_TICKER_12HOUR..timerUnit, hour, minute)
+		return format(TIMEMANAGER_TICKER_12HOUR..timerUnit, hour, minute)
 	end
 end
 
---[[ Bonus roll database ]]--
-local bonus = {
-	52834, 52838,	-- Gold
-	52835, 52839,	-- Honor
-	52837, 52840,	-- Resources
-}
-local bonusName = GetCurrencyInfo(1580)
-
 --[[ Custom api for add title line ]]--
-local title
 local function addTitle(text)
 	if not title then
 		GameTooltip:AddLine(" ")
@@ -61,14 +63,22 @@ end
 ---------------    [[ Updates ]]     ---------------
 --================================================--
 
+local function OnEvent(self)
+	local r, g, b
+	if C_Calendar_GetNumPendingInvites() > 0 then 
+		r, g, b = .57, 1, .57
+	else
+		r, g, b = 1, 1, 1
+	end
+	
+	Text:SetTextColor(r, g, b)
+end
+
 --[[ Update data text ]]--
 local function OnUpdate(self, elapsed)
 	self.timer = (self.timer or 3) + elapsed
 	-- Limit frequency / 限制一下更新速率
 	if self.timer > 5 then
-		-- Calender color when get invite / 行事曆有邀請時變色
-		local color = C_Calendar.GetNumPendingInvites() > 0 and "|cffFF0000" or ""
-		
 		-- Local time / 本地時間
 		local hour, minute
 		if GetCVarBool("timeMgrUseLocalTime") then
@@ -76,7 +86,7 @@ local function OnUpdate(self, elapsed)
 		else
 			hour, minute = GetGameTime()
 		end
-		Text:SetText(updateTimerFormat(color, hour, minute))
+		Text:SetText(updateTimerFormat(hour, minute))
 		
 		self.timer = 0
 	end
@@ -224,17 +234,19 @@ end
 		OnEnter(self)
 	end)
 	
-	Stat:SetScript("OnLeave", function()
+	Stat:SetScript("OnLeave", function(self)
 		-- normal color
 		Text:SetTextColor(1, 1, 1)
 		-- tooltip hide
 		GameTooltip:Hide()
+		OnEvent(self)
 	end)
 	
 	--[[ Data text ]]--
 	Stat:RegisterEvent("CALENDAR_UPDATE_PENDING_INVITES")
 	Stat:RegisterEvent("PLAYER_ENTERING_WORLD")
 	--Stat:RegisterEvent("UPDATE_INSTANCE_INFO")
+	Stat:SetScript("OnEvent", OnEvent)
 	Stat:SetScript("OnUpdate", OnUpdate)
 	
 	--[[ Options ]]--
