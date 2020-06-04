@@ -2,12 +2,13 @@
 
 A Info Bar.
 
+一個訊息條。
 
 ## Info
 
 Kiminfo based on diminfo (and it based on tukui data text modules). There are 9 modules.
 
-Kiminfo 是基於 diminfo 製作的訊息條 (而它源自於 tukui)，有九個模組。本插件僅發布在 Curse、Wowinterface 和 Github，謝絕任何搬運轉載。
+Kiminfo 是基於 diminfo 製作的訊息條 (而它源自於 tukui)，有九個模組。**本插件僅發布在 Curse、Wowinterface 和 Github，謝絕任何搬運轉載。**
 
 ## Notice
 
@@ -103,6 +104,148 @@ Just edit config.lua to change them. I suggest use [Notepad++](https://notepad-p
 * Time / 時間
 	* 顯示時間，指向時顯示副本與每周任務進度
 	* 左鍵：行事曆；右鍵：碼錶
+
+</details>
+
+## Important when config
+
+<details>
+<summary>English</summary>
+	
+### Do not forget
+
+Kiminfo use `Time` module as starting parent, it anchored on UIParend, and other modules anchored modules on it's left. For example, as default Config setting, `Time` module is the first loaded and `Bags` module is second. This order is also **modules load order**.
+
+```lua
+	C.Time = true
+	C.TimePoint =  {"TOPLEFT", UIParent, 15, -20}
+	
+	-- Bags / 背包
+	C.Bags = true
+	C.BagsPoint = {"LEFT", "Kiminfo_Time", "RIGHT", 30, 0}
+	
+	-- Memory / 記憶體占用列表
+	C.Memory = true
+	C.MaxAddOns = 30
+	C.MemoryPoint =  {"LEFT", "Kiminfo_Bags", "RIGHT", 30, 0}
+```
+
+If you wanna change info bar position, just change `Time` module position; but if you wanna change modules order, Should not forget change load order in `Modules/Modules.xml`, or they cannot get anchor **because a modules cannot anchor on another modules which load later then itself**.
+
+For example, if you wanna change `Bags` modules to `Guild` modules right, should do this:
+
+```diff
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="Time.lua"/>
+- 	<Script file="Bags.lua"/>
+	<Script file="Memory.lua"/>
+	<Script file="System.lua"/>
+	<Script file="Spec.lua"/>
+	<Script file="Friends.lua"/>
+	<Script file="Guild.lua"/>
++ 	<Script file="Bags.lua"/>
+	<Script file="Durability.lua"/>
+	<Script file="Positions.lua"/>
+</Ui>
+```
+
+And then change anchor：
+
+```diff
+	-- Timer / 時鐘
+	C.Time = true
+	C.TimePoint =  {"TOPLEFT", UIParent, 15, -20}
+	
+- 	-- Bags / 背包
+- 	C.Bags = true
+- 	C.BagsPoint = {"LEFT", "Kiminfo_Time", "RIGHT", 30, 0}
+	
+	-- Memory / 記憶體占用列表
+	C.Memory = true
+	C.MaxAddOns = 30
+- 	C.MemoryPoint =  {"LEFT", "Kiminfo_Bags", "RIGHT", 30, 0}
++ 	C.MemoryPoint =  {"LEFT", "Kiminfo_Time", "RIGHT", 30, 0}
+
+	... omit ...
+	
+	-- Guild / 公會
+	C.Guild = true
+	C.GuildPoint = {"LEFT", "Kiminfo_Friends", "RIGHT", 30, 0}
+	
++ 	-- Bags / 背包
++ 	C.Bags = true
++ 	C.BagsPoint = {"LEFT", "Kiminfo_Guild", "RIGHT", 30, 0}
+```
+
+</details>
+
+<details>
+<summary>中文</summary>
+
+### Do not forget
+
+Kiminfo 以最左的模塊`時間`作為起始錨點，其錨點於遊戲定義的父級框體，而其他模塊則錨點於它左邊的前一個模塊，例如預設樣式中的`背包`即錨點於`時間`，而`插件`又錨點於背包。這個順序同時也是模組的**載入順序**。
+
+```lua
+	C.Time = true
+	C.TimePoint =  {"TOPLEFT", UIParent, 15, -20}
+	
+	-- Bags / 背包
+	C.Bags = true
+	C.BagsPoint = {"LEFT", "Kiminfo_Time", "RIGHT", 30, 0}
+	
+	-- Memory / 記憶體占用列表
+	C.Memory = true
+	C.MaxAddOns = 30
+	C.MemoryPoint =  {"LEFT", "Kiminfo_Bags", "RIGHT", 30, 0}
+```
+
+若你打算移動整條訊息條，調整`時間`模組的位置即可；但若打算更改模組的顯示順序，不要忘記同時更改`Modules/Modules.xml`中的模組載入順序。如果沒有更改插件將無法正常運作，**因為插件無法使先加載的模組錨點於後加載的模組**。
+
+舉例，若你想要將背包模組移至公會模組右方，就要將載入順序更改為：
+
+```diff
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="Time.lua"/>
+- 	<Script file="Bags.lua"/>
+	<Script file="Memory.lua"/>
+	<Script file="System.lua"/>
+	<Script file="Spec.lua"/>
+	<Script file="Friends.lua"/>
+	<Script file="Guild.lua"/>
++ 	<Script file="Bags.lua"/>
+	<Script file="Durability.lua"/>
+	<Script file="Positions.lua"/>
+</Ui>
+```
+
+再將錨點變更為：
+
+```diff
+	-- Timer / 時鐘
+	C.Time = true
+	C.TimePoint =  {"TOPLEFT", UIParent, 15, -20}
+	
+- 	-- Bags / 背包
+- 	C.Bags = true
+- 	C.BagsPoint = {"LEFT", "Kiminfo_Time", "RIGHT", 30, 0}
+	
+	-- Memory / 記憶體占用列表
+	C.Memory = true
+	C.MaxAddOns = 30
+- 	C.MemoryPoint =  {"LEFT", "Kiminfo_Bags", "RIGHT", 30, 0}
++ 	C.MemoryPoint =  {"LEFT", "Kiminfo_Time", "RIGHT", 30, 0}
+
+	... 中略 ...
+	
+	-- Guild / 公會
+	C.Guild = true
+	C.GuildPoint = {"LEFT", "Kiminfo_Friends", "RIGHT", 30, 0}
+	
++ 	-- Bags / 背包
++ 	C.Bags = true
++ 	C.BagsPoint = {"LEFT", "Kiminfo_Guild", "RIGHT", 30, 0}
+```
 
 </details>
 
