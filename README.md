@@ -114,7 +114,7 @@ Just edit config.lua to change them. I suggest use [Notepad++](https://notepad-p
 	
 ### Do not forget
 
-Kiminfo use `Time` module as starting parent, it anchored on UIParend, and other modules anchored modules on it's left. For example, as default Config setting, `Time` module is the first loaded and `Bags` module is second. This order is also **modules load order**.
+Kiminfo use `Time` module as starting anchored and it anchored on UIParent, other modules anchored modules on it's left. For example, as default Config setting, `Time` module is the first loaded and `Bags` module is second. This order is also **modules load order**.
 
 ```lua
 	C.Time = true
