@@ -16,16 +16,16 @@ NO in-game config. If you need, try other else such like Titan Panel.
 
 這是一個沒有遊戲內控制台的插件，有此需求請用 Titan Panel。
 
-## More summary
+## Config
+
+Just edit config.lua to change them. I suggest use [Notepad++](https://notepad-plus-plus.org/), [Notepads (Win10 only)](https://www.notepadsapp.com/) or [Akelpad](http://akelpad.sourceforge.net/en/index.php) to edit lua file. save file and /reload wow after change.
+
+編輯 config.lua 以更改設定。推薦使用 [Notepad++](https://notepad-plus-plus.org/)、[Notepads (Win10 only)](https://www.notepadsapp.com/) 或 [Akelpad](http://akelpad.sourceforge.net/en/index.php) 來編輯 lua 檔案。編輯完存檔後 /reload 重載遊戲即可。
+
+## Feature
 
 <details>
 <summary>English</summary>
-
-## Config
-
-Just edit config.lua to change them. I suggest use [Notepad++](https://notepad-plus-plus.org/), [otepads (Win10 only)](https://www.notepadsapp.com/) or [Akelpad](http://akelpad.sourceforge.net/en/index.php) to edit lua file. save file and /reload wow after change.
-
-## Feature
 
 * Bags
 	* Show bag slot, gold and currency
@@ -64,12 +64,6 @@ Just edit config.lua to change them. I suggest use [Notepad++](https://notepad-p
 
 <details>
 <summary>中文</summary>
-
-## Config
-
-編輯 config.lua 以更改設定。推薦使用 [Notepad++](https://notepad-plus-plus.org/)、[otepads (Win10 only)](https://www.notepadsapp.com/) 或 [Akelpad](http://akelpad.sourceforge.net/en/index.php) 來編輯 lua 檔案。編輯完存檔後 /reload 重載遊戲即可。
-
-## Feature
 
 * Bags / 背包
 	* 顯示空餘格數、金幣和兌換通貨
