@@ -2,7 +2,7 @@
 ## Author: EK
 ## Title: |cff00ffffKim|rinfo
 ## Notes: Info Data Bar
-## Version: R3
+## Version: R3.1
 ## SavedVariables: Kiminfo
 ## X-Credits: Tukz, Loshine, Siweia, HopeASD, Peter
 

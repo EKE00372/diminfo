@@ -236,10 +236,11 @@ end
 	
 	Stat:SetScript("OnLeave", function(self)
 		-- normal color
-		Text:SetTextColor(1, 1, 1)
+		--Text:SetTextColor(1, 1, 1)
+		OnEvent(self)
 		-- tooltip hide
 		GameTooltip:Hide()
-		OnEvent(self)
+		
 	end)
 	
 	--[[ Data text ]]--
