@@ -194,7 +194,7 @@ Kiminfo 以最左的模塊`時間`作為起始錨點，其錨點於遊戲定義�
 	C.MemoryPoint =  {"LEFT", "Kiminfo_Bags", "RIGHT", 30, 0}
 ```
 
-若你打算移動整條訊息條，調整`時間`模組的位置即可；但若打算更改模組的顯示順序，不要忘記同時更改`Modules/Modules.xml`中的模組載入順序。如果沒有更改插件將無法正常運作，**因為插件無法使先加載的模組錨點於後加載的模組**。
+若你打算移動整條訊息條，調整`時間`模組的位置即可；但若打算更改模組的顯示順序，不要忘記同時更改`Modules/Modules.xml`中的模組載入順序。如果沒有更改插件將無法正常運作，**因為插件無法使先載入的模組錨點於後載入的模組**。
 
 舉例，若你想要將背包模組移至公會模組右方，就要將載入順序更改為：
 
@@ -239,6 +239,96 @@ Kiminfo 以最左的模塊`時間`作為起始錨點，其錨點於遊戲定義�
 + 	-- Bags / 背包
 + 	C.Bags = true
 + 	C.BagsPoint = {"LEFT", "Kiminfo_Guild", "RIGHT", 30, 0}
+```
+
+</details>
+
+## My Layout example
+
+This is my layout, an example for edit.
+
+這是我自己使用的樣式，作為例子供參考。
+
+<details>
+<summary>Modules.xml</summary>
+
+This is my layout, an example for edit.
+```xml
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="Time.lua"/>
+	<Script file="Bags.lua"/>
+	<Script file="Memory.lua"/>
+	<Script file="System.lua"/>
+	<Script file="Spec.lua"/>
+	<Script file="Friends.lua"/>
+	<Script file="Guild.lua"/>
+	<Script file="Durability.lua"/>
+	<Script file="Positions.lua"/>
+</Ui>
+```
+</details>
+
+<details>
+<summary>Conifg.lua</summary>
+
+```lua
+-----------
+-- Panel --
+-----------
+
+	-- Enable panel / 啟用面板
+	C.Panel = true
+	
+	-- anchor, parent, x, y, width, height, alpha
+	-- 錨點，父級框體，x座標，y座標，寬度，高度，透明度
+	C.Panel1 = {"TOPLEFT", UIParent, 165, -20, 420, 36, 32, .8}
+	C.Panel2 = {"TOPLEFT", UIParent, 165, -60, 320, 36, 32, .8}
+	-- add if you need, max to C.Panel5 / 自己加，最多到C.Panel5
+
+--------------
+-- Settings --
+--------------
+	
+	-- Tooltip showup direction / 滑鼠提示的顯示方向
+	-- if you put databar on screen botton, change true to false. / 如果你調整訊息列至畫面底部，將ture改為false
+	C.StickTop = true
+	
+	-- Timer / 時鐘
+	C.Time = true
+	C.TimePoint =  {"TOPLEFT", UIParent, 185, -30}
+	
+	-- Friends / 好友
+	C.Friends = true
+	C.FriendsPoint =  {"LEFT", "Kiminfo_Time", "RIGHT", 30, 0}
+	
+	-- Guild / 公會
+	C.Guild = true
+	C.GuildPoint = {"LEFT", "Kiminfo_Friends", "RIGHT", 30, 0}
+	
+	-- Bags / 背包
+	C.Bags = true
+	C.BagsPoint = {"LEFT", "Kiminfo_Guild", "RIGHT", 30, 0}
+	
+	-- Durability / 耐久
+	C.Durability = true
+	C.DurabilityPoint = {"LEFT", "Kiminfo_Bags", "RIGHT", 30, 0}
+
+	-- Zone and Position / 地名座標
+	C.Positions = true
+	C.PositionsPoint = {"LEFT", "Kiminfo_Dura", "RIGHT", 20, 0}
+	
+	-- Memory / 記憶體占用列表
+	C.Memory = true
+	C.MaxAddOns = 30
+	C.MemoryPoint = {"TOPLEFT", UIParent, 200, -68}
+	
+	-- System: Fps and latency / 幀數與延遲
+	C.System = true
+	C.SystemPoint = {"LEFT", "Kiminfo_Mem", "RIGHT", 70, 0}
+	
+	-- Spec: Spec and Loot Spec
+	C.Spec = true
+	C.SpecPoint =  {"LEFT", "Kiminfo_System", "RIGHT", 15, 0}
 ```
 
 </details>
