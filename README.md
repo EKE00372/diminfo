@@ -251,8 +251,7 @@ This is my layout, an example for edit.
 
 <details>
 <summary>Modules.xml</summary>
-
-This is my layout, an example for edit.
+	
 ```xml
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
 	<Script file="Time.lua"/>
