@@ -121,7 +121,7 @@ end
 --[[ Refresh Data text ]]--
 local function RefreshText()
 	updateMemoryTable()
-	local totalMemory = updateMemory()
+	totalMemory = updateMemory()
 	
 	if totalMemory >= 1024 then
 		Text:SetText(format("%.1fmb", totalMemory/1024))
@@ -136,8 +136,9 @@ end
 
 --[[ Update when login ]]--
 local function OnEvent(self)
-	-- Setting: I'm not sure but somebody said auto collect will make client crash so default false it
+	-- Setting
 	if Kiminfo.AutoCollect == nil then
+		-- I'm not sure but somebody said auto collect will make client crash so default false it
 		Kiminfo.AutoCollect = false
 	end
 	
@@ -205,10 +206,10 @@ local function OnEnter(self)
 end
 
 local function OnLeave(self)
-	
 	-- Data text
-	totalNum = updateMaxAddons()
+	local totalNum = updateMaxAddons()
 	Text:SetText(totalNum)
+	
 	-- Mouseover color
 	Icon:SetVertexColor(1, 1, 1)
 	Text:SetTextColor(1, 1, 1)
