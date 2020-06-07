@@ -37,7 +37,8 @@ local C, F, G, L = unpack(ns)
 -- Panel --
 -----------
 
-	C.Panel = true			-- Enable panel / 啟用面板
+	-- Enable panel / 啟用面板
+	C.Panel = true
 	
 	-- anchor, parent, x, y, width, height, alpha
 	-- 錨點，父級框體，x座標，y座標，寬度，高度，透明度
@@ -51,10 +52,6 @@ local C, F, G, L = unpack(ns)
 	-- Tooltip showup direction / 滑鼠提示的顯示方向
 	-- if you put databar on screen botton, change true to false. / 如果你調整訊息列至畫面底部，將ture改為false
 	C.StickTop = true
-	
-	-- Show memory usage when only mouseover / 只在指向時顯示插件占用
-	-- if you have too many addons, enable this to avoid fps drop cause by memory refresh / 如果你用了很多插件，啟用它防止掉幀
-	C.MemHide = false
 	
 	-- Timer / 時鐘
 	C.Time = true
@@ -93,17 +90,13 @@ local C, F, G, L = unpack(ns)
 	C.Positions = true
 	C.PositionsPoint = {"LEFT", "Kiminfo_Dura", "RIGHT", 20, 0}
 	
-	
-	
 -------------
 -- Credits --
 -------------
 
-	-- NDui
-	-- diminfo
-	-- Tukz
-	-- Aftermath
-	-- HopeASD
+	-- Tukz, Loshine, Siweia, HopeASD
+	-- Bar texture support: Peterdox
+	-- Icon texture from SX Databar.NDui
 	
 	-- C_Map.GetPlayerMapPosition Memory Usage
 	-- https://www.wowinterface.com/forums/showthread.php?t=56290

@@ -4,7 +4,7 @@ if not C.Memory then return end
 
 local format, min, max, sort, wipe = format, min, max, sort, wipe
 local CreateFrame = CreateFrame
-local GetNumAddOns, GetAddOnInfo = GetNumAddOns, GetAddOnInfo
+local GetNumAddOns, GetAddOnInfo, IsAddOnLoaded = GetNumAddOns, GetAddOnInfo, IsAddOnLoaded
 local UpdateAddOnMemoryUsage, GetAddOnMemoryUsage = UpdateAddOnMemoryUsage, GetAddOnMemoryUsage
 local collectgarbage, gcinfo = collectgarbage, gcinfo
 
@@ -70,6 +70,20 @@ end
 ---------------    [[ Table ]]     ---------------
 --==============================================--
 
+--[[ Get enable addon number ]]--
+local function updateMaxAddons()
+	local numAddons = GetNumAddOns()
+	local totalNum = 0
+	
+	for i = 1, numAddons do
+		if IsAddOnLoaded(i) then
+			totalNum = totalNum +1
+		end
+	end
+	
+	return totalNum
+end
+	
 --[[ Get addon list ]]--
 local function updateMemoryTable()
 	local numAddons = GetNumAddOns()
@@ -107,7 +121,7 @@ end
 --[[ Refresh Data text ]]--
 local function RefreshText()
 	updateMemoryTable()
-	totalMemory = updateMemory()
+	local totalMemory = updateMemory()
 	
 	if totalMemory >= 1024 then
 		Text:SetText(format("%.1fmb", totalMemory/1024))
@@ -116,44 +130,32 @@ local function RefreshText()
 	end
 end
 
---[[
-local function AddonNum()
-	local num = 0
-	for i = 1, numAddons do
-		local _, _, _, loadable, reason = GetAddOnInfo(i)
-	end
-	
-	return loadable and not reason
-end
-]]--
 --================================================--
 ---------------    [[ Updates ]]     ---------------
 --================================================--
 
---[[ Update data text ]]--
-local function OnUpdate(self, elapsed)
-	self.timer = (self.timer or 3) + elapsed
-	-- Limit frequency / 限制一下更新速率
-	if self.timer > 20 then
-		RefreshText()
-		self.timer = 0
+--[[ Update when login ]]--
+local function OnEvent(self)
+	-- Setting: I'm not sure but somebody said auto collect will make client crash so default false it
+	if Kiminfo.AutoCollect == nil then
+		Kiminfo.AutoCollect = false
 	end
+	
+	-- Data text
+	local totalNum = updateMaxAddons()
+	Text:SetText(totalNum)
+	self:SetAllPoints(Text)
 end
 
 --[[ Update tooltip ]]--
 local function OnEnter(self)
 	
-	--[[ Data text ]]--
-	
-	-- mouseover color
+	-- Data text
+	RefreshText()	-- Refresh at first, and get addon table for tooltip show
 	Icon:SetVertexColor(0, 1, 1)
 	Text:SetTextColor(0, 1, 1)
 	
-	--[[ Tooltip ]]--
-	
-	-- Refresh at first, and get addon table
-	RefreshText()
-	
+	-- Tooltip
 	local maxAddOns = C.MaxAddOns
 	local isShiftKeyDown = IsShiftKeyDown()
 	local maxShown = isShiftKeyDown and #memoryTable or min(maxAddOns, #memoryTable)
@@ -202,42 +204,16 @@ local function OnEnter(self)
 	GameTooltip:Show()
 end
 
---[[ Update when login ]]--
-local function OnEvent(self)
-	
-	--[[ Setting ]]--
-	
-	if Kiminfo.AutoCollect == nil then
-		-- I'm not sure but somebody said auto collect will make client crash so default false it
-		Kiminfo.AutoCollect = false
-	end
-	
-	--[[ Data text ]]--
-	
-	if C.MemHide then
-		Text:SetText(ADDONS) -- Show "Addons" when not hover
-	else
-		RefreshText() -- Get total memory when entering world
-		self:SetScript("OnUpdate", OnUpdate)
-	end
-	self:SetAllPoints(Text)
-end
-
 local function OnLeave(self)
 	
-	--[[ Data text ]]--
-	
-	-- Show "Addons" when not hover
-	if C.MemHide then
-		Text:SetText(ADDONS)
-	end
-	
-	--[[ Tooltip ]]--
-	
+	-- Data text
+	totalNum = updateMaxAddons()
+	Text:SetText(totalNum)
 	-- Mouseover color
 	Icon:SetVertexColor(1, 1, 1)
 	Text:SetTextColor(1, 1, 1)
-	-- Tooltip hide
+	
+	-- Tooltip
 	GameTooltip:Hide()
 end
 
@@ -245,8 +221,9 @@ end
 ---------------    [[ Scripts ]]     ---------------
 --================================================--
 	
-	--[[ Login load ]] --
+	--[[ Data text ]]--
 	Stat:RegisterEvent("PLAYER_ENTERING_WORLD")
+	Stat:RegisterEvent("ADDON_LOADED")
 	Stat:SetScript("OnEvent", OnEvent)
 	
 	--[[ Options ]]--
@@ -269,11 +246,6 @@ end
 	--[[ Tooltip ]]-- 
 	Stat:SetScript("OnEnter", OnEnter)
 	Stat:SetScript("OnLeave", OnLeave)
-	
-	--[[ Data text ]]--
-	--[[if not C.MemHide then 
-		Stat:SetScript("OnUpdate", OnUpdate)
-	end]]--
 
 --=====================================================--
 ---------------    [[ Auto Collect ]]     ---------------
