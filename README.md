@@ -42,9 +42,9 @@ Just edit config.lua to change them. I suggest use [Notepad++](https://notepad-p
 * Guild
 	* Show online guild members
 	* List as guild rank
-	* Left click: old guild frame, right click: community frame
+	* Left click: community frame, right click: old guild frame
 * Memory
-	* Show addon memory usage, list all addon usage
+	* Show addon number and switch to memory usage when moueseover, list all addon usage
 	* Option: auto collect
 	* Left click: collect memory manually, right click: auto collect config
 * Positions
@@ -80,9 +80,9 @@ Just edit config.lua to change them. I suggest use [Notepad++](https://notepad-p
 * Guild / 公會
 	* 顯示線上公會成員
 	* 以會階排序，shift 指向反向排序
-	* 左鍵：傳統公會視窗；右鍵：社群公會視窗
+	* 左鍵：社群公會視窗；右鍵：傳統公會視窗
 * Memory / 記憶體
-	* 顯示插件列表與記憶體占用
+	* 顯示啟用插件數，指向時顯示插件列表與記憶體占用
 	* 選項：自動回收冗餘記憶體
 	* 左鍵：手動回收；右鍵：自動回收開關
 * Positions / 位置
@@ -251,7 +251,7 @@ This is my layout, an example for edit.
 
 <details>
 <summary>Modules.xml</summary>
-	
+
 ```xml
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
 	<Script file="Time.lua"/>

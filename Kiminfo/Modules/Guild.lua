@@ -205,8 +205,8 @@ local function OnEnter(self)
 	
 	-- Options
 	tooltip:AddLine(" ", G.Line)
-	tooltip:AddLine(G.OptionColor..G.LeftButton.."+ Shift "..SLASH_WHISPER2:gsub("/(.*)","%1"), G.OptionColor..GUILD..G.LeftButton)
-	tooltip:AddLine(G.OptionColor..G.LeftButton.."+ Alt "..INVITE, G.OptionColor..COMMUNITIES..G.RightButton)
+	tooltip:AddLine(G.OptionColor..G.LeftButton.."+ Shift "..SLASH_WHISPER2:gsub("/(.*)","%1"), G.OptionColor..COMMUNITIES..G.LeftButton)
+	tooltip:AddLine(G.OptionColor..G.LeftButton.."+ Alt "..INVITE, G.OptionColor..GUILD..G.RightButton)
 
 	tooltip:AddLine(" ")
 	tooltip:AddLine(MEMBERS, ZONE)
