@@ -2,9 +2,9 @@ local addon, ns = ...
 local C, F, G, L = unpack(ns)
 if not C.Durability then return end
 
-local format = string.format
-local floor = math.floor
-local sort = table.sort
+local format, floor, max, sort, modf, select = string.format, math.floor, max, table.sort, math.modf, select
+local CreateFrame = CreateFrame
+local GetInventoryItemLink, GetInventoryItemDurability, GetInventoryItemTexture = GetInventoryItemLink, GetInventoryItemDurability, GetInventoryItemTexture
 
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
@@ -25,6 +25,7 @@ local Text  = Stat:CreateFontString(nil, "OVERLAY")
 ---------------    [[ Functions ]]     ---------------
 --==================================================--
 
+--[[ Data text color gardient ]]--
 local function gradientColor(perc)
 	perc = perc > 1 and 1 or perc < 0 and 0 or perc -- Stay between 0-1
 		
@@ -35,7 +36,7 @@ local function gradientColor(perc)
 	return format("|cff%02x%02x%02x", r*255, g*255, b*255), r, g, b
 end
 
--- slots
+--[[ Slots ]]--
 local localSlots = {
 	[1] = {1, INVTYPE_HEAD, 1000},
 	[2] = {3, INVTYPE_SHOULDER, 1000},
@@ -50,14 +51,14 @@ local localSlots = {
 	[11] = {18, INVTYPE_RANGED, 1000}
 }
 	
---[[ Sort slots ]]--
+--[[ Sort slots by durability ]]--
 local function sortSlots(a, b)
 	if a and b then
 		return (a[3] == b[3] and a[1] < b[1]) or (a[3] < b[3])
 	end
 end
 
---[[ Custom api to get durability ]]--
+--[[ Get durability ]]--
 local function getItemDurability()
 	local numSlots = 0
 	
@@ -106,17 +107,17 @@ end
 
 --[[ Tooltip update ]]--
 local function OnEnter(self)
-	
-	-- title
-	GameTooltip:SetOwner(self, "ANCHOR_BOTTOM", 0, -10)
-	GameTooltip:ClearLines()
 	local p1 = select(3, GetTalentTabInfo(1))
 	local p2 = select(3, GetTalentTabInfo(2))
 	local p3 = select(3, GetTalentTabInfo(3))
+	
+	-- Title
+	GameTooltip:SetOwner(self, C.StickTop and "ANCHOR_BOTTOM" or "ANCHOR_TOP", 0, C.StickTop and -10 or 10)
+	GameTooltip:ClearLines()
 	GameTooltip:AddDoubleLine(TALENT, p1.."/"..p2.."/"..p3, 0, .6, 1, 0, .6, 1)
 	GameTooltip:AddLine(" ")
 	
-	-- slot item list
+	-- Slot item list
 	for i = 1, 11 do
 		if localSlots[i][3] ~= 1000 then
 			local slot = localSlots[i][1]
@@ -127,10 +128,11 @@ local function OnEnter(self)
 		end
 	end
 	
-	-- otpions
+	-- Otpions
 	GameTooltip:AddDoubleLine(" ", G.Line)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..CHARACTER_INFO..G.LeftButton)
-	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.AutoRepair..(diminfo.AutoRepair and "|cff55ff55"..ENABLE or "|cffff5555"..DISABLE)..G.RightButton)
+	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.AutoRepair..(diminfo.AutoRepair and G.Enable or G.Disable)..G.RightButton)
+	GameTooltip:AddDoubleLine(" ", G.OptionColor..HONOR..G.MiddleButton)
 	
 	GameTooltip:Show()
 end
@@ -149,7 +151,9 @@ end
 	Stat:SetScript("OnMouseDown", function(self, button)
 		if button == "RightButton" then
 			diminfo.AutoRepair = not diminfo.AutoRepair
-			self:GetScript("OnEnter")(self)
+			OnEnter(self)
+		elseif button == "MiddleButton" then
+			ToggleCharacter("HonorFrame")
 		else
 			ToggleCharacter("PaperDollFrame")
 		end
@@ -174,25 +178,6 @@ local RepairGear = CreateFrame("Frame")
 			
 			-- 可以修裝而且花費大於零
 			if canRepair and cost > 0 then
-				if IsInGuild() then
-					local guildMoney = GetGuildBankWithdrawMoney()
-					
-					-- 可提領金額大於公會餘額
-					if guildMoney > GetGuildBankMoney() then
-						guildMoney = GetGuildBankMoney()
-					end
-					
-					if guildMoney >= cost and CanGuildBankRepair() then
-						RepairAllItems(1)
-						print(format("|cff99CCFF"..GUILDCONTROL_OPTION15.."|r%s", GetMoneyString(cost)))
-						return
-					elseif guildMoney == 0 and IsGuildLeader() then
-						RepairAllItems(1)
-						print(format("|cff99CCFF"..GUILDCONTROL_OPTION15.."|r%s", GetMoneyString(cost)))
-						return
-					end
-				end
-				
 				if money > cost then
 					RepairAllItems()
 					print(format("|cff99CCFF"..REPAIR_COST.."|r%s", GetMoneyString(cost)))

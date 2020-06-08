@@ -3,6 +3,11 @@ local C, F, G, L = unpack(ns)
 if not C.Positions then return end
 
 local format = string.format
+local CreateFrame = CreateFrame
+
+local subzone, zone, pvp
+local coordX, coordY = 0, 0
+local mapRects = {}
 
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
@@ -23,9 +28,6 @@ local Text  = Stat:CreateFontString(nil, "OVERLAY")
 ---------------    [[ Functions ]]     ---------------
 --==================================================--
 
-local subzone, zone, pvp
-local coordX, coordY = 0, 0
-
 --[[ Zone text color ]]--
 local zoneColor = {
 	sanctuary = {SANCTUARY_TERRITORY, {.41, .8, .94}},
@@ -37,13 +39,12 @@ local zoneColor = {
 	neutral = {format(FACTION_CONTROLLED_TERRITORY,FACTION_STANDING_LABEL4), {1, .93, .76}}
 }
 
---[[ format ]]--
+--[[ Format ]]--
 local function formatCoords()
 	return format("%.1f, %.1f", coordX*100, coordY*100)
 end
 
 --[[ Get xy ]]--
-local mapRects = {}
 local tempVec2D = CreateVector2D(0, 0)
 local function GetPlayerMapPos(mapID)
 	tempVec2D.x, tempVec2D.y = UnitPosition("player")
@@ -63,7 +64,7 @@ local function GetPlayerMapPos(mapID)
 	return tempVec2D.y/mapRect[2].y, tempVec2D.x/mapRect[2].x
 end
 
---[[ update coords ]]--
+--[[ Update coords ]]--
 local function UpdateCoords(self, elapsed)
 	self.elapsed = (self.elapsed or 0) + elapsed
 	
@@ -84,6 +85,7 @@ end
 --================================================--
 ---------------    [[ Updates ]]     ---------------
 --================================================--
+
 local function OnEvent(self)
 	subzone, zone, pvp = GetSubZoneText(), GetZoneText(), {GetZonePVPInfo()}
 	
@@ -98,11 +100,11 @@ end
 local function OnEnter(self)
 	self:SetScript("OnUpdate", UpdateCoords)
 	
-	-- title
-	GameTooltip:SetOwner(self, "ANCHOR_BOTTOM", 0, -10)
+	-- Title
+	GameTooltip:SetOwner(self, C.StickTop and "ANCHOR_BOTTOM" or "ANCHOR_TOP", 0, C.StickTop and -10 or 10)
 	GameTooltip:ClearLines()
 	
-	-- coords
+	-- Coords
 	if not IsInInstance() then
 		GameTooltip:AddLine(zone, 0, .8, 1)
 		GameTooltip:AddLine(format("|cffffffff%s|r", formatCoords()), 1, 1, 1)
@@ -110,7 +112,7 @@ local function OnEnter(self)
 		GameTooltip:AddLine(zone, 0, .8, 1)
 	end
 	
-	-- subzone
+	-- Subzone
 	if pvp[1] and not IsInInstance() then
 		local r, g, b = unpack(zoneColor[pvp[1]][2])
 		if subzone and subzone ~= zone then
@@ -119,7 +121,7 @@ local function OnEnter(self)
 		GameTooltip:AddLine(format(zoneColor[pvp[1]][1],pvp[3] or ""), r, g, b)
 	end
 	
-	-- options
+	-- Options
 	GameTooltip:AddDoubleLine(" ", G.Line)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..WORLDMAP_BUTTON..G.LeftButton)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.XY..G.RightButton)
@@ -149,9 +151,11 @@ end
 	Stat:SetScript("OnMouseUp", function(_, btn)
 		if btn == "LeftButton" then
 			ToggleFrame(WorldMapFrame)
-		else
+		elseif btn == "RightButton" then
 			if not IsInInstance() then
 				ChatFrame_OpenChat(format("%s (%s)", zone, formatCoords()), chatFrame)
 			end
+		else
+			return
 		end
 	end)

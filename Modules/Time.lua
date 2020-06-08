@@ -2,7 +2,9 @@ local addon, ns = ...
 local C, F, G, L = unpack(ns)
 if not C.Time then return end
 
-local format = string.format
+local format, time, date = string.format, time, date
+local GetCVarBool = GetCVarBool
+local TIMEMANAGER_TICKER_24HOUR, TIMEMANAGER_TICKER_12HOUR = TIMEMANAGER_TICKER_24HOUR, TIMEMANAGER_TICKER_12HOUR
 
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
@@ -23,7 +25,7 @@ local Text  = Stat:CreateFontString(nil, "OVERLAY")
 ---------------    [[ Functions ]]     ---------------
 --==================================================--
 
---[[ format 24/12 hour clock ]]--
+--[[ Format 24/12 hour clock ]]--
 local function updateTimerFormat(hour, minute)
 	if GetCVarBool("timeMgrUseMilitaryTime") then
 		return format(TIMEMANAGER_TICKER_24HOUR, hour, minute)
@@ -38,7 +40,7 @@ local function updateTimerFormat(hour, minute)
 	end
 end
 
---[[ custom api for add title line ]]--
+--[[ Custom api for add title line ]]--
 local title
 local function addTitle(text)
 	if not title then
@@ -55,9 +57,9 @@ end
 --[[ Update data text ]]--
 local function OnUpdate(self, elapsed)
 	self.timer = (self.timer or 3) + elapsed
-	-- 限制一下更新速率
+	-- Limit frequency / 限制一下更新速率
 	if self.timer > 5 then
-		-- 本地時間
+		-- Local time / 本地時間
 		local hour, minute
 		if GetCVarBool("timeMgrUseLocalTime") then
 			hour, minute = tonumber(date("%H")), tonumber(date("%M"))
@@ -78,17 +80,17 @@ local function OnEnter(self)
 	local today = C_DateAndTime.GetTodaysDate()
 	local w, m, d, y = today.weekDay, today.month, today.day, today.year
 	
-	-- title
-	GameTooltip:SetOwner(self, "ANCHOR_BOTTOM", 0, -10)
+	-- Title
+	GameTooltip:SetOwner(self, C.StickTop and "ANCHOR_BOTTOM" or "ANCHOR_TOP", 0, C.StickTop and -10 or 10)
 	GameTooltip:ClearLines()
 	GameTooltip:AddLine(format(FULLDATE, CALENDAR_WEEKDAY_NAMES[w], CALENDAR_FULLDATE_MONTH_NAMES[m], d, y), 0, .6, 1)
 	GameTooltip:AddLine(" ")
 
-	-- game time
+	-- Game time
 	GameTooltip:AddDoubleLine(TIMEMANAGER_TOOLTIP_LOCALTIME, GameTime_GetLocalTime(true), .6, .8, 1, 1, 1, 1)
 	GameTooltip:AddDoubleLine(TIMEMANAGER_TOOLTIP_REALMTIME, GameTime_GetGameTime(true), .6, .8, 1, 1, 1, 1)
 	
-	-- 副本進度
+	--[[ 副本進度 ]]--
 
 	-- Dungeon
 	title = false
@@ -131,6 +133,7 @@ local function OnEnter(self)
 	
 	GameTooltip:Show()
 end
+
 --================================================--
 ---------------    [[ Scripts ]]     ---------------
 --================================================--
@@ -150,5 +153,7 @@ end
 	Stat:SetScript("OnMouseDown", function(self, btn)
 		if btn == "RightButton"  then
 			ToggleFrame(TimeManagerFrame)
+		else
+			return
 		end
 	end)

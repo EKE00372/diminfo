@@ -3,6 +3,8 @@ local C, F, G, L = unpack(ns)
 if not C.Bags then return end
 
 local format = string.format
+local CreateFrame = CreateFrame
+local GetContainerNumFreeSlots, GetContainerNumSlots = GetContainerNumFreeSlots, GetContainerNumSlots
 
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
@@ -55,7 +57,7 @@ local function OnEnter(self)
 	local money = GetMoney()
 	
 	-- title
-	GameTooltip:SetOwner(self, "ANCHOR_BOTTOM", 0, -10)
+	GameTooltip:SetOwner(self, C.StickTop and "ANCHOR_BOTTOM" or "ANCHOR_TOP", 0, C.StickTop and -10 or 10)
 	GameTooltip:ClearLines()
 	GameTooltip:AddDoubleLine(BAGSLOT, free.."/"..total, 0, .6, 1, 0, .6, 1)
 	GameTooltip:AddLine(" ")
@@ -68,7 +70,7 @@ local function OnEnter(self)
 	-- options
 	GameTooltip:AddDoubleLine(" ", G.Line)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..BAGSLOT..G.LeftButton)
-	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.AutoSell..(diminfo.AutoSell and "|cff55ff55"..ENABLE or "|cffff5555"..DISABLE)..G.RightButton, 1, 1, 1, .4, .78, 1)
+	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.AutoSell..(diminfo.AutoSell and G.Enable or G.Disable)..G.RightButton, 1, 1, 1, .4, .78, 1)
 	
 	GameTooltip:Show()
 end
@@ -89,18 +91,14 @@ end
 	Stat:SetScript("OnEvent", OnEvent)
 	
 	--[[ Options ]]--
-	Stat:SetScript("OnMouseDown", function(self,button)
+	Stat:SetScript("OnMouseDown", function(self, button)
 		if button == "RightButton" then
 			diminfo.AutoSell = not diminfo.AutoSell
-			self:GetScript("OnEnter")(self)
-		elseif button == "MiddleButton" then
-			if InCombatLockdown() then
-				UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT)
-				return
-			end
-			ToggleCharacter("TokenFrame")
-		else
+			OnEnter(self)
+		elseif button == "LeftButton" then
 			ToggleAllBags()
+		else
+			return
 		end
 	end)
 
@@ -108,8 +106,8 @@ end
 ---------------    [[ Auto sell gray ]]     ---------------
 --=======================================================--
 
-local SellGray = CreateFrame("Frame")
-	SellGray:SetScript("OnEvent", function()
+local sellGray = CreateFrame("Frame")
+	sellGray:SetScript("OnEvent", function()
 		if diminfo.AutoSell == true then
 			local c = 0
 			
@@ -134,4 +132,4 @@ local SellGray = CreateFrame("Frame")
 			end
 		end
 	end)
-	SellGray:RegisterEvent("MERCHANT_SHOW")
+	sellGray:RegisterEvent("MERCHANT_SHOW")
