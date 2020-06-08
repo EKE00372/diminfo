@@ -2,8 +2,13 @@
 local C, F, G, L = unpack(ns)
 if not C.System then return end
 
-local format = string.format
-local loginTime = GetTime()	-- to get log in time at all of first
+local format, floor, min, max, sort, wipe = string.format, math.floor, min, math.max, sort, wipe
+local CreateFrame = CreateFrame
+local GetNumAddOns, GetAddOnInfo = GetNumAddOns, GetAddOnInfo
+local UpdateAddOnCPUUsage, GetAddOnCPUUsage, ResetCPUUsage = UpdateAddOnCPUUsage, GetAddOnCPUUsage, ResetCPUUsage
+
+local loginTime = GetTime()	-- Get log in time at all of first
+local usageTable = {}
 local usageString = "%.3f ms"
 
 --=================================================--
@@ -25,8 +30,8 @@ local Text  = Stat:CreateFontString(nil, "OVERLAY")
 ---------------    [[ Color ]]     ---------------
 --==============================================--
 
---[[ latency color on tooltip ]]--
-local function colorLatencyTooltip(latency)
+--[[ Latency color ]]--
+local function colorLatency(latency)
 	if latency < 300 then
 		return "|cff0CD809"..latency
 	elseif (latency >= 300 and latency < 500) then
@@ -36,18 +41,7 @@ local function colorLatencyTooltip(latency)
 	end
 end
 
---[[ latency color on data text ]]--
-local function colorLatency(latency)
-	if latency < 250 then
-		return "|cff0CD809"..latency
-	elseif latency < 500 then
-		return "|cffE8DA0F"..latency
-	else
-		return "|cffD80909"..latency
-	end
-end
-
---[[ fps color on data text ]]--
+--[[ Fps color ]]--
 local function colorFPS(fps)
 	if fps < 15 then
 		return "|cffD80909"..fps
@@ -61,8 +55,6 @@ end
 --==================================================--
 ---------------    [[ Functions ]]     ---------------
 --==================================================--
-
-local usageTable = {}
 
 local function updateUsageTable()
 	local numAddons = GetNumAddOns()
@@ -106,7 +98,7 @@ local function OnUpdate(self, elapsed)
 		local _, _, latencyHome, latencyWorld = GetNetStats()
 		
 		local fps = floor(GetFramerate())
-		local lat = math.max(latencyHome, latencyWorld)
+		local lat = max(latencyHome, latencyWorld)
 		
 		Text:SetText(colorFPS(fps).."|rfps"..colorLatency(lat).."|rms")
 		
@@ -118,16 +110,17 @@ end
 local function OnEnter(self)
 	local _, _, latencyHome, latencyWorld = GetNetStats()
 	
-	-- title
-	GameTooltip:SetOwner(self, "ANCHOR_BOTTOM", 0, -10)
+	-- Title
+	GameTooltip:SetOwner(self, C.StickTop and "ANCHOR_BOTTOM" or "ANCHOR_TOP", 0, C.StickTop and -10 or 10)
 	GameTooltip:ClearLines()
 	GameTooltip:AddLine(CHAT_MSG_SYSTEM, 0, .6, 1)
 	GameTooltip:AddLine(" ")
 	
-	-- latency
-	GameTooltip:AddDoubleLine(L.Home,  colorLatencyTooltip(latencyHome).."|r ms", .6, .8, 1, 1, 1, 1)
-	GameTooltip:AddDoubleLine(L.World, colorLatencyTooltip(latencyWorld).."|r ms", .6, .8, 1, 1, 1, 1)
+	-- Latency
+	GameTooltip:AddDoubleLine(L.Home,  colorLatency(latencyHome).."|r ms", .6, .8, 1, 1, 1, 1)
+	GameTooltip:AddDoubleLine(L.World, colorLatency(latencyWorld).."|r ms", .6, .8, 1, 1, 1, 1)
 	
+	-- CPU usage
 	if GetCVar("scriptProfile") == "1" then
 		updateUsageTable()
 		local totalCPU = updateUsage()
@@ -161,9 +154,14 @@ local function OnEnter(self)
 		end
 	end
 	
-	-- options
+	-- Options
 	GameTooltip:AddDoubleLine(" ", G.Line)
-	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.CPU..(GetCVar("scriptProfile") == "1" and "|cff55ff55"..ENABLE or "|cffff5555"..DISABLE)..G.RightButton)
+	
+	if GetCVar("scriptProfile") == "1" then
+		GameTooltip:AddDoubleLine(" ", G.OptionColor..L.ResetCPU..G.LeftButton)
+	end
+	
+	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.CPU..(GetCVar("scriptProfile") == "1" and G.Enable or G.Disable)..G.RightButton)
 
 	GameTooltip:Show()
 end
@@ -182,8 +180,13 @@ end
 				SetCVar("scriptProfile", 0)
 				print(L.ReloadOff)
 			end
+		elseif btn == "LeftButton" then
+			ResetCPUUsage()
+		else
+			return
 		end
-		self:GetScript("OnEnter")(self)
+		
+		OnEnter(self)
 	end)
 	
 	--[[ Tooltip ]]--

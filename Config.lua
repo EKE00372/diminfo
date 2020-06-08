@@ -50,6 +50,10 @@ local C, F, G, L = unpack(ns)
 -- Settings --
 --------------
 	
+	-- Tooltip showup direction / 滑鼠提示的顯示方向
+	-- if you put databar on screen botton, change true to false. / 如果你調整訊息列至畫面底部，將ture改為false
+	C.StickTop = true
+
 	-- Bags / 背包
 	C.Bags = true
 	C.BagsPoint = {"TOPLEFT", UIParent, 18, -12}
