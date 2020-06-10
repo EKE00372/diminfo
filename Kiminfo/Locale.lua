@@ -70,6 +70,40 @@ local getLocale = GetLocale()
 		L.Mobile = "移动装置"
 		L.Desktop = "桌面应用"
 		
+		elseif getLocale == "ruRU" then
+		
+		L.AutoSell = "Автопродажа барахла: "
+		L.TrashSold = "Мусор продал, заработал "
+		
+		L.AutoRepair = "Авторемонт: "
+		L.None = "Не экипирован"
+		
+		L.Lonely = "Одинокий"
+		
+		L.Shift = "Shift показать все"
+		L.Hidden = "Скрытый"
+		
+		L.DefaultUsage = "Использование памяти пользовательского интерфейса по умолчанию"
+		L.TotleUsage = "Общее Использование Памяти"
+		L.Collected = "Сборка мусора: "
+		L.ManualCollect = "Ручной Сбор"
+		L.AutoCollect = "Автоматический Сбор Памяти: "
+		
+		L.XY = "Передача координат"
+		
+		L.Spec = "Спек"
+		L.Loot = LOOT
+		
+		L.Home = "Домой"
+		L.World = "Мир"
+		L.CPU = "Показать загрузку процессора: "
+		L.ReloadOn = "|cff00ffffKim|rinfo[|cff00ff00Система|r]: Вы увидите загрузку процессора аддона после перезагрузки пользовательского интерфейса."
+		L.ReloadOff = "|cff00ffffKim|rinfo[|cff00ff00Система|r]: Вы можете скрыть таблицу использования процессора аддона после перезагрузки пользовательского интерфейса."
+		
+		L.App = "Портативный помощник"
+		L.Mobile = "Мобильный"
+		L.Desktop = "Рабочий стол"
+		
 	else
 		L.AutoSell = "Auto Sell junk: "
 		L.TrashSold = "Trash sold, earned "
