@@ -29,6 +29,7 @@ local getLocale = GetLocale()
 		L.Home = "本地"
 		L.World = "世界"
 		L.CPU = "顯示 CPU 占用比例："
+		L.ResetCPU = "重置 CPU 占用列表"
 		L.ReloadOn = "|cff00ffffKim|rinfo[|cff00ff00System|r]：重載介面後顯示插件的 CPU 占用。"
 		L.ReloadOff = "|cff00ffffKim|rinfo[|cff00ff00System|r]：重載介面後隱藏插件的 CPU 占用。"
 		
@@ -62,7 +63,8 @@ local getLocale = GetLocale()
 		
 		L.Home = "本地"
 		L.World = "世界"
-		L.CPU = "显示CPU占用比例："
+		L.CPU = "显示 CPU 占用比例："
+		L.ResetCPU = "重置 CPU 占用列表"
 		L.ReloadOn = "|cff00ffffKim|rinfo[|cff00ff00System|r]：重载界面后显示插件的 CPU 占用。"
 		L.ReloadOff = "|cff00ffffKim|rinfo[|cff00ff00System|r]：重载界面后隐藏插件的 CPU 占用。"
 		
@@ -70,7 +72,7 @@ local getLocale = GetLocale()
 		L.Mobile = "移动装置"
 		L.Desktop = "桌面应用"
 		
-		elseif getLocale == "ruRU" then
+	elseif getLocale == "ruRU" then
 		
 		L.AutoSell = "Автопродажа барахла: "
 		L.TrashSold = "Мусор продал, заработал "
@@ -97,6 +99,7 @@ local getLocale = GetLocale()
 		L.Home = "Домой"
 		L.World = "Мир"
 		L.CPU = "Показать загрузку процессора: "
+		L.ResetCPU = "Сброс загрузку процессора"
 		L.ReloadOn = "|cff00ffffKim|rinfo[|cff00ff00Система|r]: Вы увидите загрузку процессора аддона после перезагрузки пользовательского интерфейса."
 		L.ReloadOff = "|cff00ffffKim|rinfo[|cff00ff00Система|r]: Вы можете скрыть таблицу использования процессора аддона после перезагрузки пользовательского интерфейса."
 		
@@ -130,6 +133,7 @@ local getLocale = GetLocale()
 		L.Home = "Home"
 		L.World = "World"
 		L.CPU = "Show CPU Usage: "
+		L.ResetCPU = "Reset CPU Usage"
 		L.ReloadOn = "|cff00ffffKim|rinfo[|cff00ff00System|r]: You would see addon's CPU usage after reloding UI."
 		L.ReloadOff = "|cff00ffffKim|rinfo[|cff00ff00System|r]: You could hide the addon's CPU usage table after reloding UI."
 		
