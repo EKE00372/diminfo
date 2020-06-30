@@ -130,7 +130,7 @@ local function OnEnter(self)
 			local green = localSlots[i][3]*2
 			local red = 1 - green
 
-			GameTooltip:AddDoubleLine(F.addIcon(GetInventoryItemTexture("player", slot), 14, 4, 46)..localSlots[i][2], floor(localSlots[i][3]*100), 1, 1, 1, red+1, green, 0)
+			GameTooltip:AddDoubleLine(F.addIcon(GetInventoryItemTexture("player", slot), 14, 4, 46).." "..localSlots[i][2], floor(localSlots[i][3]*100), 1, 1, 1, red+1, green, 0)
 		end
 	end
 	
@@ -205,11 +205,11 @@ local RepairGear = CreateFrame("Frame")
 					-- Use guild repair if you can / 優先使用公會修理
 					if guildMoney >= cost and CanGuildBankRepair() then
 						RepairAllItems(1)
-						print(format("|cff99CCFF"..GUILDCONTROL_OPTION15.."|r%s", GetMoneyString(cost)))
+						print(format("|cff99CCFF"..GUILDCONTROL_OPTION15.."|r %s", GetMoneyString(cost)))
 						return
 					elseif guildMoney == 0 and IsGuildLeader() then
 						RepairAllItems(1)
-						print(format("|cff99CCFF"..GUILDCONTROL_OPTION15.."|r%s", GetMoneyString(cost)))
+						print(format("|cff99CCFF"..REPAIR_COST.."|r %s", GetMoneyString(cost)))
 						return
 					end
 				end

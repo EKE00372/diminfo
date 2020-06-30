@@ -81,18 +81,20 @@ local function OnEnter(self)
 		local name, count, icon, currencyID = GetBackpackCurrencyInfo(i)
 		
 		if name and i == 1 then
+			local iconTexture = select(3, GetCurrencyInfo(104))
+			
 			GameTooltip:AddLine(" ")
-			GameTooltip:AddLine(G.OptionColor..CURRENCY)
+			GameTooltip:AddLine(F.addIcon(iconTexture, 14, 4, 46).." "..G.OptionColor..CURRENCY)
 		end
 		
 		if name and count then
-			local _, _, _, _, _, total = GetCurrencyInfo(currencyID)
+			local total = select(6, GetCurrencyInfo(currencyID))
 			local iconTexture = F.addIcon(icon, 14, 4, 46)
 			
 			if total > 0 then
-				GameTooltip:AddDoubleLine(iconTexture..name, count.."/"..total, 1, 1, 1, 1, 1, 1)
+				GameTooltip:AddDoubleLine(iconTexture.." "..name, count.."/"..total, 1, 1, 1, 1, 1, 1)
 			else
-				GameTooltip:AddDoubleLine(iconTexture..name, count, 1, 1, 1, 1, 1, 1)
+				GameTooltip:AddDoubleLine(iconTexture.." "..name, count, 1, 1, 1, 1, 1, 1)
 			end
 		end
 	end

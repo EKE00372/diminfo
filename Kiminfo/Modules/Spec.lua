@@ -92,7 +92,7 @@ local function OnEnter(self)
 		for c = 1, 3 do
 			local _, name, icon, selected = GetTalentInfo(t, c, 1)
 			if selected then
-				GameTooltip:AddLine(F.addIcon(icon, 14, 4, 46).." ["..c.."]"..name, 1, 1, 1)
+				GameTooltip:AddLine(F.addIcon(icon, 14, 4, 46).." ["..c.."] "..name, 1, 1, 1)
 			end
 		end
 	end
