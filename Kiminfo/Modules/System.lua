@@ -7,6 +7,7 @@ local CreateFrame = CreateFrame
 local GetNumAddOns, GetAddOnInfo = GetNumAddOns, GetAddOnInfo
 local UpdateAddOnCPUUsage, GetAddOnCPUUsage, ResetCPUUsage = UpdateAddOnCPUUsage, GetAddOnCPUUsage, ResetCPUUsage
 
+local r, g, b
 local loginTime = GetTime()	-- Get log in time at all of first
 local usageTable = {}
 local usageString = "%.3f ms"
@@ -212,6 +213,9 @@ local function OnEnter(self)
 	
 	-- Options
 	GameTooltip:AddDoubleLine(" ", G.Line)
+	if GetCVar("scriptProfile") == "1" then
+		GameTooltip:AddDoubleLine(" ", G.OptionColor..L.ResetCPU..G.LeftButton)
+	end
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.CPU..(GetCVar("scriptProfile") == "1" and G.Enable or G.Disable)..G.RightButton)
 
 	GameTooltip:Show()
