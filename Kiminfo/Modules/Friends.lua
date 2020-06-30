@@ -372,15 +372,15 @@ local function OnEnter(self)
 				end
 				
 				if isShiftKeyDown then
-					tooltip:AddLine(icon..levelc..info[8].."|r "..classc..info[4].."|r"..info[6]..G.OptionColor.." ("..info[3]..")", zonec..info[9])
+					tooltip:AddLine(icon.." "..levelc..info[8].."|r "..classc..info[4].."|r"..info[6]..G.OptionColor.." ("..info[3]..")", zonec..info[9])
 				else
-					tooltip:AddLine(icon..levelc..info[8].."|r "..classc..info[4].."|r"..info[6]..G.OptionColor.." ("..info[2]..")", zonec..info[9])
+					tooltip:AddLine(icon.." "..levelc..info[8].."|r "..classc..info[4].."|r"..info[6]..G.OptionColor.." ("..info[2]..")", zonec..info[9])
 				end
 			else
 				if isShiftKeyDown then
-					tooltip:AddLine(F.addIcon(BNet_GetClientTexture(info[5]), 14, 4, 46)..G.OptionColor..info[3].."|r"..info[6], F.Hex(.65, .65, .65)..info[9])
+					tooltip:AddLine(F.addIcon(BNet_GetClientTexture(info[5]), 14, 4, 46).." "..G.OptionColor..info[3].."|r"..info[6], F.Hex(.65, .65, .65)..info[9])
 				else
-					tooltip:AddLine(F.addIcon(BNet_GetClientTexture(info[5]), 14, 4, 46)..G.OptionColor..info[4].."|r"..info[6], F.Hex(.65, .65, .65)..info[9])
+					tooltip:AddLine(F.addIcon(BNet_GetClientTexture(info[5]), 14, 4, 46).." "..G.OptionColor..info[4].."|r"..info[6], F.Hex(.65, .65, .65)..info[9])
 				end
 			end
 			
