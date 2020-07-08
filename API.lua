@@ -54,7 +54,7 @@ F.Wrap = function(str, limit, indent, indent1)
 end
 
 -- 創建框架
-F.CreatePanel = function(anchor, parent, x, y, w, h, size, a)
+F.CreatePanel = function(style, anchor, parent, x, y, w, h, a)
 	local panel = CreateFrame("Frame", nil, parent)
 	local framelvl = parent:GetFrameLevel()
 	
@@ -66,37 +66,53 @@ F.CreatePanel = function(anchor, parent, x, y, w, h, size, a)
 	panel:SetFrameStrata("BACKGROUND")
 	panel:SetFrameLevel(framelvl == 0 and 0 or framelvl-1)
 	
-	panel.bg = panel:CreateTexture(nil, "BACKGROUND")
-	panel.bg:SetAllPoints(panel)
-	panel.bg:SetTexture(G.Tex)
-	panel.bg:SetVertexColor(.1, .1, .1, a)
+	if style == "Glass" then
+		panel:SetBackdrop({
+			bgFile = "Interface\\Buttons\\WHITE8x8",
+			tile = false,
+			edgeFile = G.Glow,
+			edgeSize = 3,
+			insets = { left = 3, right = 3, top = 3, bottom = 3 },
+		})
+		panel:SetBackdropColor( .1, .1, .1, a)
+		panel:SetBackdropBorderColor(0, 0, 0)
+	elseif style == "Gradient" then
+		panel:SetBackdropColor( .1, .1, .1, a)
+		panel:SetBackdropBorderColor(0, 0, 0)
+		panel.bg = panel:CreateTexture(nil, "BACKGROUND")
+		panel.bg:SetAllPoints(panel)
+		panel.bg:SetTexture(G.Tex)
+		panel.bg:SetVertexColor(.1, .1, .1, a)
+		
+		-- 左側漸變
+		local left = CreateFrame("Frame", nil, parent)
+		left:SetSize(60, h)
+		left:ClearAllPoints()
+		left:SetPoint("RIGHT", panel, "LEFT", 0, 0)
+		left:SetFrameStrata("BACKGROUND")
+		left:SetFrameLevel(framelvl == 0 and 0 or framelvl-1)
+		
+		left.bg = left:CreateTexture(nil, "BACKGROUND")
+		left.bg:SetAllPoints(left)
+		left.bg:SetTexture(G.Tex)
+		left.bg:SetGradientAlpha("HORIZONTAL", .1, .1, .1, 0, .1, .1, .1, a)
+		
+		-- 右側漸變
+		local right = CreateFrame("Frame", nil, parent)
+		right:SetSize(80, h)
+		right:ClearAllPoints()
+		right:SetPoint("LEFT", panel, "RIGHT", 0, 0)
+		right:SetFrameStrata("BACKGROUND")
+		right:SetFrameLevel(framelvl == 0 and 0 or framelvl-1)
+		
+		right.bg = right:CreateTexture(nil, "BACKGROUND")
+		right.bg:SetAllPoints(right)
+		right.bg:SetTexture(G.Tex)
+		right.bg:SetGradientAlpha("HORIZONTAL", .1, .1, .1, a, .1, .1, .1, 0)
+	else
+		return
+	end
 	
-	-- 左側漸變
-	local left = CreateFrame("Frame", nil, parent)
-	left:SetSize(60, h)
-	left:ClearAllPoints()
-	left:SetPoint("RIGHT", panel, "LEFT", 0, 0)
-	left:SetFrameStrata("BACKGROUND")
-	left:SetFrameLevel(framelvl == 0 and 0 or framelvl-1)
-	
-	left.bg = left:CreateTexture(nil, "BACKGROUND")
-	left.bg:SetAllPoints(left)
-	left.bg:SetTexture(G.Tex)
-	left.bg:SetGradientAlpha("HORIZONTAL", .1, .1, .1, 0, .1, .1, .1, a)
-	
-	-- 右側漸變
-	local right = CreateFrame("Frame", nil, parent)
-	right:SetSize(80, h)
-	right:ClearAllPoints()
-	right:SetPoint("LEFT", panel, "RIGHT", 0, 0)
-	right:SetFrameStrata("BACKGROUND")
-	right:SetFrameLevel(framelvl == 0 and 0 or framelvl-1)
-	
-	right.bg = right:CreateTexture(nil, "BACKGROUND")
-	right.bg:SetAllPoints(right)
-	right.bg:SetTexture(G.Tex)
-	right.bg:SetGradientAlpha("HORIZONTAL", .1, .1, .1, a, .1, .1, .1, 0)
-
 	return panel
 end
 
@@ -110,7 +126,7 @@ G.Disable = "|cffff5555"..DISABLE
 G.AFK = "|T"..FRIENDS_TEXTURE_AFK..":14:14:0:0:16:16:1:15:1:15|t"
 G.DND = "|T"..FRIENDS_TEXTURE_DND..":14:14:0:0:16:16:1:15:1:15|t"
 
-if not C.Panel then return end
+if not C.ShowPanel then return end
 
 if C.Panel1 then F.CreatePanel(unpack(C.Panel1)) end
 if C.Panel2 then F.CreatePanel(unpack(C.Panel2)) end

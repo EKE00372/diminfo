@@ -261,7 +261,7 @@ local function OnEnter(self)
 	
 	-- Options
 	tooltip:AddLine(" ", G.Line)
-	tooltip:AddLine(G.OptionColor..G.LeftButton.."+ Shift "..SLASH_WHISPER2:gsub("/(.*)","%1"), G.OptionColor..FRIENDS..G.LeftButton)
+	tooltip:AddLine(G.OptionColor..G.LeftButton.."+ Shift "..L.Whisper, G.OptionColor..FRIENDS..G.LeftButton)
 	tooltip:AddLine(G.OptionColor..G.LeftButton.."+ Alt "..INVITE, G.OptionColor..BATTLENET_BROADCAST..G.RightButton)
 
 	-- In-game online friends list
@@ -331,18 +331,18 @@ local function OnEnter(self)
 				
 				if info[6] == BNET_CLIENT_WOWC then
 					if isShiftKeyDown then
-						tooltip:AddLine(F.addIcon(BNet_GetClientTexture(BNET_CLIENT_WOW), 14, 8, 42)..levelc..info[10].."|r "..classc..info[4].."|r"..info[8]..G.OptionColor.." ("..info[3]..")", zonec..info[11].." - "..info[7])
+						tooltip:AddLine(F.addIcon(BNet_GetClientTexture(BNET_CLIENT_WOW), 14, 8, 42).." "..levelc..info[10].."|r "..classc..info[4].."|r"..info[8]..G.OptionColor.." ("..info[3]..")", zonec..info[11].." - "..info[7])
 					else
-						tooltip:AddLine(F.addIcon(BNet_GetClientTexture(BNET_CLIENT_WOW), 14, 8, 42)..levelc..info[10].."|r "..classc..info[4].."|r"..info[8]..G.OptionColor.." ("..info[2]..")", zonec..info[11])
+						tooltip:AddLine(F.addIcon(BNet_GetClientTexture(BNET_CLIENT_WOW), 14, 8, 42).." "..levelc..info[10].."|r "..classc..info[4].."|r"..info[8]..G.OptionColor.." ("..info[2]..")", zonec..info[11])
 					end
 				else
 					local icon = "|T"..BNet_GetClientTexture(BNET_CLIENT_WOW)..":14:14:0:0:50:50:8:42:8:42:160:160:160|t"
 					local noRealm = info[11]:match("[^ -]+")
 					
 					if isShiftKeyDown then
-						tooltip:AddLine(icon..levelc..info[10].."|r "..classc..info[4].."|r"..info[8]..G.OptionColor.." ("..info[3]..")", zonec..info[11])
+						tooltip:AddLine(icon.." "..levelc..info[10].."|r "..classc..info[4].."|r"..info[8]..G.OptionColor.." ("..info[3]..")", zonec..info[11])
 					else
-						tooltip:AddLine(icon..levelc..info[10].."|r "..classc..info[4].."|r"..info[8]..G.OptionColor.." ("..info[2]..")", zonec..noRealm)
+						tooltip:AddLine(icon.." "..levelc..info[10].."|r "..classc..info[4].."|r"..info[8]..G.OptionColor.." ("..info[2]..")", zonec..noRealm)
 					end
 				end
 			end
@@ -357,9 +357,9 @@ local function OnEnter(self)
 			
 			if F.Multicheck(info[6], "S2", "D3", "WTCG", "Hero", "Pro", "S1", "DST2", "VIPR", "ODIN", "W3") then
 				if isShiftKeyDown then
-					tooltip:AddLine(F.addIcon(BNet_GetClientTexture(info[6]), 14, 8, 42)..G.OptionColor..info[3].."|r"..info[8], F.Hex(.65, .65, .65)..info[11])
+					tooltip:AddLine(F.addIcon(BNet_GetClientTexture(info[6]), 14, 8, 42).." "..G.OptionColor..info[3].."|r"..info[8], F.Hex(.65, .65, .65)..info[11])
 				else
-					tooltip:AddLine(F.addIcon(BNet_GetClientTexture(info[6]), 14, 8, 42)..G.OptionColor..info[2].."|r"..info[8], F.Hex(.65, .65, .65)..info[11])
+					tooltip:AddLine(F.addIcon(BNet_GetClientTexture(info[6]), 14, 8, 42).." "..G.OptionColor..info[2].."|r"..info[8], F.Hex(.65, .65, .65)..info[11])
 				end
 			end
 			
@@ -373,9 +373,9 @@ local function OnEnter(self)
 			
 			if F.Multicheck(info[6], "App", "BSAp") then
 				if isShiftKeyDown then
-					tooltip:AddLine(F.addIcon(BNet_GetClientTexture(info[6]), 14, 8, 42)..G.OptionColor..info[3].."|r"..info[8], F.Hex(.65, .65, .65)..info[11])
+					tooltip:AddLine(F.addIcon(BNet_GetClientTexture(info[6]), 14, 8, 42).." "..G.OptionColor..info[3].."|r"..info[8], F.Hex(.65, .65, .65)..info[11])
 				else
-					tooltip:AddLine(F.addIcon(BNet_GetClientTexture(info[6]), 14, 8, 42)..G.OptionColor..info[2].."|r"..info[8], F.Hex(.65, .65, .65)..info[11])
+					tooltip:AddLine(F.addIcon(BNet_GetClientTexture(info[6]), 14, 8, 42).." "..G.OptionColor..info[2].."|r"..info[8], F.Hex(.65, .65, .65)..info[11])
 				end
 			end
 			
@@ -426,7 +426,7 @@ end
 	--[[ Options ]]--
 	Stat:SetScript("OnMouseDown", function(self, button)
 		if button == "LeftButton" then
-			ToggleFriendsFrame()
+			securecall(ToggleFriendsFrame, 1)
 		elseif button == "RightButton" then
 			StaticPopup_Show("SET_BN_BROADCAST")
 		else

@@ -124,7 +124,7 @@ local function OnEnter(self)
 			local green = localSlots[i][3]*2
 			local red = 1 - green
 
-			GameTooltip:AddDoubleLine(F.addIcon(GetInventoryItemTexture("player", slot), 14, 4, 46)..localSlots[i][2], floor(localSlots[i][3]*100).."%", 1, 1, 1, red+1, green, 0)
+			GameTooltip:AddDoubleLine(F.addIcon(GetInventoryItemTexture("player", slot), 14, 4, 46).." "..localSlots[i][2], floor(localSlots[i][3]*100).."%", 1, 1, 1, red+1, green, 0)
 		end
 	end
 	

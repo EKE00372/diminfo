@@ -20,7 +20,7 @@ local C, F, G, L = unpack(ns)
 -- Golbal --
 ------------
 
-	C.Panel = true			-- Enable panel / 啟用面板
+	C.ShowPanel = true		-- Enable panel / 啟用面板
 	C.ClassColor = true		-- Enable font color / 啟用職業染色
 
 -----------
@@ -28,6 +28,7 @@ local C, F, G, L = unpack(ns)
 -----------
 
 	G.Tex = G.MediaFolder.."bar.tga"
+	G.Glow = G.MediaFolder.."glow.tga"
 	G.Fonts = STANDARD_TEXT_FONT		-- 字型 / Font
 	G.FontSize = 16						-- 大小 / Font size
 	G.FontFlag = "OUTLINE"				-- 描邊 / Font outline
@@ -41,17 +42,24 @@ local C, F, G, L = unpack(ns)
 -- Panel --
 -----------
 
-	-- anchor, parent, x, y, width, height, alpha
-	-- 錨點，父級框體，x座標，y座標，寬度，高度，透明度
-	C.Panel1 = {"TOPLEFT", UIParent, 0, -2, 730, 36, 32, .6}
+	-- style, anchor, parent, x, y, width, height, alpha
+	-- 風格，錨點，父級框體，x座標，y座標，寬度，高度，透明度
+	
+	C.Panel1 = {"Gradient", "TOPLEFT", UIParent, 0, -2, 730, 36, .6}
+	--C.Panel1 = {"Glass", "TOPLEFT", UIParent, 0, -6, 860, 16, .6}
 	-- add if you need, max to C.Panel5 / 自己加，最多到C.Panel5
+	
+	-- NOTE:
+	-- 風格必需是 "Gradient" (漸變) 或 "Glass" (玻璃)
+	-- style should be "Gradient" or "Glass"
 	
 --------------
 -- Settings --
 --------------
 	
 	-- Tooltip showup direction / 滑鼠提示的顯示方向
-	-- if you put databar on screen botton, change true to false. / 如果你調整訊息列至畫面底部，將ture改為false
+	-- Note: 如果你調整訊息列至畫面底部，將ture改為false
+	-- Note: if you put databar on screen botton, change true to false.
 	C.StickTop = true
 
 	-- Bags / 背包
@@ -83,7 +91,7 @@ local C, F, G, L = unpack(ns)
 	C.Durability = true
 	C.DurabilityPoint = {"LEFT", "diminfo_Guild", "RIGHT", 16, 0}
 	--C.DurabilityPoint = {"TOPLEFT", UIParent, 520, -12}
-
+	
 	-- Timer / 時鐘
 	C.Time = true
 	C.TimePoint =  {"LEFT", "diminfo_Dura", "RIGHT", 16, 0}
@@ -98,8 +106,15 @@ local C, F, G, L = unpack(ns)
 -- Credits --
 -------------
 
+	-- HopeASD, Peterodox
 	-- NDui
 	-- https://github.com/siweia/NDuiClassic/tree/master/Interface/AddOns/NDui/Modules/Infobar
 	-- diminfo
 	-- https://www.wowinterface.com/downloads/info20899-diminfo.html
-	-- HopeASD, Peterodox
+	
+	-- To edit Position
+	
+	-- [欢迎来到小N老师的Lua新手讲堂] 第一讲 锚点与位置
+	-- https://bbs.nga.cn/read.php?tid=4555096
+	-- Wowpedia: SetPoint()
+	-- https://wow.gamepedia.com/API_Region_SetPoint

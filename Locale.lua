@@ -9,6 +9,7 @@ local getLocale = GetLocale()
 		L.AutoRepair = "自動修理："
 		L.None = "無裝備"
 		
+		L.Whisper = SLASH_WHISPER2:gsub("/(.*)","%1")
 		L.Lonely = "沒人要"
 		
 		L.Shift = "Shift 展開"
@@ -39,6 +40,7 @@ local getLocale = GetLocale()
 		L.AutoRepair = "自动修理："
 		L.None = "无装备"
 		
+		L.Whisper = "密语"
 		L.Lonely = "沒人要"
 		
 		L.Shift = "Shift 展开"
@@ -69,6 +71,7 @@ local getLocale = GetLocale()
 		L.AutoRepair = "Auto Repair: "
 		L.None = "None"
 		
+		L.Whisper = "Whisper"
 		L.Lonely = "Lonely"
 		
 		L.Shift = "Shift show all"
