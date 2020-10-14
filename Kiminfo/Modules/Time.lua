@@ -4,11 +4,12 @@ if not C.Time then return end
 
 local format, time, date = string.format, time, date
 local C_Calendar_GetNumPendingInvites = C_Calendar.GetNumPendingInvites
+local C_DateAndTime_GetCurrentCalendarTime = C_DateAndTime.GetCurrentCalendarTime
 local GetCVarBool = GetCVarBool
 local TIMEMANAGER_TICKER_24HOUR, TIMEMANAGER_TICKER_12HOUR = TIMEMANAGER_TICKER_24HOUR, TIMEMANAGER_TICKER_12HOUR
 
 local title
-local bonusName = GetCurrencyInfo(1580) -- Bonus roll
+local bonusName = C_CurrencyInfo.GetCurrencyInfo(1580).name -- Bonus roll
 local bonus = {
 	52834, 52838,	-- Gold
 	52835, 52839,	-- Honor
@@ -97,7 +98,7 @@ local function OnEnter(self)
 	-- 獲取進度
 	RequestRaidInfo()
 	
-	local today = C_Calendar.GetDate()
+	local today = C_DateAndTime_GetCurrentCalendarTime()
 	local w, m, d, y = today.weekday, today.month, today.monthDay, today.year
 	
 	-- Title
@@ -162,7 +163,7 @@ local function OnEnter(self)
 	--[[ Weekly quest / 每周任務 ]]--
 	
 	-- Bonus weekly / 好運符任務
-	title = false
+	--[[title = false
 	local count, maxCoins = 0, 2
 	for _, id in pairs(bonus) do
 		if IsQuestFlaggedCompleted(id) then
@@ -178,10 +179,10 @@ local function OnEnter(self)
 		else
 			GameTooltip:AddDoubleLine(bonusName, count.."/"..maxCoins, 1, 1, 1, 0, 1, .5)
 		end
-	end
+	end]]--
 	
 	-- Pvp weekly / 征服每周進度
-	do
+	--[[do
 		local currentValue, maxValue, questID = PVPGetConquestLevelInfo()
 		local questDone = questID and questID == 0
 		
@@ -194,10 +195,10 @@ local function OnEnter(self)
 				GameTooltip:AddDoubleLine(PVP_CONQUEST, currentValue.."/"..maxValue, 1, 1, 1, 1, 1, 1)
 			end
 		end
-	end
+	end]]--
 	
 	-- Island weekly / 海嶼遠征周任
-	local iwqID = C_IslandsQueue.GetIslandsWeeklyQuestID()
+	--[[local iwqID = C_IslandsQueue.GetIslandsWeeklyQuestID()
 	if iwqID and UnitLevel("player") >= 115 then
 		addTitle(QUESTS_LABEL)
 		
@@ -213,7 +214,7 @@ local function OnEnter(self)
 			
 			GameTooltip:AddDoubleLine(ISLANDS_HEADER, stautsText, 1, 1, 1, 1, 1, 1)
 		end
-	end
+	end]]--
 	
 	GameTooltip:AddDoubleLine(" ", G.Line)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..SLASH_CALENDAR1:gsub("/(.*)","%1")..G.LeftButton)
@@ -246,6 +247,9 @@ end
 	--[[ Data text ]]--
 	Stat:RegisterEvent("CALENDAR_UPDATE_PENDING_INVITES")
 	Stat:RegisterEvent("PLAYER_ENTERING_WORLD")
+	--Stat:RegisterEvent("CALENDAR_EVENT_ALARM")
+	--Stat:RegisterEvent("CALENDAR_UPDATE_EVENT_LIST")
+	--Stat:RegisterEvent("CALENDAR_UPDATE_INVITE_LIST")
 	--Stat:RegisterEvent("UPDATE_INSTANCE_INFO")
 	Stat:SetScript("OnEvent", OnEvent)
 	Stat:SetScript("OnUpdate", OnUpdate)

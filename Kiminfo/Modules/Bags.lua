@@ -5,6 +5,8 @@ if not C.Bags then return end
 local format = format
 local CreateFrame = CreateFrame
 local GetContainerNumFreeSlots, GetContainerNumSlots = GetContainerNumFreeSlots, GetContainerNumSlots
+local C_CurrencyInfo_GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo
+local C_CurrencyInfo_GetBackpackCurrencyInfo = C_CurrencyInfo.GetBackpackCurrencyInfo
 
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
@@ -45,6 +47,17 @@ local function getBagSlots()
 	return free, total, used
 end
 
+--[[ GetCurrencyInfo ]]--
+local function GetBackpackCurrencyInfo(id)
+	local info = C_CurrencyInfo_GetBackpackCurrencyInfo(id)
+	
+	if info then
+		return info.name, info.quantity, info.iconFileID, info.currencyTypesID
+	end
+	
+	return nil
+end
+
 --================================================--
 ---------------    [[ Updates ]]     ---------------
 --================================================--
@@ -81,14 +94,14 @@ local function OnEnter(self)
 		local name, count, icon, currencyID = GetBackpackCurrencyInfo(i)
 		
 		if name and i == 1 then
-			local iconTexture = select(3, GetCurrencyInfo(104))
+			local iconTexture = C_CurrencyInfo.GetCurrencyInfo(104).iconFileID
 			
 			GameTooltip:AddLine(" ")
 			GameTooltip:AddLine(F.addIcon(iconTexture, 14, 4, 46).." "..G.OptionColor..CURRENCY)
 		end
 		
 		if name and count then
-			local total = select(6, GetCurrencyInfo(currencyID))
+			local total = C_CurrencyInfo_GetCurrencyInfo(currencyID).maxQuantity
 			local iconTexture = F.addIcon(icon, 14, 4, 46)
 			
 			if total > 0 then
