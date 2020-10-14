@@ -4,8 +4,10 @@ if not C.Spec then return end
 
 local format, min, max, sort, wipe = format, min, max, sort, wipe
 local CreateFrame = CreateFrame
+local C_SpecializationInfo_CanPlayerUsePVPTalentUI = C_SpecializationInfo.CanPlayerUsePVPTalentUI
 
 local pvpTalents
+local pvpTexture = C_CurrencyInfo.GetCurrencyInfo(104).iconFileID
 
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
@@ -97,14 +99,12 @@ local function OnEnter(self)
 		end
 	end
 	
-	-- Pvp telent
-	if UnitLevel("player") >= SHOW_PVP_TALENT_LEVEL then
+	-- PvP telent
+	if C_SpecializationInfo_CanPlayerUsePVPTalentUI() then
 		pvpTalents = C_SpecializationInfo.GetAllSelectedPvpTalentIDs()
 		
 		if #pvpTalents > 0 then
-			-- Pvp title
-			local pvpTexture = select(3, GetCurrencyInfo(104))
-			
+			-- PvP title
 			GameTooltip:AddLine(" ")
 			GameTooltip:AddLine(F.addIcon(pvpTexture, 14, 4, 46).." "..PVP_TALENTS, .6, .8, 1)
 			
