@@ -182,7 +182,7 @@ local function OnEnter(self)
 	end]]--
 	
 	-- Pvp weekly / 征服每周進度
-	--[[do
+	do
 		local currentValue, maxValue, questID = PVPGetConquestLevelInfo()
 		local questDone = questID and questID == 0
 		
@@ -195,7 +195,7 @@ local function OnEnter(self)
 				GameTooltip:AddDoubleLine(PVP_CONQUEST, currentValue.."/"..maxValue, 1, 1, 1, 1, 1, 1)
 			end
 		end
-	end]]--
+	end
 	
 	-- Island weekly / 海嶼遠征周任
 	--[[local iwqID = C_IslandsQueue.GetIslandsWeeklyQuestID()

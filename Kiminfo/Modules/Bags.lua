@@ -87,7 +87,7 @@ local function OnEnter(self)
 	-- Bag slot
 	GameTooltip:AddLine(G.OptionColor..BAGSLOT)
 	GameTooltip:AddDoubleLine(USE, used, 1, 1, 1, 1, 1, 1)
-	GameTooltip:AddDoubleLine(MONEY, GetMoneyString(money).."  ", 1, 1, 1, 1, 1, 1)
+	GameTooltip:AddDoubleLine(MONEY, GetMoneyString(money).." ", 1, 1, 1, 1, 1, 1)
 	
 	-- Currency
 	for i = 1, GetNumWatchedTokens() do
