@@ -4,6 +4,7 @@ if not C.Spec then return end
 
 local format, min, max, sort, wipe = format, min, max, sort, wipe
 local CreateFrame = CreateFrame
+local GetSpecialization, GetSpecializationInfo = GetSpecialization, GetSpecializationInfo
 local C_SpecializationInfo_CanPlayerUsePVPTalentUI = C_SpecializationInfo.CanPlayerUsePVPTalentUI
 
 local pvpTalents
@@ -159,10 +160,10 @@ end
 		GameTooltip:Hide()
 		
 		-- Get current spec id index
-		local ID = GetSpecialization()
-		if not ID then return end
+		local SpecIndex = GetSpecialization()
+		if not SpecIndex then return end
 		-- Get current spec info
-		local specID, specName = GetSpecializationInfo(ID)
+		local specID, specName = GetSpecializationInfo(SpecIndex)
 		-- Get currnet loot spec
 		local LootSpec = GetLootSpecialization()
 		

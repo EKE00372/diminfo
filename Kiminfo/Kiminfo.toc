@@ -1,8 +1,8 @@
-## Interface: 90001
+## Interface: 90002
 ## Author: EK
 ## Title: |cff00ffffKim|rinfo
 ## Notes: Info Data Bar
-## Version: R3.3
+## Version: R3.4
 ## SavedVariables: Kiminfo
 ## X-Credits: Tukz, Loshine, Siweia, HopeASD, Peter
 
