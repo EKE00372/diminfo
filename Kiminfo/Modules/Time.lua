@@ -5,16 +5,25 @@ if not C.Time then return end
 local format, time, date = string.format, time, date
 local C_Calendar_GetNumPendingInvites = C_Calendar.GetNumPendingInvites
 local C_DateAndTime_GetCurrentCalendarTime = C_DateAndTime.GetCurrentCalendarTime
+local C_AreaPoiInfo_GetAreaPOIInfo = C_AreaPoiInfo.GetAreaPOIInfo
+local IsQuestFlaggedCompleted = C_QuestLog.IsQuestFlaggedCompleted
+local C_UIWidgetManager_GetTextWithStateWidgetVisualizationInfo =  C_UIWidgetManager.GetTextWithStateWidgetVisualizationInfo
 local GetCVarBool = GetCVarBool
 local TIMEMANAGER_TICKER_24HOUR, TIMEMANAGER_TICKER_12HOUR = TIMEMANAGER_TICKER_24HOUR, TIMEMANAGER_TICKER_12HOUR
 
-local title
-local bonusName = C_CurrencyInfo.GetCurrencyInfo(1580).name -- Bonus roll
-local bonus = {
-	52834, 52838,	-- Gold
-	52835, 52839,	-- Honor
-	52837, 52840,	-- Resources
+-- Torghast
+local TorghastWidgets, TorghastInfo = {
+	{nameID = 2925, levelID = 2930}, -- Fracture Chambers
+	{nameID = 2926, levelID = 2932}, -- Skoldus Hall
+	{nameID = 2924, levelID = 2934}, -- Soulforges
+	{nameID = 2927, levelID = 2936}, -- Coldheart Interstitia
+	{nameID = 2928, levelID = 2938}, -- Mort'regar
+	{nameID = 2929, levelID = 2940}, -- The Upper Reaches
 }
+-- Fuckking blizzard make the name on tooltip wrap like shit
+local function CleanupLevelName(text)
+	return gsub(text, "|n", "")
+end
 
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
@@ -52,6 +61,7 @@ local function updateTimerFormat(hour, minute)
 end
 
 --[[ Custom api for add title line ]]--
+local title
 local function addTitle(text)
 	if not title then
 		GameTooltip:AddLine(" ")
@@ -120,7 +130,7 @@ local function OnEnter(self)
 		
 		if not (id == 11 or id == 12 or id == 13) then
 			addTitle(RAID_INFO_WORLD_BOSS)
-			GameTooltip:AddDoubleLine(name, SecondsToTime(reset, true, nil, 3), 1, .82, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(name, SecondsToTime(reset, true, nil, 3), 1, 1, 1, 1, 1, 1)
 		end
 	end
 	
@@ -138,7 +148,7 @@ local function OnEnter(self)
 				r, g, b = 1, 1, 1
 			end
 		
-		GameTooltip:AddDoubleLine(difficultyName.." - "..name, SecondsToTime(reset, true, nil, 3), 1, .82, 0, r, g, b)
+		GameTooltip:AddDoubleLine(difficultyName.." - "..name, SecondsToTime(reset, true, nil, 3), 1, 1, 1, r, g, b)
 		end
 	end
 
@@ -156,67 +166,33 @@ local function OnEnter(self)
 				r, g, b = 1, 1, 1
 			end
 		
-		GameTooltip:AddDoubleLine(difficultyName.." - "..name, SecondsToTime(reset, true, nil, 3), 1, .82, 0, r, g, b)
+		GameTooltip:AddDoubleLine(difficultyName.." - "..name, SecondsToTime(reset, true, nil, 3), 1, 1, 1, r, g, b)
 		end
 	end
 	
-	--[[ Weekly quest / 每周任務 ]]--
-	
-	-- Bonus weekly / 好運符任務
-	--[[title = false
-	local count, maxCoins = 0, 2
-	for _, id in pairs(bonus) do
-		if IsQuestFlaggedCompleted(id) then
-			count = count + 1
-		end
+	-- Torghast
+	if not TorghastInfo then
+		TorghastInfo = C_AreaPoiInfo_GetAreaPOIInfo(1543, 6640)
 	end
-	
-	if count > 0 then
-		addTitle(QUESTS_LABEL)
-		
-		if count == maxCoins then
-			GameTooltip:AddDoubleLine(bonusName, COMPLETE, 1, 1, 1, 0, 1, 0)
-		else
-			GameTooltip:AddDoubleLine(bonusName, count.."/"..maxCoins, 1, 1, 1, 0, 1, .5)
-		end
-	end]]--
-	
-	-- Pvp weekly / 征服每周進度
-	do
-		local currentValue, maxValue, questID = PVPGetConquestLevelInfo()
-		local questDone = questID and questID == 0
-		
-		if IsPlayerAtEffectiveMaxLevel() then
-			if questDone then
-				addTitle(QUESTS_LABEL)
-				GameTooltip:AddDoubleLine(PVP_CONQUEST, COMPLETE, 1, 1, 1, 0, 1, 0)
-			elseif currentValue > 0 then
-				addTitle(QUESTS_LABEL)
-				GameTooltip:AddDoubleLine(PVP_CONQUEST, currentValue.."/"..maxValue, 1, 1, 1, 1, 1, 1)
+	if TorghastInfo and IsQuestFlaggedCompleted(60136) then
+		title = false
+		for _, value in pairs(TorghastWidgets) do
+			local nameInfo = C_UIWidgetManager_GetTextWithStateWidgetVisualizationInfo(value.nameID)
+			if nameInfo and nameInfo.shownState == 1 then
+				addTitle(TorghastInfo.name)
+				local nameText = CleanupLevelName(nameInfo.text)
+				local levelInfo = C_UIWidgetManager_GetTextWithStateWidgetVisualizationInfo(value.levelID)
+				local levelText = AVAILABLE
+				if levelInfo and levelInfo.shownState == 1 then
+					levelText = CleanupLevelName(levelInfo.text)
+				end
+				GameTooltip:AddDoubleLine(nameText, levelText, 1, 1, 1, 1, 1, 1)
 			end
 		end
 	end
-	
-	-- Island weekly / 海嶼遠征周任
-	--[[local iwqID = C_IslandsQueue.GetIslandsWeeklyQuestID()
-	if iwqID and UnitLevel("player") >= 115 then
-		addTitle(QUESTS_LABEL)
-		
-		if IsQuestFlaggedCompleted(iwqID) then
-			GameTooltip:AddDoubleLine(ISLANDS_HEADER, COMPLETE, 1, 1, 1, 0, 1, 0)
-		else
-			local cur, max = select(4, GetQuestObjectiveInfo(iwqID, 1, false))
-			local stautsText = cur.."/"..max
-			
-			if not cur or not max then
-				stautsText = LFG_LIST_LOADING
-			end
-			
-			GameTooltip:AddDoubleLine(ISLANDS_HEADER, stautsText, 1, 1, 1, 1, 1, 1)
-		end
-	end]]--
-	
+
 	GameTooltip:AddDoubleLine(" ", G.Line)
+	GameTooltip:AddDoubleLine(" ", G.OptionColor..RATED_PVP_WEEKLY_VAULT..G.MiddleButton)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..SLASH_CALENDAR1:gsub("/(.*)","%1")..G.LeftButton)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..STOPWATCH_TITLE..G.RightButton)
 	
@@ -259,12 +235,23 @@ end
 		if btn == "RightButton"  then
 			ToggleTimeManager()
 		elseif btn == "LeftButton"  then
-			if InCombatLockdown() then
+			--[[if InCombatLockdown() then
 				UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT)
 				return
-			end
+			end]]--
 			
 			ToggleCalendar()
+			
+		elseif btn == "MiddleButton" then
+			if not WeeklyRewardsFrame then LoadAddOn("Blizzard_WeeklyRewards") end
+			
+			--[[if InCombatLockdown() then
+				UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT)
+				return
+			end]]--
+			
+			ToggleFrame(WeeklyRewardsFrame)
+
 		else
 			return
 		end

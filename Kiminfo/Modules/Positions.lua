@@ -4,6 +4,7 @@ if not C.Positions then return end
 
 local format = format
 local CreateFrame = CreateFrame
+local C_Map_GetWorldPosFromMapPos, C_Map_GetBestMapForUnit = C_Map.GetWorldPosFromMapPos, C_Map.GetBestMapForUnit
 
 local subzone, zone, pvp
 local coordX, coordY = 0, 0
@@ -53,8 +54,8 @@ local function GetPlayerMapPos(mapID)
 	local mapRect = mapRects[mapID]
 	if not mapRect then
 		mapRect = {}
-		mapRect[1] = select(2, C_Map.GetWorldPosFromMapPos(mapID, CreateVector2D(0, 0)))
-		mapRect[2] = select(2, C_Map.GetWorldPosFromMapPos(mapID, CreateVector2D(1, 1)))
+		mapRect[1] = select(2, C_Map_GetWorldPosFromMapPos(mapID, CreateVector2D(0, 0)))
+		mapRect[2] = select(2, C_Map_GetWorldPosFromMapPos(mapID, CreateVector2D(1, 1)))
 		mapRect[2]:Subtract(mapRect[1])
 	
 		mapRects[mapID] = mapRect
@@ -69,7 +70,7 @@ local function UpdateCoords(self, elapsed)
 	self.elapsed = (self.elapsed or 0) + elapsed
 	
 	if self.elapsed > .1 then
-		local x, y = GetPlayerMapPos(C_Map.GetBestMapForUnit("player"))
+		local x, y = GetPlayerMapPos(C_Map_GetBestMapForUnit("player"))
 		if x then
 			coordX, coordY = x, y
 		else
@@ -124,7 +125,7 @@ local function OnEnter(self)
 	-- Options
 	GameTooltip:AddDoubleLine(" ", G.Line)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..WORLDMAP_BUTTON..G.LeftButton)
-	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.XY..G.RightButton)
+	GameTooltip:AddDoubleLine(" ", G.OptionColor..MAP_PIN..G.RightButton)
 	
 	GameTooltip:Show()
 end
@@ -150,14 +151,20 @@ end
 	--[[ Options ]]--
 	Stat:SetScript("OnMouseUp", function(_, btn)
 		if btn == "LeftButton" then
-			if InCombatLockdown() then
+			--[[if InCombatLockdown() then
 				UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT)
 				return
-			end
+			end]]--
 			ToggleFrame(WorldMapFrame)
 		elseif btn == "RightButton" then
 			if not IsInInstance() then
-				ChatFrame_OpenChat(format("%s (%s)", zone, formatCoords()), chatFrame)
+				local map = C_Map_GetBestMapForUnit("player")
+				local x, y = GetPlayerMapPos(map)
+				local hasUnit = UnitExists("target") and not UnitIsPlayer("target")
+				local unitName = hasUnit and UnitName("target") or ""
+				
+				C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(map, x, y))
+				ChatFrame_OpenChat(format("%s %s (%s) %s", C_Map.GetUserWaypointHyperlink(), zone, formatCoords(), unitName), chatFrame)
 			end
 		else
 			return
