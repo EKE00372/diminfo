@@ -92,7 +92,7 @@ local getLocale = GetLocale()
 		L.Collected = "Сборка мусора: "
 		L.ManualCollect = "Ручной Сбор"
 		L.AutoCollect = "Автоматический Сбор Памяти: "
-		L.CollectWarning = "|cff00ffffKim|rinfo[|cff00ff00Memory|r]: |cffff0000NOTICE: DANGER!|r Auto collected memory will maybe cause your client freeze."
+		L.CollectWarning = "|cff00ffffKim|rinfo[|cff00ff00Memory|r]: |cffff0000NOTICE: DANGER!|r Auto collected memory may cause your client freeze."
 		
 		L.XY = "Передача координат"
 		
@@ -127,7 +127,7 @@ local getLocale = GetLocale()
 		L.Collected = "Garbage collected: "
 		L.ManualCollect = "Manual Collect"
 		L.AutoCollect = "Auto Collect Memory: "
-		L.CollectWarning = "|cff00ffffKim|rinfo[|cff00ff00Memory|r]: |cffff0000NOTICE: DANGER!|r Auto collected memory will maybe cause your client freeze."
+		L.CollectWarning = "|cff00ffffKim|rinfo[|cff00ff00Memory|r]: |cffff0000NOTICE: DANGER!|r Auto collected memory may cause your client freeze."
 		
 		L.XY = "Coordinates broadcast"
 		
