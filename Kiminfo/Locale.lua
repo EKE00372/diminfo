@@ -21,9 +21,7 @@ local getLocale = GetLocale()
 		L.ManualCollect = "手動釋放暫存記憶體"
 		L.AutoCollect = "自動整理暫存記憶體："
 		L.CollectWarning = "|cff00ffffKim|rinfo[|cff00ff00Memory|r]：|cffff0000注意：危險功能！|r啟用自動整理暫存記憶體可能使遊戲主程式周期性凍結。"
-		
-		L.XY = "發送座標"
-		
+
 		L.Spec = "專精"
 		L.Loot = LOOT
 		
@@ -57,9 +55,7 @@ local getLocale = GetLocale()
 		L.ManualCollect = "手动释放"
 		L.AutoCollect = "自动整理內存："
 		L.CollectWarning = "|cff00ffffKim|rinfo[|cff00ff00Memory|r]：|cffff0000注意：危险功能！|r启用自动整理內存可能使客户端周期性冻结。"
-		
-		L.XY = "发送座标"
-		
+			
 		L.Spec = "专精"
 		L.Loot = "拾取"
 		
@@ -94,8 +90,6 @@ local getLocale = GetLocale()
 		L.AutoCollect = "Автоматический Сбор Памяти: "
 		L.CollectWarning = "|cff00ffffKim|rinfo[|cff00ff00Memory|r]: |cffff0000NOTICE: DANGER!|r Auto collected memory may cause your client freeze."
 		
-		L.XY = "Передача координат"
-		
 		L.Spec = "Спек"
 		L.Loot = LOOT
 		
@@ -128,8 +122,6 @@ local getLocale = GetLocale()
 		L.ManualCollect = "Manual Collect"
 		L.AutoCollect = "Auto Collect Memory: "
 		L.CollectWarning = "|cff00ffffKim|rinfo[|cff00ff00Memory|r]: |cffff0000NOTICE: DANGER!|r Auto collected memory may cause your client freeze."
-		
-		L.XY = "Coordinates broadcast"
 		
 		L.Spec = "Spec"
 		L.Loot = LOOT
