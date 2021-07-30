@@ -168,10 +168,10 @@ end
 			Kiminfo.AutoRepair = not Kiminfo.AutoRepair
 			OnEnter(self)
 		else
-			if InCombatLockdown() then
+			--[[if InCombatLockdown() then
 				UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT)
 				return
-			end
+			end]]--
 			ToggleCharacter("PaperDollFrame")
 		end
 	end)

@@ -196,10 +196,10 @@ end
 			end
 			EasyMenu(specMenuList, specMenuFrame, "cursor", 0, 0, "MENU", 3)
 		else
-			if InCombatLockdown() then
+			--[[if InCombatLockdown() then
 				UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT)
 				return
-			end
+			end]]--
 			
 			if not PlayerTalentFrame then
 				LoadAddOn("Blizzard_TalentUI")

@@ -114,9 +114,9 @@ local function OnEnter(self)
 	
 	-- Options
 	GameTooltip:AddDoubleLine(" ", G.Line)
+	GameTooltip:AddDoubleLine(" ", G.OptionColor..CURRENCY..G.MiddleButton)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..BAGSLOT..G.LeftButton)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.AutoSell..(Kiminfo.AutoSell and G.Enable or G.Disable)..G.RightButton, 1, 1, 1, .4, .78, 1)
-	GameTooltip:AddDoubleLine(" ", G.OptionColor..CURRENCY..G.MiddleButton)
 	
 	GameTooltip:Show()
 end
@@ -153,10 +153,10 @@ end
 			Kiminfo.AutoSell = not Kiminfo.AutoSell
 			OnEnter(self)
 		elseif button == "MiddleButton" then
-			if InCombatLockdown() then
+			--[[if InCombatLockdown() then
 				UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT)
 				return
-			end
+			end]]--
 			
 			ToggleCharacter("TokenFrame")
 		else

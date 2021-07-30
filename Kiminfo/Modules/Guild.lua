@@ -7,6 +7,7 @@ local format, sort, wipe = format, sort, wipe
 local CreateFrame = CreateFrame
 local GetNumGuildMembers, GetGuildRosterInfo = GetNumGuildMembers, GetGuildRosterInfo
 local GetGuildFactionInfo = GetGuildFactionInfo
+local InviteToGroup = C_PartyInfo.InviteUnit -- Replace C. new api as old InviteToGroup()
 
 local guildTable = {}
 local name, rank, rankindex, level, zone, connected, status, class
@@ -269,10 +270,10 @@ end
 	
 	--[[ Options ]]--
 	Stat:SetScript("OnMouseDown", function(self, button)
-		if InCombatLockdown() then
+		--[[if InCombatLockdown() then
 			UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT)
 			return
-		end
+		end]]--
 		
 		if button == "RightButton" then
 			if not IsInGuild() then return end

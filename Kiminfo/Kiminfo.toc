@@ -1,8 +1,12 @@
-## Interface: 90002
+## Interface: 90100
 ## Author: EK
 ## Title: |cff00ffffKim|rinfo
-## Notes: Info Data Bar
-## Version: R3.4
+## Title-zhTW: |cff00ffffKim|rinfo 資訊條
+## Title-zhCN: |cff00ffffKim|rinfo 信息条
+## Notes: Light info bar.
+## Notes-zhTW: 小巧資訊條。
+## Notes-zhCN: 轻量级信息条。
+## Version: R3.5
 ## SavedVariables: Kiminfo
 ## X-Credits: Tukz, Loshine, Siweia, HopeASD, Peter
 

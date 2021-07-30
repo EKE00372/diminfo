@@ -236,6 +236,7 @@ end
 			print(format("|cff66C6FF%s|r%s", L.Collected, formatMemory(before - gcinfo())))
 		elseif btn == "RightButton" then
 			Kiminfo.AutoCollect = not Kiminfo.AutoCollect
+			print(L.CollectWarning)
 		else
 			return
 		end
