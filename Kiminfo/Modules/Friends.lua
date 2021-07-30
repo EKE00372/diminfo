@@ -8,6 +8,7 @@ local CreateFrame = CreateFrame
 local C_FriendList_GetFriendInfoByIndex = C_FriendList.GetFriendInfoByIndex
 local C_BattleNet_GetFriendAccountInfo = C_BattleNet.GetFriendAccountInfo
 local C_FriendList_GetNumOnlineFriends, BNGetNumFriends = C_FriendList.GetNumOnlineFriends, BNGetNumFriends
+local InviteToGroup = C_PartyInfo.InviteUnit -- Replace C. new api as old InviteToGroup()
 
 local title	-- Custom line
 local friendTable, bnetTable = {}, {}	-- build table
@@ -442,10 +443,10 @@ end
 	
 	--[[ Options ]]--
 	Stat:SetScript("OnMouseDown", function(self, button)
-		if InCombatLockdown() then
+		--[[if InCombatLockdown() then
 			UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT)
 			return
-		end
+		end]]--
 		
 		if button == "LeftButton" then
 			ToggleFriendsFrame()

@@ -49,7 +49,7 @@ Just edit config.lua to change them. I suggest use [Notepad++](https://notepad-p
 	* Left click: collect memory manually, right click: auto collect config
 * Positions
 	* Show zone text and update xy coord when mouseover
-	* Left click: world map, right click: post coord
+	* Left click: world map, right click: post coord with Blizzard map pin, if have target will send target name also.
 * Spec
 	* Show spec and loot spec, list telent when mouseover
 	* Left click: telent frame, right click: change loot spec, middle click: switch spec
@@ -87,7 +87,7 @@ Just edit config.lua to change them. I suggest use [Notepad++](https://notepad-p
 	* 左鍵：手動回收；右鍵：自動回收開關
 * Positions / 位置
 	* 顯示區域名稱，指向時顯示座標
-	* 左鍵：大地圖；右鍵：在聊天框發送座標
+	* 左鍵：大地圖；右鍵：在聊天框發送包含地圖標記的座標，如果有目標一併發送目標名字
 * Spec / 專精
 	* 顯示當前專精與拾取專精，指向時列出天賦
 	* 左鍵：天賦頁面；右鍵：更改拾取專精；中鍵：切換專精
