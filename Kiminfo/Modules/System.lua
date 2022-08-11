@@ -213,6 +213,7 @@ local function OnEnter(self)
 	
 	-- Options
 	GameTooltip:AddDoubleLine(" ", G.Line)
+	GameTooltip:AddDoubleLine(" ", G.OptionColor..RELOADUI..G.MiddleButton)
 	if GetCVar("scriptProfile") == "1" then
 		GameTooltip:AddDoubleLine(" ", G.OptionColor..L.ResetCPU..G.LeftButton)
 	end
@@ -235,6 +236,8 @@ end
 				SetCVar("scriptProfile", 0)
 				print(L.ReloadOff)
 			end
+		elseif btn == "MiddleButton" then
+			ReloadUI()
 		elseif btn == "LeftButton" then
 			ResetCPUUsage()
 		end
