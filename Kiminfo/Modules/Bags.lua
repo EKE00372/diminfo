@@ -4,9 +4,10 @@ if not C.Bags then return end
 
 local format = format
 local CreateFrame = CreateFrame
-local GetContainerNumFreeSlots, GetContainerNumSlots = GetContainerNumFreeSlots, GetContainerNumSlots
+local GetContainerNumFreeSlots, GetContainerNumSlots = C_Container.GetContainerNumFreeSlots, C_Container.GetContainerNumSlots
 local C_CurrencyInfo_GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo
 local C_CurrencyInfo_GetBackpackCurrencyInfo = C_CurrencyInfo.GetBackpackCurrencyInfo
+local GetContainerItemLink, GetContainerItemInfo = C_Container.GetContainerItemLink, C_Container.GetContainerItemInfo
 
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
@@ -44,7 +45,7 @@ local function getBagSlots()
 	end
 	used = total - free
 	
-	return free, total, used
+	return free, total, used	
 end
 
 --[[ GetCurrencyInfo ]]--

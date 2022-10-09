@@ -367,9 +367,9 @@ local function OnEnter(self)
 				
 				local icon
 				if info[5] == BNET_CLIENT_WOW then
-					icon = F.addIcon(BNet_GetClientTexture(BNET_CLIENT_WOW), 14, 4, 46)
+					icon = F.addIcon(BNet_GetBattlenetClientAtlas(BNET_CLIENT_WOW), 14, 4, 46)
 				else
-					icon = "|T"..BNet_GetClientTexture(BNET_CLIENT_WOW)..":14:14:0:0:50:50:4:46:4:46:160:160:160|t"
+					icon = "|T"..BNet_GetBattlenetClientAtlas(BNET_CLIENT_WOW)..":14:14:0:0:50:50:4:46:4:46:60:220:220|t"
 				end
 				
 				if isShiftKeyDown then
@@ -379,9 +379,9 @@ local function OnEnter(self)
 				end
 			else
 				if isShiftKeyDown then
-					tooltip:AddLine(F.addIcon(BNet_GetClientTexture(info[5]), 14, 4, 46).." "..G.OptionColor..info[3].."|r"..info[6], F.Hex(.65, .65, .65)..info[9])
+					tooltip:AddLine(F.addIcon(BNet_GetBattlenetClientAtlas(info[5]), 14, 4, 46).." "..G.OptionColor..info[3].."|r"..info[6], F.Hex(.65, .65, .65)..info[9])
 				else
-					tooltip:AddLine(F.addIcon(BNet_GetClientTexture(info[5]), 14, 4, 46).." "..G.OptionColor..info[4].."|r"..info[6], F.Hex(.65, .65, .65)..info[9])
+					tooltip:AddLine(F.addIcon(BNet_GetBattlenetClientAtlas(info[5]), 14, 4, 46).." "..G.OptionColor..info[4].."|r"..info[6], F.Hex(.65, .65, .65)..info[9])
 				end
 			end
 			
