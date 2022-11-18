@@ -6,6 +6,10 @@ local format, floor, max, sort, modf, select = string.format, math.floor, max, t
 local CreateFrame = CreateFrame
 local GetInventoryItemLink, GetInventoryItemDurability, GetInventoryItemTexture = GetInventoryItemLink, GetInventoryItemDurability, GetInventoryItemTexture
 
+local LibShowUIPanel = LibStub("LibShowUIPanel-1.0")
+local ShowUIPanel = LibShowUIPanel.ShowUIPanel
+local HideUIPanel = LibShowUIPanel.HideUIPanel
+
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
 --=================================================--
@@ -168,11 +172,7 @@ end
 			Kiminfo.AutoRepair = not Kiminfo.AutoRepair
 			OnEnter(self)
 		else
-			--[[if InCombatLockdown() then
-				UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT)
-				return
-			end]]--
-			ToggleCharacter("PaperDollFrame")
+			if not CharacterFrame:IsShown() then ShowUIPanel(CharacterFrame) else HideUIPanel(CharacterFrame) end
 		end
 	end)
 	
