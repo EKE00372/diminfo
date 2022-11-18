@@ -11,6 +11,10 @@ local C_UIWidgetManager_GetTextWithStateWidgetVisualizationInfo =  C_UIWidgetMan
 local GetCVarBool = GetCVarBool
 local TIMEMANAGER_TICKER_24HOUR, TIMEMANAGER_TICKER_12HOUR = TIMEMANAGER_TICKER_24HOUR, TIMEMANAGER_TICKER_12HOUR
 
+local LibShowUIPanel = LibStub("LibShowUIPanel-1.0")
+local ShowUIPanel = LibShowUIPanel.ShowUIPanel
+local HideUIPanel = LibShowUIPanel.HideUIPanel
+
 -- Torghast
 local TorghastWidgets, TorghastInfo = {
 	{nameID = 2925, levelID = 2930}, -- Fracture Chambers
@@ -235,23 +239,11 @@ end
 		if btn == "RightButton"  then
 			ToggleTimeManager()
 		elseif btn == "LeftButton"  then
-			--[[if InCombatLockdown() then
-				UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT)
-				return
-			end]]--
-			
-			ToggleCalendar()
-			
+			if not CalendarFrame then LoadAddOn("Blizzard_Calendar") end
+				if not CalendarFrame:IsShown() then ShowUIPanel(CalendarFrame) else HideUIPanel(CalendarFrame) end
 		elseif btn == "MiddleButton" then
 			if not WeeklyRewardsFrame then LoadAddOn("Blizzard_WeeklyRewards") end
-			
-			--[[if InCombatLockdown() then
-				UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT)
-				return
-			end]]--
-			
-			ToggleFrame(WeeklyRewardsFrame)
-
+			if not WeeklyRewardsFrame:IsShown() then ShowUIPanel(WeeklyRewardsFrame) else HideUIPanel(WeeklyRewardsFrame) end
 		else
 			return
 		end

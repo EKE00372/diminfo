@@ -12,6 +12,10 @@ local GetContainerNumFreeSlots, GetContainerNumSlots = C_Container.GetContainerN
 local UseContainerItem, GetContainerItemInfo = C_Container.UseContainerItem, C_Container.GetContainerItemInfo
 local GetContainerItemEquipmentSetInfo = C_Container.GetContainerItemEquipmentSetInfo
 
+local LibShowUIPanel = LibStub("LibShowUIPanel-1.0")
+local ShowUIPanel = LibShowUIPanel.ShowUIPanel
+local HideUIPanel = LibShowUIPanel.HideUIPanel
+
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
 --=================================================--
@@ -157,11 +161,7 @@ end
 			Kiminfo.AutoSell = not Kiminfo.AutoSell
 			OnEnter(self)
 		elseif button == "MiddleButton" then
-			--[[if InCombatLockdown() then
-				UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT)
-				return
-			end]]--
-			
+			--if not TokenFrame:IsShown() then ShowUIPanel(TokenFrame) else HideUIPanel(TokenFrame) end
 			ToggleCharacter("TokenFrame")
 		else
 			ToggleAllBags()
@@ -189,7 +189,6 @@ local sellGray = CreateFrame("Frame")
 						
 							if price > 0 then
 								UseContainerItem(bag, slot)
-								--PickupMerchantItem()
 								c = c + price
 							end
 						end

@@ -11,6 +11,7 @@
 ## X-Credits: Tukz, Loshine, Siweia, HopeASD, Peter
 
 Libs\Libs.xml
+Libs\TaintLess.xml
 
 Config.lua
 API.lua
