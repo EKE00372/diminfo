@@ -4,10 +4,13 @@ if not C.Bags then return end
 
 local format = format
 local CreateFrame = CreateFrame
-local GetContainerNumFreeSlots, GetContainerNumSlots = C_Container.GetContainerNumFreeSlots, C_Container.GetContainerNumSlots
+
 local C_CurrencyInfo_GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo
 local C_CurrencyInfo_GetBackpackCurrencyInfo = C_CurrencyInfo.GetBackpackCurrencyInfo
-local GetContainerItemLink, GetContainerItemInfo = C_Container.GetContainerItemLink, C_Container.GetContainerItemInfo
+
+local GetContainerNumFreeSlots, GetContainerNumSlots = C_Container.GetContainerNumFreeSlots, C_Container.GetContainerNumSlots
+local UseContainerItem, GetContainerItemInfo = C_Container.UseContainerItem, C_Container.GetContainerItemInfo
+local GetContainerItemEquipmentSetInfo = C_Container.GetContainerItemEquipmentSetInfo
 
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
@@ -176,15 +179,19 @@ local sellGray = CreateFrame("Frame")
 			
 			for bag = 0, 4 do
 				for slot = 1, GetContainerNumSlots(bag) do
-					local link = GetContainerItemLink(bag, slot)
-					
-					if link and (select(11, GetItemInfo(link)) ~= nil) and (select(2, GetContainerItemInfo(bag, slot)) ~= nil) then
-						local price = select(11, GetItemInfo(link)) * select(2, GetContainerItemInfo(bag, slot))
+					local info = GetContainerItemInfo(bag, slot)
+					if info then
+						local count, quality, link, noValue, itemID = info.stackCount, info.quality, info.hyperlink, info.hasNoValue, info.itemID
+						local isInSet = GetContainerItemEquipmentSetInfo(bag, slot)
 						
-						if select(3, GetItemInfo(link)) == 0 and price > 0 then
-							UseContainerItem(bag, slot)
-							PickupMerchantItem()
-							c = c + price
+						if link and not noValue and not isInSet and quality == 0 then
+							local price = select(11, GetItemInfo(link)) * count
+						
+							if price > 0 then
+								UseContainerItem(bag, slot)
+								--PickupMerchantItem()
+								c = c + price
+							end
 						end
 					end
 				end

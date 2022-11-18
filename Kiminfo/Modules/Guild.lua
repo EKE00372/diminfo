@@ -101,14 +101,12 @@ end
 
 --[[ Click function ]]--
 local function buttonOnClick(self, name, btn)
-	if btn == "LeftButton" then
-		if IsAltKeyDown() then
-			InviteToGroup(name)
-		elseif IsShiftKeyDown() then
-			ChatFrame_OpenChat("/w "..name.." ", SELECTED_DOCK_FRAME)
-		else
-			return
-		end
+	if btn == "LeftButton" and IsShiftKeyDown() then
+		InviteToGroup(name)
+	elseif btn == "MiddleButton" then
+		ChatFrame_OpenChat("/w "..name.." ", SELECTED_DOCK_FRAME)
+	else
+		return
 	end
 end
 
@@ -206,8 +204,8 @@ local function OnEnter(self)
 	
 	-- Options
 	tooltip:AddLine(" ", G.Line)
-	tooltip:AddLine(G.OptionColor..G.LeftButton.."+ Shift "..SLASH_WHISPER2:gsub("/(.*)","%1"), G.OptionColor..COMMUNITIES..G.LeftButton)
-	tooltip:AddLine(G.OptionColor..G.LeftButton.."+ Alt "..INVITE, G.OptionColor..GUILD..G.RightButton)
+	tooltip:AddLine(G.OptionColor..G.LeftButton.."+ Shift "..INVITE, G.OptionColor..COMMUNITIES..G.LeftButton)
+	tooltip:AddLine(G.OptionColor..G.MiddleButton..SLASH_WHISPER2:gsub("/(.*)","%1"), G.OptionColor..GUILD..G.RightButton)
 
 	tooltip:AddLine(" ")
 	tooltip:AddLine(MEMBERS, ZONE)
