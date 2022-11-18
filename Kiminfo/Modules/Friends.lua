@@ -88,33 +88,29 @@ end
 
 --[[ Click function for in-game friends ]]--
 local function gameOnClick(self, info, btn)
-	if btn == "LeftButton" then
-		if IsAltKeyDown() then
+	if btn == "LeftButton" and IsShiftKeyDown() then
 			-- In-game invite / 遊戲內邀請
 			InviteToGroup(info[1])
-		elseif IsShiftKeyDown() then
-			-- In-game msg / 遊戲內密語
-			ChatFrame_OpenChat("/w "..info[1].." ", SELECTED_DOCK_FRAME)
-		else
-			return
-		end
+	elseif btn == "MiddleButton" then
+		-- In-game msg / 遊戲內密語
+		ChatFrame_OpenChat("/w "..info[1].." ", SELECTED_DOCK_FRAME)
+	else
+		return
 	end
 end
 
 --[[ Click function for bn friends ]]--
 local function bnOnClick(self, info, btn)
-	if btn == "LeftButton" then
-		if IsAltKeyDown() then
-			-- BN invite / 戰網邀請
-			if info[5] == BNET_CLIENT_WOW then
-				InviteToGroup(info[4].."-"..info[10])
-			end
-		elseif IsShiftKeyDown() then
-			-- BN msg / 戰網聊天
-			ChatFrame_SendBNetTell(info[2])
-		else
-			return
+	if btn == "LeftButton" and IsShiftKeyDown() then
+		-- BN invite / 戰網邀請
+		if info[5] == BNET_CLIENT_WOW then
+			InviteToGroup(info[4].."-"..info[10])
 		end
+	elseif btn == "MiddleButton" then
+		-- BN msg / 戰網聊天
+		ChatFrame_SendBNetTell(info[2])
+	else
+		return
 	end
 end
 
@@ -183,6 +179,7 @@ local function buildBNetTable(num)
 				local charName = gameAccountInfo.characterName
 				local client = gameAccountInfo.clientProgram
 				local class = gameAccountInfo.className or UNKNOWN
+				local faction = gameAccountInfo.factionName
 				local zoneName = gameAccountInfo.areaName or UNKNOWN
 				local realmName = gameAccountInfo.realmName or ""
 				local level = gameAccountInfo.characterLevel
@@ -238,7 +235,7 @@ local function buildBNetTable(num)
 				end
 				
 				--number - bn, tag, name, client, status, class, level, aera, app / 編號 - 戰網，TAG，名字，程式，狀態，職業，等級，地點，魔獸好戰友
-				tinsert(bnetTable, {i, accountName, battleTag, charName, client, status, class, level, infoText, realmName, isMobile})
+				tinsert(bnetTable, {i, accountName, battleTag, charName, client, faction, status, class, level, infoText, realmName, isMobile})
 			end
 		end
 	end
@@ -302,8 +299,8 @@ local function OnEnter(self)
 	
 	-- Options
 	tooltip:AddLine(" ", G.Line)
-	tooltip:AddLine(G.OptionColor..G.LeftButton.."+ Shift "..SLASH_WHISPER2:gsub("/(.*)","%1"), G.OptionColor..FRIENDS..G.LeftButton)
-	tooltip:AddLine(G.OptionColor..G.LeftButton.."+ Alt "..INVITE, G.OptionColor..BATTLENET_BROADCAST..G.RightButton)
+	tooltip:AddLine(G.OptionColor..G.LeftButton.."+ Shift "..INVITE, G.OptionColor..FRIENDS..G.LeftButton)
+	tooltip:AddLine(G.OptionColor..G.MiddleButton..SLASH_WHISPER2:gsub("/(.*)","%1"), G.OptionColor..BATTLENET_BROADCAST..G.RightButton)
 
 	-- In-game online friends list
 	if onlineFriends > 0 then
@@ -352,14 +349,14 @@ local function OnEnter(self)
 			
 			if F.Multicheck(info[5], BNET_CLIENT_WOW, BNET_CLIENT_WOWC) then
 				local zonec
-				if GetRealZoneText() == info[9] then
+				if GetRealZoneText() == info[10] then
 					zonec = F.Hex(.3, 1, .3)
 				else
 					zonec = F.Hex(.65, .65, .65)
 				end
 				
-				local levelc = F.Hex(GetQuestDifficultyColor(info[8]))
-				local classc = F.Hex((CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[info[7]])
+				local levelc = F.Hex(GetQuestDifficultyColor(info[9]))
+				local classc = F.Hex((CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[info[8]])
 			
 				if classc == nil then
 					classc = levelc
@@ -367,21 +364,29 @@ local function OnEnter(self)
 				
 				local icon
 				if info[5] == BNET_CLIENT_WOW then
-					icon = F.addIcon(BNet_GetBattlenetClientAtlas(BNET_CLIENT_WOW), 14, 4, 46)
+					if info[6] == "Horde" then
+						icon = F.addIcon("Interface\\FriendsFrame\\PlusManz-Horde", 14, 4, 46)
+					elseif info[6] == "Alliance" then
+						--icon = F.addIcon("Interface\\FriendsFrame\\PlusManz-Alliance", 14, 4, 46)
+						icon = F.addIcon(G.Alliance, 14, 0, 50)
+					end
 				else
-					icon = "|T"..BNet_GetBattlenetClientAtlas(BNET_CLIENT_WOW)..":14:14:0:0:50:50:4:46:4:46:60:220:220|t"
+					--icon = "|T"..BNet_GetBattlenetClientAtlas(BNET_CLIENT_WOW)..":14:14:0:0:50:50:4:46:4:46|t"
+					--icon = F.addIcon("Interface\\FriendsFrame\\Battlenet-WoWicon", 14, 4, 46)
+					icon = F.addIcon(G.WOWIcon, 14, 0, 50)
+					--icon = F.addIcon(BNet_GetClientEmbeddedAtlas(BNET_CLIENT_WOW, 14), 14, 4, 46)
 				end
 				
 				if isShiftKeyDown then
-					tooltip:AddLine(icon.." "..levelc..info[8].."|r "..classc..info[4].."|r"..info[6]..G.OptionColor.." ("..info[3]..")", zonec..info[9])
+					tooltip:AddLine(icon.." "..levelc..info[9].."|r "..classc..info[4].."|r"..info[7]..G.OptionColor.." ("..info[3]..")", zonec..info[10])
 				else
-					tooltip:AddLine(icon.." "..levelc..info[8].."|r "..classc..info[4].."|r"..info[6]..G.OptionColor.." ("..info[2]..")", zonec..info[9])
+					tooltip:AddLine(icon.." "..levelc..info[9].."|r "..classc..info[4].."|r"..info[7]..G.OptionColor.." ("..info[2]..")", zonec..info[10])
 				end
 			else
 				if isShiftKeyDown then
-					tooltip:AddLine(F.addIcon(BNet_GetBattlenetClientAtlas(info[5]), 14, 4, 46).." "..G.OptionColor..info[3].."|r"..info[6], F.Hex(.65, .65, .65)..info[9])
+					tooltip:AddLine(F.addIcon(BNet_GetBattlenetClientAtlas(info[5]), 14, 4, 46).." "..G.OptionColor..info[3].."|r"..info[7], F.Hex(.65, .65, .65)..info[10])
 				else
-					tooltip:AddLine(F.addIcon(BNet_GetBattlenetClientAtlas(info[5]), 14, 4, 46).." "..G.OptionColor..info[4].."|r"..info[6], F.Hex(.65, .65, .65)..info[9])
+					tooltip:AddLine(F.addIcon(BNet_GetBattlenetClientAtlas(info[5]), 14, 4, 46).." "..G.OptionColor..info[4].."|r"..info[7], F.Hex(.65, .65, .65)..info[10])
 				end
 			end
 			
