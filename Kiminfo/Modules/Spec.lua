@@ -14,9 +14,12 @@ local GetTalentInfo, GetPvpTalentInfoByID = GetTalentInfo, GetPvpTalentInfoByID
 local C_SpecializationInfo_CanPlayerUsePVPTalentUI = C_SpecializationInfo.CanPlayerUsePVPTalentUI
 local C_SpecializationInfo_GetAllSelectedPvpTalentIDs = C_SpecializationInfo.GetAllSelectedPvpTalentIDs
 
-
 local pvpTalents, SpecIndex, LootIndex, newMenu, numSpecs, numLocal
 local pvpTexture = C_CurrencyInfo.GetCurrencyInfo(104).iconFileID
+
+local LibShowUIPanel = LibStub("LibShowUIPanel-1.0")
+local ShowUIPanel = LibShowUIPanel.ShowUIPanel
+local HideUIPanel = LibShowUIPanel.HideUIPanel
 
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
@@ -276,9 +279,7 @@ end
 			BuildSpecMenu()
 			EasyMenu(newMenu, SpecMenuFrame, "cursor", 0, 0, "MENU", 3)
 		else
-			if not PlayerTalentFrame then
-				LoadAddOn("Blizzard_TalentUI")
-			end
-			ToggleTalentFrame(2)
+			if not ClassTalentFrame then LoadAddOn("Blizzard_ClassTalentUI") end
+			if not ClassTalentFrame:IsShown() then ShowUIPanel(ClassTalentFrame) else HideUIPanel(ClassTalentFrame) end
 		end
 	end)

@@ -10,6 +10,10 @@ local C_BattleNet_GetFriendAccountInfo = C_BattleNet.GetFriendAccountInfo
 local C_FriendList_GetNumOnlineFriends, BNGetNumFriends = C_FriendList.GetNumOnlineFriends, BNGetNumFriends
 local InviteToGroup = C_PartyInfo.InviteUnit -- Replace C. new api as old InviteToGroup()
 
+local LibShowUIPanel = LibStub("LibShowUIPanel-1.0")
+local ShowUIPanel = LibShowUIPanel.ShowUIPanel
+local HideUIPanel = LibShowUIPanel.HideUIPanel
+
 local title	-- Custom line
 local friendTable, bnetTable = {}, {}	-- build table
 local friendOnline = gsub(ERR_FRIEND_ONLINE_SS, ".+h", "")	-- get string
@@ -454,7 +458,7 @@ end
 		end]]--
 		
 		if button == "LeftButton" then
-			ToggleFriendsFrame()
+			if not FriendsFrame:IsShown() then ShowUIPanel(FriendsFrame) else HideUIPanel(FriendsFrame) end
 		elseif button == "RightButton" then
 			StaticPopup_Show("SET_BN_BROADCAST")
 		else

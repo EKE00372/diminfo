@@ -9,6 +9,10 @@ local GetNumGuildMembers, GetGuildRosterInfo = GetNumGuildMembers, GetGuildRoste
 local GetGuildFactionInfo = GetGuildFactionInfo
 local InviteToGroup = C_PartyInfo.InviteUnit -- Replace C. new api as old InviteToGroup()
 
+local LibShowUIPanel = LibStub("LibShowUIPanel-1.0")
+local ShowUIPanel = LibShowUIPanel.ShowUIPanel
+local HideUIPanel = LibShowUIPanel.HideUIPanel
+
 local guildTable = {}
 local name, rank, rankindex, level, zone, connected, status, class
 
@@ -276,9 +280,10 @@ end
 		if button == "RightButton" then
 			if not IsInGuild() then return end
 			if not GuildFrame then LoadAddOn("Blizzard_GuildUI") end
-			ToggleFrame(GuildFrame)
+			if not GuildFrame:IsShown() then ShowUIPanel(GuildFrame) else HideUIPanel(GuildFrame) end
 		elseif button == "LeftButton" then
-			ToggleCommunitiesFrame()
+			if not CommunitiesFrame then LoadAddOn("Blizzard_Communities") end
+			if not CommunitiesFrame:IsShown() then ShowUIPanel(CommunitiesFrame) else HideUIPanel(CommunitiesFrame) end
 		else
 			return
 		end
