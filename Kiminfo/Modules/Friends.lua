@@ -8,7 +8,7 @@ local CreateFrame = CreateFrame
 local C_FriendList_GetFriendInfoByIndex = C_FriendList.GetFriendInfoByIndex
 local C_BattleNet_GetFriendAccountInfo = C_BattleNet.GetFriendAccountInfo
 local C_FriendList_GetNumOnlineFriends, BNGetNumFriends = C_FriendList.GetNumOnlineFriends, BNGetNumFriends
-local InviteToGroup = C_PartyInfo.InviteUnit -- Replace C. new api as old InviteToGroup()
+local BNet_GetClientEmbeddedAtlas, InviteToGroup = BNet_GetClientEmbeddedAtlas, C_PartyInfo.InviteUnit -- Replace C. new api as old InviteToGroup()
 
 local LibShowUIPanel = LibStub("LibShowUIPanel-1.0")
 local ShowUIPanel = LibShowUIPanel.ShowUIPanel
@@ -371,14 +371,10 @@ local function OnEnter(self)
 					if info[6] == "Horde" then
 						icon = F.addIcon("Interface\\FriendsFrame\\PlusManz-Horde", 14, 4, 46)
 					elseif info[6] == "Alliance" then
-						--icon = F.addIcon("Interface\\FriendsFrame\\PlusManz-Alliance", 14, 4, 46)
 						icon = F.addIcon(G.Alliance, 14, 0, 50)
 					end
 				else
-					--icon = "|T"..BNet_GetBattlenetClientAtlas(BNET_CLIENT_WOW)..":14:14:0:0:50:50:4:46:4:46|t"
-					--icon = F.addIcon("Interface\\FriendsFrame\\Battlenet-WoWicon", 14, 4, 46)
 					icon = F.addIcon(G.WOWIcon, 14, 0, 50)
-					--icon = F.addIcon(BNet_GetClientEmbeddedAtlas(BNET_CLIENT_WOW, 14), 14, 4, 46)
 				end
 				
 				if isShiftKeyDown then
@@ -386,11 +382,12 @@ local function OnEnter(self)
 				else
 					tooltip:AddLine(icon.." "..levelc..info[9].."|r "..classc..info[4].."|r"..info[7]..G.OptionColor.." ("..info[2]..")", zonec..info[10])
 				end
-			else
+			else				
 				if isShiftKeyDown then
-					tooltip:AddLine(F.addIcon(BNet_GetBattlenetClientAtlas(info[5]), 14, 4, 46).." "..G.OptionColor..info[3].."|r"..info[7], F.Hex(.65, .65, .65)..info[10])
+					--CreateAtlasMarkup, BNet_GetBattlenetClientAtlas
+					tooltip:AddLine(BNet_GetClientEmbeddedAtlas(info[5], 14, 14).." "..G.OptionColor..info[3].."|r"..info[7], F.Hex(.65, .65, .65)..info[10])
 				else
-					tooltip:AddLine(F.addIcon(BNet_GetBattlenetClientAtlas(info[5]), 14, 4, 46).." "..G.OptionColor..info[4].."|r"..info[7], F.Hex(.65, .65, .65)..info[10])
+					tooltip:AddLine(BNet_GetClientEmbeddedAtlas(info[5], 14, 14).." "..G.OptionColor..info[4].."|r"..info[7], F.Hex(.65, .65, .65)..info[10])
 				end
 			end
 			
