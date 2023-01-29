@@ -208,7 +208,7 @@ local function buildBNetTable(num)
 				local infoText
 				if client == BNET_CLIENT_WOW then
 					-- Print area when friend is playing wow / 玩魔獸顯示地區
-					if ( not zoneName or zoneName == "" ) then
+					if (not zoneName or zoneName == "") then
 						infoText = UNKNOWN
 					else
 						infoText = zoneName
@@ -368,13 +368,9 @@ local function OnEnter(self)
 				
 				local icon
 				if info[5] == BNET_CLIENT_WOW then
-					if info[6] == "Horde" then
-						icon = F.addIcon("Interface\\FriendsFrame\\PlusManz-Horde", 14, 4, 46)
-					elseif info[6] == "Alliance" then
-						icon = F.addIcon(G.Alliance, 14, 0, 50)
-					end
+					icon = (info[6] == "Horde" and F.addIcon(G.Horde, 12, 2, 48)) or (info[6] == "Alliance" and F.addIcon(G.Alliance, 12, 2, 48))
 				else
-					icon = F.addIcon(G.WOWIcon, 14, 0, 50)
+					icon = F.addIcon(G.WOWIcon, 12, -2, 52)
 				end
 				
 				if isShiftKeyDown then
@@ -382,12 +378,12 @@ local function OnEnter(self)
 				else
 					tooltip:AddLine(icon.." "..levelc..info[9].."|r "..classc..info[4].."|r"..info[7]..G.OptionColor.." ("..info[2]..")", zonec..info[10])
 				end
-			else				
+			else
 				if isShiftKeyDown then
-					--CreateAtlasMarkup, BNet_GetBattlenetClientAtlas
-					tooltip:AddLine(BNet_GetClientEmbeddedAtlas(info[5], 14, 14).." "..G.OptionColor..info[3].."|r"..info[7], F.Hex(.65, .65, .65)..info[10])
+					--CreateAtlasMarkup(BNet_GetBattlenetClientAtlas(info[5]), 14, 14)
+					tooltip:AddLine(BNet_GetClientEmbeddedAtlas(info[5], 12, 12).." "..G.OptionColor..info[3].."|r"..info[7], F.Hex(.65, .65, .65)..info[10])
 				else
-					tooltip:AddLine(BNet_GetClientEmbeddedAtlas(info[5], 14, 14).." "..G.OptionColor..info[4].."|r"..info[7], F.Hex(.65, .65, .65)..info[10])
+					tooltip:AddLine(BNet_GetClientEmbeddedAtlas(info[5], 12, 12).." "..G.OptionColor..info[4].."|r"..info[7], F.Hex(.65, .65, .65)..info[10])
 				end
 			end
 			

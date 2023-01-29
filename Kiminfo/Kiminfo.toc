@@ -1,4 +1,4 @@
-## Interface: 100002
+## Interface: 100005
 ## Author: EK
 ## Title: |cff00ffffKim|rinfo
 ## Title-zhTW: |cff00ffffKim|rinfo 資訊條
@@ -6,7 +6,7 @@
 ## Notes: Light info bar.
 ## Notes-zhTW: 小巧資訊條。
 ## Notes-zhCN: 轻量级信息条。
-## Version: R3.8
+## Version: R3.8a
 ## SavedVariables: Kiminfo
 ## X-Credits: Tukz, Loshine, Siweia, HopeASD, Peter
 
