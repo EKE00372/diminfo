@@ -118,6 +118,7 @@ G.Fps = G.MediaFolder.."fps.tga"
 G.Ping = G.MediaFolder.."ping.tga"
 G.Mem = G.MediaFolder.."spell.tga"
 G.Alliance = G.MediaFolder.."Alliance"
+G.Horde = G.MediaFolder.."Horde"
 G.WOWIcon = G.MediaFolder.."WoW_Yellow"
 
 --G.LeftButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:230:307|t "
@@ -128,8 +129,8 @@ G.LeftButton = " |T"..G.MediaFolder.."MouseButtonOrange.tga:13:11:0:-2:128:32:4:
 G.RightButton = " |T"..G.MediaFolder.."MouseButtonOrange.tga:13:11:0:-2:128:32:36:60:0:32|t "
 G.MiddleButton = " |T"..G.MediaFolder.."MouseButtonOrange.tga:13:11:0:-2:128:32:68:92:0:32|t "
 
-G.AFK = "|T"..FRIENDS_TEXTURE_AFK..":14:14:0:0:16:16:1:15:1:15|t"
-G.DND = "|T"..FRIENDS_TEXTURE_DND..":14:14:0:0:16:16:1:15:1:15|t"
+G.AFK = "|T"..FRIENDS_TEXTURE_AFK..":14:14:0:-1:16:16:1:15:1:15|t"
+G.DND = "|T"..FRIENDS_TEXTURE_DND..":14:14:0:-1:16:16:1:15:1:15|t"
 
 G.Enable = "|cff55ff55"..ENABLE
 G.Disable = "|cffff5555"..DISABLE
