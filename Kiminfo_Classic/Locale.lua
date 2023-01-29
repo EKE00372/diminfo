@@ -20,15 +20,18 @@ local getLocale = GetLocale()
 		L.Collected = "釋放記憶體："
 		L.ManualCollect = "手動釋放暫存記憶體"
 		L.AutoCollect = "自動整理暫存記憶體："
-		
+		L.CollectWarning = "|cff00ffffKim|rinfo[|cff00ff00Memory|r]：|cffff0000注意：危險功能！|r啟用自動整理暫存記憶體可能使遊戲主程式周期性凍結。"
+
 		L.XY = "發送座標"
 		
 		L.Spec = "專精"
 		L.Loot = LOOT
+		L.TalentSwitch = "切換天賦"
 		
 		L.Home = "本地"
 		L.World = "世界"
 		L.CPU = "顯示 CPU 占用比例："
+		L.ResetCPU = "重置 CPU 占用列表"
 		L.ReloadOn = "|cff00ffffKim|rinfo[|cff00ff00System|r]：重載介面後顯示插件的 CPU 占用。"
 		L.ReloadOff = "|cff00ffffKim|rinfo[|cff00ff00System|r]：重載介面後隱藏插件的 CPU 占用。"
 		
@@ -54,24 +57,63 @@ local getLocale = GetLocale()
 		L.Collected = "释放內存："
 		L.ManualCollect = "手动释放"
 		L.AutoCollect = "自动整理內存："
-		
+		L.CollectWarning = "|cff00ffffKim|rinfo[|cff00ff00Memory|r]：|cffff0000注意：危险功能！|r启用自动整理內存可能使客户端周期性冻结。"
+			
 		L.XY = "发送座标"
 		
 		L.Spec = "专精"
 		L.Loot = "拾取"
+		L.TalentSwitch = "切换天赋"
 		
 		L.Home = "本地"
 		L.World = "世界"
-		L.CPU = "显示CPU占用比例："
-		L.ReloadOn = "|cff777777Kim|rinfo[|cff00ff00System|r]：重载界面后显示插件的 CPU 占用。"
-		L.ReloadOff = "|cff777777Kim|rinfo[|cff00ff00System|r]：重载界面后隐藏插件的 CPU 占用。"
+		L.CPU = "显示 CPU 占用比例："
+		L.ResetCPU = "重置 CPU 占用列表"
+		L.ReloadOn = "|cff00ffffKim|rinfo[|cff00ff00System|r]：重载界面后显示插件的 CPU 占用。"
+		L.ReloadOff = "|cff00ffffKim|rinfo[|cff00ff00System|r]：重载界面后隐藏插件的 CPU 占用。"
 		
 		L.App = "随身助手"
 		L.Mobile = "移动装置"
-		L.Desktop = "桌面应用"	
-	
-	else
+		L.Desktop = "桌面应用"
 		
+	elseif getLocale == "ruRU" then
+		
+		L.AutoSell = "Автопродажа барахла: "
+		L.TrashSold = "Мусор продал, заработал "
+		
+		L.AutoRepair = "Авторемонт: "
+		L.None = "Не экипирован"
+		
+		L.Lonely = "Одинокий"
+		
+		L.Shift = "Shift показать все"
+		L.Hidden = "Скрытый"
+		
+		L.DefaultUsage = "Использование памяти пользовательского интерфейса по умолчанию"
+		L.TotleUsage = "Общее Использование Памяти"
+		L.Collected = "Сборка мусора: "
+		L.ManualCollect = "Ручной Сбор"
+		L.AutoCollect = "Автоматический Сбор Памяти: "
+		L.CollectWarning = "|cff00ffffKim|rinfo[|cff00ff00Memory|r]: |cffff0000NOTICE: DANGER!|r Auto collected memory may cause your client freeze."
+		
+		L.XY = "Coordinates Broadcast"
+		
+		L.Spec = "Спек"
+		L.Loot = LOOT
+		L.TalentSwitch = "Switch Talent"
+		
+		L.Home = "Домой"
+		L.World = "Мир"
+		L.CPU = "Показать загрузку процессора: "
+		L.ResetCPU = "Сброс загрузку процессора"
+		L.ReloadOn = "|cff00ffffKim|rinfo[|cff00ff00Система|r]: Вы увидите загрузку процессора аддона после перезагрузки пользовательского интерфейса."
+		L.ReloadOff = "|cff00ffffKim|rinfo[|cff00ff00Система|r]: Вы можете скрыть таблицу использования процессора аддона после перезагрузки пользовательского интерфейса."
+		
+		L.App = "Портативный помощник"
+		L.Mobile = "Мобильный"
+		L.Desktop = "Рабочий стол"
+		
+	else
 		L.AutoSell = "Auto Sell junk: "
 		L.TrashSold = "Trash sold, earned "
 		
@@ -88,17 +130,20 @@ local getLocale = GetLocale()
 		L.Collected = "Garbage collected: "
 		L.ManualCollect = "Manual Collect"
 		L.AutoCollect = "Auto Collect Memory: "
+		L.CollectWarning = "|cff00ffffKim|rinfo[|cff00ff00Memory|r]: |cffff0000NOTICE: DANGER!|r Auto collected memory may cause your client freeze."
 		
-		L.XY = "Coordinates broadcast"
+		L.XY = "Coordinates Broadcast"
 		
 		L.Spec = "Spec"
 		L.Loot = LOOT
+		L.TalentSwitch = "Switch Talent"
 		
 		L.Home = "Home"
 		L.World = "World"
 		L.CPU = "Show CPU Usage: "
-		L.ReloadOn = "|cff777777Kim|rinfo[|cff00ff00System|r]: You would see addon's CPU usage after reloding UI."
-		L.ReloadOff = "|cff777777Kim|rinfo[|cff00ff00System|r]: You could hide the addon's CPU usage table after reloding UI."
+		L.ResetCPU = "Reset CPU Usage"
+		L.ReloadOn = "|cff00ffffKim|rinfo[|cff00ff00System|r]: You would see addon's CPU usage after reloding UI."
+		L.ReloadOff = "|cff00ffffKim|rinfo[|cff00ff00System|r]: You could hide the addon's CPU usage table after reloding UI."
 		
 		L.App = "Companion"
 		L.Mobile = "Mobile"

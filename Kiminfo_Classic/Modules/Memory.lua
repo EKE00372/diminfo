@@ -2,8 +2,14 @@
 local C, F, G, L = unpack(ns)
 if not C.Memory then return end
 
-local format = string.format
-local sort = table.sort
+local format, min, max, sort, wipe = format, min, max, sort, wipe
+local CreateFrame = CreateFrame
+local GetNumAddOns, GetAddOnInfo, IsAddOnLoaded = GetNumAddOns, GetAddOnInfo, IsAddOnLoaded
+local UpdateAddOnMemoryUsage, GetAddOnMemoryUsage = UpdateAddOnMemoryUsage, GetAddOnMemoryUsage
+local collectgarbage, gcinfo = collectgarbage, gcinfo
+
+local memoryTable, totalMemory  = {}, 0
+local eventCount = 0
 
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
@@ -16,7 +22,7 @@ local Stat = CreateFrame("Frame", G.addon.."Mem", UIParent)
 
 --[[ Create icon ]]--
 local Icon = Stat:CreateTexture(nil, "OVERLAY")
-	Icon:SetSize(G.FontSize+8, G.FontSize+8)
+	Icon:SetSize(G.FontSize+6, G.FontSize+6)
 	Icon:SetPoint("RIGHT", Stat, "LEFT", 0, 0)
 	Icon:SetTexture(G.Mem)
 	Icon:SetVertexColor(1, 1, 1)
@@ -32,6 +38,7 @@ local Text  = Stat:CreateFontString(nil, "OVERLAY")
 ---------------    [[ format ]]     ---------------
 --===============================================--
 
+--[[ Format memory for tooltip list ]]--
 local function formatMemory(value)
 	if value > 1024 then
 		return format("%.1f mb", value / 1024)
@@ -40,6 +47,7 @@ local function formatMemory(value)
 	end
 end
 
+--[[ Format memory color for tooltip list ]]--
 local function memoryColor(value, times)
 	if not times then times = 1 end
 
@@ -62,9 +70,21 @@ end
 ---------------    [[ Table ]]     ---------------
 --==============================================--
 
-local memoryTable, totalMemory  = {}, 0
-
---[[ get addon list ]]--
+--[[ Get enable addon number ]]--
+local function updateMaxAddons()
+	local numAddons = GetNumAddOns()
+	local totalNum = 0
+	
+	for i = 1, numAddons do
+		if IsAddOnLoaded(i) then
+			totalNum = totalNum +1
+		end
+	end
+	
+	return totalNum
+end
+	
+--[[ Get addon list ]]--
 local function updateMemoryTable()
 	local numAddons = GetNumAddOns()
 	if numAddons == #memoryTable then return end
@@ -76,14 +96,14 @@ local function updateMemoryTable()
 	end
 end
 
---[[ sort list ]]--
+--[[ Sort addon list ]]--
 local function sortMemory(a, b)
 	if a and b then
 		return a[3] > b[3]
 	end
 end
 
---[[ update addon memory ]]--
+--[[ Update addon memory ]]--
 local function updateMemory()
 	UpdateAddOnMemoryUsage()
 
@@ -98,41 +118,57 @@ local function updateMemory()
 	return total
 end
 
+--[[ Refresh Data text ]]--
+local function RefreshText()
+	updateMemoryTable()
+	totalMemory = updateMemory()
+	
+	if totalMemory >= 1024 then
+		Text:SetText(format("%.1fmb", totalMemory/1024))
+	else
+		Text:SetText(format("%.1fkb", totalMemory/1024))
+	end
+end
+
 --================================================--
 ---------------    [[ Updates ]]     ---------------
 --================================================--
 
---[[ Update data text ]]--
-local function OnUpdate(self, elapsed)
-	self.timer = (self.timer or 3) + elapsed
-	-- 限制一下更新速率
-	if self.timer > 5 then
-		updateMemoryTable()
-		totalMemory = updateMemory()
-		
-		if totalMemory >= 1024 then
-			Text:SetText(format("%.1fmb", totalMemory/1024))
-		else
-			Text:SetText(format("%.1fkb", totalMemory/1024))
-		end
-		self.timer = 0
+--[[ Update when login ]]--
+local function OnEvent(self)
+	-- Setting
+	if Kiminfo.AutoCollect == nil then
+		-- I'm not sure but somebody said auto collect will make client crash so default false it
+		Kiminfo.AutoCollect = false
 	end
+	
+	-- Data text
+	local totalNum = updateMaxAddons()
+	Text:SetText(totalNum)
+	self:SetAllPoints(Text)
 end
 
 --[[ Update tooltip ]]--
 local function OnEnter(self)
+	
+	-- Data text
+	RefreshText()	-- Refresh at first, and get addon table for tooltip show
+	Icon:SetVertexColor(0, 1, 1)
+	Text:SetTextColor(0, 1, 1)
+	
+	-- Tooltip
 	local maxAddOns = C.MaxAddOns
 	local isShiftKeyDown = IsShiftKeyDown()
 	local maxShown = isShiftKeyDown and #memoryTable or min(maxAddOns, #memoryTable)
 	local numEnabled = 0
 
-	-- title
-	GameTooltip:SetOwner(self, "ANCHOR_BOTTOM", 0, -10)
+	-- Title
+	GameTooltip:SetOwner(self, C.StickTop and "ANCHOR_BOTTOM" or "ANCHOR_TOP", 0, C.StickTop and -10 or 10)
 	GameTooltip:ClearLines()
-	GameTooltip:AddDoubleLine(ADDONS, formatMemory(totalMemory), 0, .6, 1, .6, .8, 1)
+	GameTooltip:AddLine(ADDONS, 0, .6, 1)
 	GameTooltip:AddLine(" ")
 
-	-- list addon
+	-- List
 	for i = 1, #memoryTable do
 		local value = memoryTable[i]
 		
@@ -145,7 +181,7 @@ local function OnEnter(self)
 		end
 	end
 	
-	-- 30th line when not shift key down
+	-- Merge line when not shift key down / 合併統計行
 	if not isShiftKeyDown and (numEnabled > maxAddOns) then
 		local hiddenMemory = 0
 		
@@ -156,73 +192,73 @@ local function OnEnter(self)
 		GameTooltip:AddDoubleLine(format("%d %s (%s)", numEnabled - maxAddOns, L.Hidden, L.Shift), formatMemory(hiddenMemory), .6, .8, 1, .6, .8, 1)
 	end
 
-	-- total
+	-- Total
 	GameTooltip:AddLine(" ")
 	GameTooltip:AddDoubleLine(L.DefaultUsage, formatMemory(gcinfo() - totalMemory), .6, .8, 1, 1, 1, 1)
 	GameTooltip:AddDoubleLine(L.TotleUsage, formatMemory(collectgarbage("count")), .6, .8, 1, 1, 1, 1)
 	
-	-- options
+	-- Options
 	GameTooltip:AddDoubleLine(" ", G.Line)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.ManualCollect..G.LeftButton)
-	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.AutoCollect..(Kiminfo.AutoCollect and "|cff55ff55"..ENABLE or "|cffff5555"..DISABLE)..G.RightButton)
+	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.AutoCollect..(Kiminfo.AutoCollect and G.Enable or G.Disable)..G.RightButton)
 	
 	GameTooltip:Show()
 end
 
---[[ Update setting ]]--
-local function OnEvent(self)
-	if Kiminfo.AutoCollect == nil then
-		Kiminfo.AutoCollect = true
-	end
+local function OnLeave(self)
+	-- Data text
+	local totalNum = updateMaxAddons()
+	Text:SetText(totalNum)
+	
+	-- Mouseover color
+	Icon:SetVertexColor(1, 1, 1)
+	Text:SetTextColor(1, 1, 1)
+	
+	-- Tooltip
+	GameTooltip:Hide()
 end
 
 --================================================--
 ---------------    [[ Scripts ]]     ---------------
 --================================================--
 	
+	--[[ Data text ]]--
 	Stat:RegisterEvent("PLAYER_ENTERING_WORLD")
+	Stat:RegisterEvent("ADDON_LOADED")
 	Stat:SetScript("OnEvent", OnEvent)
 	
 	--[[ Options ]]--
 	Stat:SetScript("OnMouseDown", function(self, btn)
 		if btn == "LeftButton" then
 			local before = gcinfo()
+			
 			collectgarbage("collect")
 			print(format("|cff66C6FF%s|r%s", L.Collected, formatMemory(before - gcinfo())))
-			-- 刷新一下TOOLTIP的總計
-			totalMemory = updateMemory()
 		elseif btn == "RightButton" then
 			Kiminfo.AutoCollect = not Kiminfo.AutoCollect
-			self:GetScript("OnEnter")(self)
+			print(L.CollectWarning)
+		else
+			return
 		end
-		self:GetScript("OnEnter")(self)
+		
+		-- Update tooltip option show / 更新Tooltip內容
+		OnEnter(self)
 	end)
 	
 	--[[ Tooltip ]]-- 
-	Stat:SetScript("OnEnter", function(self)
-		OnEnter(self)
-		Icon:SetVertexColor(0, 1, 1)
-		Text:SetTextColor(0, 1, 1)
-	end)
-	Stat:SetScript("OnLeave", function()
-		GameTooltip:Hide()
-		Icon:SetVertexColor(1, 1, 1)
-		Text:SetTextColor(1, 1, 1)
-	end)
-	
-	--[[ Data text ]]--
-	Stat:SetScript("OnUpdate", OnUpdate)
+	Stat:SetScript("OnEnter", OnEnter)
+	Stat:SetScript("OnLeave", OnLeave)
 
 --=====================================================--
 ---------------    [[ Auto Collect ]]     ---------------
 --=====================================================--
 
-local eventcount = 0
-local a = CreateFrame("Frame")
-	a:RegisterAllEvents()
-	a:SetScript("OnEvent", function(self, event)
+local autoCollect = CreateFrame("Frame")
+	autoCollect:RegisterAllEvents()
+	autoCollect:SetScript("OnEvent", function(self, event)
 		if Kiminfo.AutoCollect == true then
-			eventcount = eventcount + 1
+			eventcount = eventCount + 1
+			
 			if InCombatLockdown() then return end
 			if eventcount > 15000 or event == "PLAYER_ENTERING_WORLD" or event == "PLAYER_REGEN_ENABLED" then
 				collectgarbage("collect")
