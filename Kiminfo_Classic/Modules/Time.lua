@@ -2,7 +2,19 @@ local addon, ns = ...
 local C, F, G, L = unpack(ns)
 if not C.Time then return end
 
-local format = string.format
+local format, time, date = string.format, time, date
+local C_Calendar_GetNumPendingInvites = C_Calendar.GetNumPendingInvites
+local C_DateAndTime_GetCurrentCalendarTime = C_DateAndTime.GetCurrentCalendarTime
+local C_AreaPoiInfo_GetAreaPOIInfo = C_AreaPoiInfo.GetAreaPOIInfo
+local IsQuestFlaggedCompleted = C_QuestLog.IsQuestFlaggedCompleted
+local C_UIWidgetManager_GetTextWithStateWidgetVisualizationInfo =  C_UIWidgetManager.GetTextWithStateWidgetVisualizationInfo
+local GetCVarBool = GetCVarBool
+local TIMEMANAGER_TICKER_24HOUR, TIMEMANAGER_TICKER_12HOUR = TIMEMANAGER_TICKER_24HOUR, TIMEMANAGER_TICKER_12HOUR
+
+local LibShowUIPanel = LibStub("LibShowUIPanel-1.0")
+local ShowUIPanel = LibShowUIPanel.ShowUIPanel
+local HideUIPanel = LibShowUIPanel.HideUIPanel
+
 
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
@@ -17,13 +29,14 @@ local Stat = CreateFrame("Frame", G.addon.."Time", UIParent)
 local Text  = Stat:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(G.Fonts, G.FontSize, G.FontFlag)
 	Text:SetPoint(unpack(C.TimePoint))
+	Text:SetTextColor(1, 1, 1)
 	Stat:SetAllPoints(Text)
-	
+
 --==================================================--
 ---------------    [[ Functions ]]     ---------------
 --==================================================--
 
---[[ format 24/12 hour clock ]]--
+--[[ Format 24/12 hour clock ]]--
 local function updateTimerFormat(hour, minute)
 	if GetCVarBool("timeMgrUseMilitaryTime") then
 		return format(TIMEMANAGER_TICKER_24HOUR, hour, minute)
@@ -38,7 +51,7 @@ local function updateTimerFormat(hour, minute)
 	end
 end
 
---[[ custom api for add title line ]]--
+--[[ Custom api for add title line ]]--
 local title
 local function addTitle(text)
 	if not title then
@@ -52,12 +65,23 @@ end
 ---------------    [[ Updates ]]     ---------------
 --================================================--
 
+local function OnEvent(self)
+	local r, g, b
+	if C_Calendar_GetNumPendingInvites() > 0 then 
+		r, g, b = .57, 1, .57
+	else
+		r, g, b = 1, 1, 1
+	end
+	
+	Text:SetTextColor(r, g, b)
+end
+
 --[[ Update data text ]]--
 local function OnUpdate(self, elapsed)
 	self.timer = (self.timer or 3) + elapsed
-	-- 限制一下更新速率
+	-- Limit frequency / 限制一下更新速率
 	if self.timer > 5 then
-		-- 本地時間
+		-- Local time / 本地時間
 		local hour, minute
 		if GetCVarBool("timeMgrUseLocalTime") then
 			hour, minute = tonumber(date("%H")), tonumber(date("%M"))
@@ -75,27 +99,27 @@ local function OnEnter(self)
 	-- 獲取進度
 	RequestRaidInfo()
 	
-	local today = C_DateAndTime.GetTodaysDate()
-	local w, m, d, y = today.weekDay, today.month, today.day, today.year
+	local today = C_DateAndTime_GetCurrentCalendarTime()
+	local w, m, d, y = today.weekday, today.month, today.monthDay, today.year
 	
-	-- title
-	GameTooltip:SetOwner(self, "ANCHOR_BOTTOM", 0, -10)
+	-- Title
+	GameTooltip:SetOwner(self, C.StickTop and "ANCHOR_BOTTOM" or "ANCHOR_TOP", 0, C.StickTop and -10 or 10)
 	GameTooltip:ClearLines()
 	GameTooltip:AddLine(format(FULLDATE, CALENDAR_WEEKDAY_NAMES[w], CALENDAR_FULLDATE_MONTH_NAMES[m], d, y), 0, .6, 1)
 	GameTooltip:AddLine(" ")
-
-	-- game time
+	
+	-- Game time
 	GameTooltip:AddDoubleLine(TIMEMANAGER_TOOLTIP_LOCALTIME, GameTime_GetLocalTime(true), .6, .8, 1, 1, 1, 1)
 	GameTooltip:AddDoubleLine(TIMEMANAGER_TOOLTIP_REALMTIME, GameTime_GetGameTime(true), .6, .8, 1, 1, 1, 1)
 	
-	-- 副本進度
-
+	--[[ 副本進度 ]]--
+	
 	-- Dungeon
 	title = false
 	for i = 1, GetNumSavedInstances() do
-		local name, _, reset, difficulty, locked, extended = GetSavedInstanceInfo(i)
+		local name, _, reset, difficulty, locked, extended, _, _, _, difficultyName = GetSavedInstanceInfo(i)
 		-- 5h and 5m
-		if difficulty == 23 and (locked or extended) then
+		if (difficulty == 2 or difficulty == 23) and (locked or extended) then
 			addTitle(DUNGEONS)
 			local r, g, b
 			if extended then
@@ -104,7 +128,7 @@ local function OnEnter(self)
 				r, g, b = 1, 1, 1
 			end
 		
-		GameTooltip:AddDoubleLine(name, SecondsToTime(reset, true, nil, 3), 1, .82, 0, r, g, b)
+		GameTooltip:AddDoubleLine(difficultyName.." - "..name, SecondsToTime(reset, true, nil, 3), 1, 1, 1, r, g, b)
 		end
 	end
 
@@ -122,11 +146,12 @@ local function OnEnter(self)
 				r, g, b = 1, 1, 1
 			end
 		
-		GameTooltip:AddDoubleLine(difficultyName.." - "..name, SecondsToTime(reset, true, nil, 3), 1, .82, 0, r, g, b)
+		GameTooltip:AddDoubleLine(difficultyName.." - "..name, SecondsToTime(reset, true, nil, 3), 1, 1, 1, r, g, b)
 		end
 	end
 
 	GameTooltip:AddDoubleLine(" ", G.Line)
+	GameTooltip:AddDoubleLine(" ", G.OptionColor..SLASH_CALENDAR1:gsub("/(.*)","%1")..G.LeftButton)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..STOPWATCH_TITLE..G.RightButton)
 	
 	GameTooltip:Show()
@@ -144,21 +169,34 @@ end
 		OnEnter(self)
 	end)
 	
-	Stat:SetScript("OnLeave", function()
+	Stat:SetScript("OnLeave", function(self)
 		-- normal color
-		Text:SetTextColor(1, 1, 1)
+		--Text:SetTextColor(1, 1, 1)
+		OnEvent(self)
 		-- tooltip hide
 		GameTooltip:Hide()
+		
 	end)
 	
 	--[[ Data text ]]--
-	--Stat:RegisterEvent("PLAYER_ENTERING_WORLD")
+	Stat:RegisterEvent("CALENDAR_UPDATE_PENDING_INVITES")
+	Stat:RegisterEvent("PLAYER_ENTERING_WORLD")
+	--Stat:RegisterEvent("CALENDAR_EVENT_ALARM")
+	--Stat:RegisterEvent("CALENDAR_UPDATE_EVENT_LIST")
+	--Stat:RegisterEvent("CALENDAR_UPDATE_INVITE_LIST")
 	--Stat:RegisterEvent("UPDATE_INSTANCE_INFO")
+	Stat:SetScript("OnEvent", OnEvent)
 	Stat:SetScript("OnUpdate", OnUpdate)
 	
 	--[[ Options ]]--
 	Stat:SetScript("OnMouseDown", function(self, btn)
 		if btn == "RightButton"  then
-			ToggleFrame(TimeManagerFrame)
+			--ToggleTimeManager()
+			if not TimeManagerFrame:IsShown() then ShowUIPanel(TimeManagerFrame) else HideUIPanel(TimeManagerFrame) end
+		elseif btn == "LeftButton"  then
+			if not CalendarFrame then LoadAddOn("Blizzard_Calendar") end
+			if not CalendarFrame:IsShown() then ShowUIPanel(CalendarFrame) else HideUIPanel(CalendarFrame) end
+		else
+			return
 		end
 	end)

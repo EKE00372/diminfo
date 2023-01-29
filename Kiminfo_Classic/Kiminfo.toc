@@ -1,12 +1,17 @@
-## Interface: 11304
-## Author: Loshine, EK
-## Title: |cff00ffffKim|rinfo_Classic
-## Notes: Info Data Bar
-## Version: C1
+## Interface: 30401
+## Author: EK
+## Title: |cff00ffffKim|rinfo
+## Title-zhTW: |cff00ffffKim|rinfo 資訊條
+## Title-zhCN: |cff00ffffKim|rinfo 信息条
+## Notes: Light info bar.
+## Notes-zhTW: 小巧資訊條。
+## Notes-zhCN: 轻量级信息条。
+## Version: R3.8a
 ## SavedVariables: Kiminfo
-## X-Credits: Tukz, Katae, Loshine, DDestruction, msylgj0, Siweia
+## X-Credits: Tukz, Loshine, Siweia, HopeASD, Peter
 
 Libs\Libs.xml
+Libs\TaintLess.xml
 
 Config.lua
 API.lua

@@ -2,8 +2,13 @@
 local C, F, G, L = unpack(ns)
 if not C.System then return end
 
-local format = string.format
-local loginTime = GetTime()	-- to get log in time at all of first
+local format, min, max, sort, wipe = format, min, max, sort, wipe
+local CreateFrame = CreateFrame
+local GetNumAddOns, GetAddOnInfo = GetNumAddOns, GetAddOnInfo
+local UpdateAddOnCPUUsage, GetAddOnCPUUsage, ResetCPUUsage = UpdateAddOnCPUUsage, GetAddOnCPUUsage, ResetCPUUsage
+
+local r, g, b
+local loginTime = GetTime()	-- Get log in time at all of first
 local usageTable = {}
 local usageString = "%.3f ms"
 
@@ -22,6 +27,7 @@ local Stat = CreateFrame("Frame", G.addon.."System", UIParent)
 local Text1  = Stat:CreateFontString(nil, "OVERLAY")
 	Text1:SetFont(G.Fonts, G.FontSize, G.FontFlag)
 	Text1:SetPoint(unpack(C.SystemPoint))
+	Text1:SetTextColor(1, 1, 1)
 	Stat:SetAllPoints(Text1)
 
 --[[ Create ping icon ]]--
@@ -35,8 +41,9 @@ local Icon1 = Stat:CreateTexture(nil, "OVERLAY")
 local Text2  = Stat:CreateFontString(nil, "OVERLAY")
 	Text2:SetFont(G.Fonts, G.FontSize, G.FontFlag)
 	Text2:SetPoint("RIGHT", Icon1, "LEFT", 0, 0)
+	Text2:SetTextColor(1, 1, 1)
 	
---[[ Create ping icon ]]--
+--[[ Create fps icon ]]--
 local Icon2 = Stat:CreateTexture(nil, "OVERLAY")
 	Icon2:SetSize(G.FontSize, G.FontSize)
 	Icon2:SetPoint("RIGHT", Text2, "LEFT", 0, 0)
@@ -47,7 +54,7 @@ local Icon2 = Stat:CreateTexture(nil, "OVERLAY")
 ---------------    [[ Color ]]     ---------------
 --==============================================--
 
---[[ latency color on data text ]]--
+--[[ latency color on tooltip ]]--
 local function colorLatencyTooltip(latency)
 	if latency < 300 then
 		return "|cff0CD809"..latency
@@ -157,13 +164,13 @@ end
 local function OnEnter(self)
 	local _, _, latencyHome, latencyWorld = GetNetStats()
 	
-	-- title
-	GameTooltip:SetOwner(self, "ANCHOR_BOTTOM", 0, -10)
+	-- Title
+	GameTooltip:SetOwner(self, C.StickTop and "ANCHOR_BOTTOM" or "ANCHOR_TOP", 0, C.StickTop and -10 or 10)
 	GameTooltip:ClearLines()
 	GameTooltip:AddLine(CHAT_MSG_SYSTEM, 0, .6, 1)
 	GameTooltip:AddLine(" ")
 	
-	-- latency
+	-- Latency
 	GameTooltip:AddDoubleLine(L.Home,  colorLatencyTooltip(latencyHome).."|r ms", .6, .8, 1, 1, 1, 1)
 	GameTooltip:AddDoubleLine(L.World, colorLatencyTooltip(latencyWorld).."|r ms", .6, .8, 1, 1, 1, 1)
 	
@@ -197,12 +204,20 @@ local function OnEnter(self)
 				end
 				GameTooltip:AddDoubleLine(format("%d %s (%s)", numEnabled - maxAddOns, L.Hidden, L.Shift), format(usageString, hiddenUsage), .6, .8, 1, .6, .8, 1)
 			end
+			
 		end
+		
+		GameTooltip:AddLine(" ")
+		GameTooltip:AddDoubleLine(TOTAL, format(usageString, totalCPU/ max(1, GetTime() - loginTime)), .6, .8, 1, 1, 1, 1)
 	end
 	
-	-- options
+	-- Options
 	GameTooltip:AddDoubleLine(" ", G.Line)
-	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.CPU..(GetCVar("scriptProfile") == "1" and "|cff55ff55"..ENABLE or "|cffff5555"..DISABLE)..G.RightButton)
+	GameTooltip:AddDoubleLine(" ", G.OptionColor..RELOADUI..G.MiddleButton)
+	if GetCVar("scriptProfile") == "1" then
+		GameTooltip:AddDoubleLine(" ", G.OptionColor..L.ResetCPU..G.LeftButton)
+	end
+	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.CPU..(GetCVar("scriptProfile") == "1" and G.Enable or G.Disable)..G.RightButton)
 
 	GameTooltip:Show()
 end
@@ -210,7 +225,6 @@ end
 --================================================--
 ---------------    [[ Scripts ]]     ---------------
 --================================================--
-	
 	
 	--[[ Options ]]--
 	Stat:SetScript("OnMouseDown", function(self, btn)
@@ -222,8 +236,13 @@ end
 				SetCVar("scriptProfile", 0)
 				print(L.ReloadOff)
 			end
+		elseif btn == "MiddleButton" then
+			ReloadUI()
+		elseif btn == "LeftButton" then
+			ResetCPUUsage()
 		end
-		self:GetScript("OnEnter")(self)
+		
+		OnEnter(self)
 	end)
 	
 	--[[ Tooltip ]]-- 
@@ -237,4 +256,4 @@ end
 	end)
 	
 	--[[ Data text ]]--
-	Stat:SetScript("OnUpdate", OnUpdate)	
+	Stat:SetScript("OnUpdate", OnUpdate)

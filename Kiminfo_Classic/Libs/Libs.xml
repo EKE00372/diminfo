@@ -1,4 +1,5 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
 	<Script file="LibStub.lua"/>
+	<Script file="LibShowUIPanel-1.0.lua"/>
 	<Script file="LibQTip-1.0.lua"/>
 </Ui>
