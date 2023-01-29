@@ -6,7 +6,7 @@
 ## Notes: Light info bar.
 ## Notes-zhTW: 小巧資訊條。
 ## Notes-zhCN: 轻量级信息条。
-## Version: R3.8a
+## Version: C4.0
 ## SavedVariables: Kiminfo
 ## X-Credits: Tukz, Loshine, Siweia, HopeASD, Peter
 
