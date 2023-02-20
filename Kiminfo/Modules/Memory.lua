@@ -126,7 +126,7 @@ local function RefreshText()
 	if totalMemory >= 1024 then
 		Text:SetText(format("%.1fmb", totalMemory/1024))
 	else
-		Text:SetText(format("%.1fkb", totalMemory/1024))
+		Text:SetText(format("%.1fmb", totalMemory/1024))
 	end
 end
 
