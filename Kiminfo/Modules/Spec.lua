@@ -43,40 +43,40 @@ local Text  = Stat:CreateFontString(nil, "OVERLAY")
 
 --[[ Right-click menu ]]--
 
--- create menu template
+-- Create menu template
 local SpecMenuFrame = CreateFrame("Frame", "SpecMenu", UIParent, "UIDropDownMenuTemplate")
 
--- select spec
+-- Select spec
 local function selectSpec(_, specIndex)
 	if SpecIndex == specIndex then return end
 	SetSpecialization(specIndex)
 	DropDownList1:Hide()
 end
 
--- check spec
+-- Check spec
 local function checkSpec(self)
 	return SpecIndex == self.arg1
 end
 
--- select loot spec
+-- Select loot spec
 local function selectLootSpec(_, index)
 	SetLootSpecialization(index)
 	DropDownList1:Hide()
 end
 
--- check loot spec
+-- Check loot spec
 local function checkLootSpec(self)
 	return LootIndex == self.arg1
 end
 
--- refresh loot spec
+-- Refresh loot spec
 local function refreshDefaultLootSpec()
 	if not SpecIndex or SpecIndex == 5 then return end
 	local mult = (3 + numSpecs) or numSpecs
 	newMenu[numLocal - mult].text = format(LOOT_SPECIALIZATION_DEFAULT, select(2, GetSpecializationInfo(SpecIndex)))
 end
 
--- select talent
+-- Select talent
 local function selectCurrentConfig(_, configID)
 	if InCombatLockdown() then UIErrorsFrame:AddMessage(DB.InfoColor..ERR_NOT_IN_COMBAT) return end
 	if not ClassTalentFrame then LoadAddOn("Blizzard_ClassTalentUI") end
@@ -86,12 +86,12 @@ local function selectCurrentConfig(_, configID)
 	ClassTalentFrame.TalentsTab:LoadConfigInternal(configID, true)
 end
 
--- check talent
+-- Check talent
 local function checkCurrentConfig(self)
 	return C_ClassTalents.GetLastSelectedSavedConfigID(self.arg2) == self.arg1
 end
 
--- refresh menu
+-- Refresh menu
 local function refreshAllTraits()
 	local numConfig = numLocal or 0
 	local specID = GetSpecializationInfo(SpecIndex)
@@ -117,7 +117,7 @@ local function refreshAllTraits()
 	end
 end
 
--- sperator menu
+-- Sperator menu
 local seperatorMenu = {
 	text = "",
 	isTitle = true,
@@ -135,11 +135,11 @@ local seperatorMenu = {
 	},
 }
 
--- build menu
+-- Build menu
 local function BuildSpecMenu()
 	if newMenu then return end
 	
-	-- build menu
+	-- Build menu
 	newMenu = {
 		{text = SPECIALIZATION, isTitle = true, notCheckable = true},
 		seperatorMenu,
@@ -147,7 +147,7 @@ local function BuildSpecMenu()
 		{text = "", arg1 = 0, func = selectLootSpec, checked = checkLootSpec},
 	}
 
-	-- build spec and lootspec menu
+	-- Build spec and lootspec menu
 	for i = 1, 4 do
 		local id, name = GetSpecializationInfo(i)
 		if id then
@@ -157,7 +157,7 @@ local function BuildSpecMenu()
 		end
 	end
 	
-	-- build talent menu
+	-- Build talent menu
 	tinsert(newMenu, seperatorMenu)
 	tinsert(newMenu, {text = GetSpellInfo(384255), isTitle = true, notCheckable = true})
 	tinsert(newMenu, {text = BLUE_FONT_COLOR:WrapTextInColorCode(TALENT_FRAME_DROP_DOWN_STARTER_BUILD), func = selectCurrentConfig,
@@ -248,7 +248,7 @@ end
 --================================================--
 ---------------    [[ Scripts ]]     ---------------
 --================================================--
-	
+
 	--[[ Tooltip ]]--
 	Stat:SetScript("OnEnter", function(self)
 		-- Mouseover color
@@ -282,4 +282,14 @@ end
 			if not ClassTalentFrame then LoadAddOn("Blizzard_ClassTalentUI") end
 			if not ClassTalentFrame:IsShown() then ShowUIPanel(ClassTalentFrame) else HideUIPanel(ClassTalentFrame) end
 		end
+	end)
+	
+-- Register even for menu update
+local frame = CreateFrame("Frame", nil, UIParent)
+	frame:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
+	frame:RegisterEvent("TRAIT_CONFIG_DELETED")
+	frame:RegisterEvent("TRAIT_CONFIG_UPDATED")
+	frame:SetScript("OnEvent", function()
+		refreshDefaultLootSpec()
+		refreshAllTraits()
 	end)

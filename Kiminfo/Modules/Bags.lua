@@ -102,7 +102,7 @@ local function OnEnter(self)
 		local name, count, icon, currencyID = GetBackpackCurrencyInfo(i)
 		
 		if name and i == 1 then
-			local iconTexture = C_CurrencyInfo.GetCurrencyInfo(104).iconFileID
+			local iconTexture = C_CurrencyInfo_GetCurrencyInfo(104).iconFileID
 			
 			GameTooltip:AddLine(" ")
 			GameTooltip:AddLine(F.addIcon(iconTexture, 14, 4, 46).." "..G.OptionColor..CURRENCY)
@@ -118,6 +118,13 @@ local function OnEnter(self)
 				GameTooltip:AddDoubleLine(iconTexture.." "..name, count, 1, 1, 1, 1, 1, 1)
 			end
 		end
+	end
+	
+	local chargeInfo = C_CurrencyInfo_GetCurrencyInfo(2167) -- Tier charges
+	if chargeInfo then
+		if GetNumWatchedTokens() < 1 then GameTooltip:AddLine(" ") end
+		local iconTexture = " |T"..chargeInfo.iconFileID..":13:15:0:0:50:50:4:46:4:46|t"
+		GameTooltip:AddDoubleLine(iconTexture..chargeInfo.name, chargeInfo.quantity.."/"..chargeInfo.maxQuantity, 1, 1, 1, 1, 1, 1)
 	end
 	
 	-- Options
