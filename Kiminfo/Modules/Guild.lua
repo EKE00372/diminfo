@@ -3,7 +3,7 @@ local C, F, G, L = unpack(ns)
 if not C.Guild then return end
 
 local LibQTip = LibStub('LibQTip-1.0')
-local format, sort, wipe = format, sort, wipe
+local format, sort, wipe, Ambiguate = format, sort, wipe, Ambiguate
 local CreateFrame = CreateFrame
 local GetNumGuildMembers, GetGuildRosterInfo = GetNumGuildMembers, GetGuildRosterInfo
 local GetGuildFactionInfo = GetGuildFactionInfo
@@ -96,7 +96,7 @@ local function BuildGuildTable()
 		
 		if connected then
 			count = count + 1
-			guildTable[count] = { Ambiguate(name, "guild"), rank, rankindex, level, zone, connected, status, class, mobile }
+			guildTable[count] = { Ambiguate(name, "none"), rank, rankindex, level, zone, connected, status, class, mobile }
 		end
 	end
 	
@@ -203,7 +203,7 @@ local function OnEnter(self)
 		end
 
 		local y, x = tooltip:AddLine()
-		tooltip:SetCell(y, 1, G.OptionColor..format(guildMotD), nil, "LEFT", 2, nil, 0, 0, width)
+		tooltip:SetCell(y, 1, G.OptionColor..guildMotD, nil, "LEFT", 2, nil, 0, 0, width)
 	end
 	
 	-- Options
