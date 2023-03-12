@@ -8,6 +8,10 @@ local GetNumAddOns, GetAddOnInfo, IsAddOnLoaded = GetNumAddOns, GetAddOnInfo, Is
 local UpdateAddOnMemoryUsage, GetAddOnMemoryUsage = UpdateAddOnMemoryUsage, GetAddOnMemoryUsage
 local collectgarbage, gcinfo = collectgarbage, gcinfo
 
+local LibShowUIPanel = LibStub("LibShowUIPanel-1.0")
+local ShowUIPanel = LibShowUIPanel.ShowUIPanel
+local HideUIPanel = LibShowUIPanel.HideUIPanel
+
 local memoryTable, totalMemory  = {}, 0
 local eventCount = 0
 
@@ -201,6 +205,7 @@ local function OnEnter(self)
 	GameTooltip:AddDoubleLine(" ", G.Line)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.ManualCollect..G.LeftButton)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.AutoCollect..(Kiminfo.AutoCollect and G.Enable or G.Disable)..G.RightButton)
+	GameTooltip:AddDoubleLine(" ", G.OptionColor..ADDON_LIST..G.MiddleButton)
 	
 	GameTooltip:Show()
 end
@@ -237,6 +242,8 @@ end
 		elseif btn == "RightButton" then
 			Kiminfo.AutoCollect = not Kiminfo.AutoCollect
 			print(L.CollectWarning)
+		elseif btn == "MiddleButton" then
+			if AddonList:IsShown() then AddonList_OnCancel() else ShowUIPanel(AddonList) end
 		else
 			return
 		end
