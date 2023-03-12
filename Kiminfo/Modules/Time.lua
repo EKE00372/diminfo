@@ -8,12 +8,23 @@ local C_DateAndTime_GetCurrentCalendarTime = C_DateAndTime.GetCurrentCalendarTim
 local C_AreaPoiInfo_GetAreaPOIInfo = C_AreaPoiInfo.GetAreaPOIInfo
 local IsQuestFlaggedCompleted = C_QuestLog.IsQuestFlaggedCompleted
 local C_UIWidgetManager_GetTextWithStateWidgetVisualizationInfo =  C_UIWidgetManager.GetTextWithStateWidgetVisualizationInfo
+local C_MythicPlus_GetRunHistory = C_MythicPlus.GetRunHistory
+local C_ChallengeMode_GetMapUIInfo = C_ChallengeMode.GetMapUIInfo
+
 local GetCVarBool = GetCVarBool
 local TIMEMANAGER_TICKER_24HOUR, TIMEMANAGER_TICKER_12HOUR = TIMEMANAGER_TICKER_24HOUR, TIMEMANAGER_TICKER_12HOUR
 
 local LibShowUIPanel = LibStub("LibShowUIPanel-1.0")
 local ShowUIPanel = LibShowUIPanel.ShowUIPanel
 local HideUIPanel = LibShowUIPanel.HideUIPanel
+local WeeklyRunsThreshold = 8
+
+local questList = {
+	-- PLAYER_DIFFICULTY_TIMEWALKER todo
+	{name = GetSpellInfo(388945), id = 70866},	-- SoDK
+	{name = "", id = 70906, itemID = 200468},	-- Grand hunt
+	{name = "", id = 70893, itemID = 200095},	-- Community feast
+}
 
 -- Torghast
 local TorghastWidgets, TorghastInfo = {
@@ -74,6 +85,26 @@ local function addTitle(text)
 	end
 end
 
+--[[ Weekly chest item link ]] --
+local itemCache = {}
+local function GetItemLink(itemID)
+	local link = itemCache[itemID]
+	if not link then
+		link = select(2, GetItemInfo(itemID))
+		itemCache[itemID] = link
+	end
+	return link
+end
+
+--[[ Mythic+ run history sort order ]]--
+local function sortHistory(entry1, entry2)
+	if entry1.level == entry2.level then
+		return entry1.mapChallengeModeID < entry2.mapChallengeModeID
+	else
+		return entry1.level > entry2.level
+	end
+end
+
 --================================================--
 ---------------    [[ Updates ]]     ---------------
 --================================================--
@@ -124,6 +155,40 @@ local function OnEnter(self)
 	-- Game time
 	GameTooltip:AddDoubleLine(TIMEMANAGER_TOOLTIP_LOCALTIME, GameTime_GetLocalTime(true), .6, .8, 1, 1, 1, 1)
 	GameTooltip:AddDoubleLine(TIMEMANAGER_TOOLTIP_REALMTIME, GameTime_GetGameTime(true), .6, .8, 1, 1, 1, 1)
+	
+	-- Mythic+ and Weekly chest quest only on max level
+	if UnitLevel("player") == MAX_PLAYER_LEVEL then
+		-- Quests
+		title = false
+		for _, v in pairs(questList) do
+			addTitle(QUESTS_LABEL)
+			if v.name and IsQuestFlaggedCompleted(v.id) then
+				GameTooltip:AddDoubleLine(v.itemID and GetItemLink(v.itemID) or v.name, COMPLETE, 1, 1, 1, .3, 1, .3)
+			else
+				GameTooltip:AddDoubleLine(v.itemID and GetItemLink(v.itemID) or v.name, INCOMPLETE, 1, 1, 1, 1, .3, .3)
+			end
+		end
+		
+		-- Mythic+ 8 runs
+		title = false
+		local runHistory = C_MythicPlus_GetRunHistory(false, true)
+		local numRuns = runHistory and #runHistory
+		if numRuns > 0 then
+			GameTooltip:AddLine(" ")
+			GameTooltip:AddDoubleLine(format(WEEKLY_REWARDS_MYTHIC_TOP_RUNS, WeeklyRunsThreshold), "("..numRuns..")", .6, .8, 1)
+			sort(runHistory, sortHistory)
+
+			for i = 1, WeeklyRunsThreshold do
+				local runInfo = runHistory[i]
+				if not runInfo then break end
+
+				local name = C_ChallengeMode_GetMapUIInfo(runInfo.mapChallengeModeID)
+				local r, g, b = .3, 1, .3
+				if not runInfo.completed then r, g, b = 1, .3, .3 end
+				GameTooltip:AddDoubleLine(name, "Lv."..runInfo.level, 1, 1, 1, r, g, b)
+			end
+		end
+	end
 	
 	--[[ 副本進度 ]]--
 	
