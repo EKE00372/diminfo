@@ -245,9 +245,9 @@ Kiminfo 以最左的模塊`時間`作為起始錨點，其錨點於遊戲定義�
 
 ## My Layout example
 
-This is my layout, an example for edit.
+This is my layout, an example for edit. You can check original code at `Template\Custom`
 
-這是我自己使用的樣式，作為例子供參考。
+這是我自己使用的樣式，作為例子供參考。也可在 `Template\Custom` 查閱。
 
 <details>
 <summary>Modules.xml</summary>
