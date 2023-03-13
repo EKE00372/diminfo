@@ -77,13 +77,16 @@ local function refreshDefaultLootSpec()
 end
 
 -- Select talent
-local function selectCurrentConfig(_, configID)
+local function selectCurrentConfig(_, configID, specID)
 	if InCombatLockdown() then UIErrorsFrame:AddMessage(DB.InfoColor..ERR_NOT_IN_COMBAT) return end
 	if not ClassTalentFrame then LoadAddOn("Blizzard_ClassTalentUI") end
-	if not ClassTalentFrame:IsShown() then
-		ShowUIPanel(ClassTalentFrame)
+	if configID == STARTER_BUILD then
+		C_ClassTalents.SetStarterBuildActive(true)
+	else
+		C_ClassTalents.LoadConfig(configID, true)
+		C_ClassTalents.SetStarterBuildActive(false)
 	end
-	ClassTalentFrame.TalentsTab:LoadConfigInternal(configID, true)
+	C_ClassTalents.UpdateLastSelectedSavedConfigID(specID or GetSpecializationInfo(SpecIndex), configID)
 end
 
 -- Check talent
@@ -161,12 +164,22 @@ local function BuildSpecMenu()
 	tinsert(newMenu, seperatorMenu)
 	tinsert(newMenu, {text = GetSpellInfo(384255), isTitle = true, notCheckable = true})
 	tinsert(newMenu, {text = BLUE_FONT_COLOR:WrapTextInColorCode(TALENT_FRAME_DROP_DOWN_STARTER_BUILD), func = selectCurrentConfig,
-		arg1 = Constants.TraitConsts.STARTER_BUILD_TRAIT_CONFIG_ID,	checked = function() return C_ClassTalents.GetStarterBuildActive() end,
+		arg1 = STARTER_BUILD,	checked = function() return C_ClassTalents.GetStarterBuildActive() end,
 	})
 	
 	numLocal = #newMenu
 	refreshDefaultLootSpec()
 	refreshAllTraits()
+	
+	-- Register even for menu update
+	local frame = CreateFrame("Frame", nil, UIParent)
+		frame:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
+		frame:RegisterEvent("TRAIT_CONFIG_DELETED")
+		frame:RegisterEvent("TRAIT_CONFIG_UPDATED")
+		frame:SetScript("OnEvent", function()
+			refreshDefaultLootSpec()
+			refreshAllTraits()
+		end)
 end
 
 --================================================--
@@ -282,14 +295,4 @@ end
 			if not ClassTalentFrame then LoadAddOn("Blizzard_ClassTalentUI") end
 			if not ClassTalentFrame:IsShown() then ShowUIPanel(ClassTalentFrame) else HideUIPanel(ClassTalentFrame) end
 		end
-	end)
-	
--- Register even for menu update
-local frame = CreateFrame("Frame", nil, UIParent)
-	frame:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
-	frame:RegisterEvent("TRAIT_CONFIG_DELETED")
-	frame:RegisterEvent("TRAIT_CONFIG_UPDATED")
-	frame:SetScript("OnEvent", function()
-		refreshDefaultLootSpec()
-		refreshAllTraits()
 	end)
