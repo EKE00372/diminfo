@@ -167,11 +167,12 @@ end
 		if button == "RightButton" then
 			Kiminfo.AutoSell = not Kiminfo.AutoSell
 			OnEnter(self)
-		elseif button == "MiddleButton" then
-			--if not TokenFrame:IsShown() then ShowUIPanel(TokenFrame) else HideUIPanel(TokenFrame) end
-			ToggleCharacter("TokenFrame")
-		else
+		elseif button == "LeftButton" then
 			ToggleAllBags()
+		elseif button == "MiddleButton" then
+			if not CharacterFrame:IsShown() then ShowUIPanel(CharacterFrame) ToggleCharacter("TokenFrame") else HideUIPanel(CharacterFrame) end
+		else
+			return
 		end
 	end)
 

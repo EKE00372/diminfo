@@ -208,8 +208,8 @@ local function OnEnter(self)
 	
 	-- Options
 	tooltip:AddLine(" ", G.Line)
-	tooltip:AddLine(G.OptionColor..G.LeftButton.."+ Shift "..INVITE, G.OptionColor..COMMUNITIES..G.LeftButton)
-	tooltip:AddLine(G.OptionColor..G.MiddleButton..SLASH_WHISPER2:gsub("/(.*)","%1"), G.OptionColor..GUILD..G.RightButton)
+	tooltip:AddLine(G.OptionColor..G.LeftButton.."+ Shift "..INVITE)
+	tooltip:AddLine(G.OptionColor..G.MiddleButton..SLASH_WHISPER2:gsub("/(.*)","%1"), G.OptionColor..COMMUNITIES..G.LeftButton)
 
 	tooltip:AddLine(" ")
 	tooltip:AddLine(MEMBERS, ZONE)
@@ -277,11 +277,7 @@ end
 			return
 		end]]--
 		
-		if button == "RightButton" then
-			if not IsInGuild() then return end
-			if not GuildFrame then LoadAddOn("Blizzard_GuildUI") end
-			if not GuildFrame:IsShown() then ShowUIPanel(GuildFrame) else HideUIPanel(GuildFrame) end
-		elseif button == "LeftButton" then
+		if button == "LeftButton" then
 			if not CommunitiesFrame then LoadAddOn("Blizzard_Communities") end
 			if not CommunitiesFrame:IsShown() then ShowUIPanel(CommunitiesFrame) else HideUIPanel(CommunitiesFrame) end
 		else
