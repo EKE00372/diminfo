@@ -22,8 +22,9 @@ local WeeklyRunsThreshold = 8
 local questList = {
 	-- PLAYER_DIFFICULTY_TIMEWALKER todo
 	{name = GetSpellInfo(388945), id = 70866},	-- SoDK
-	{name = "", id = 70906, itemID = 200468},	-- Grand hunt
-	{name = "", id = 70893, itemID = 200095},	-- Community feast
+	{name = L.GrandHunts, id = 70906},	-- Grand hunt
+	{name = GetSpellInfo(386441), id = 70893},	-- Community feast
+	--70221 工匠精神
 }
 
 -- Torghast
@@ -35,10 +36,6 @@ local TorghastWidgets, TorghastInfo = {
 	{nameID = 2928, levelID = 2938}, -- Mort'regar
 	{nameID = 2929, levelID = 2940}, -- The Upper Reaches
 }
--- Fuckking blizzard make the name on tooltip wrap like shit
-local function CleanupLevelName(text)
-	return gsub(text, "|n", "")
-end
 
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
@@ -161,11 +158,11 @@ local function OnEnter(self)
 		-- Quests
 		title = false
 		for _, v in pairs(questList) do
-			addTitle(QUESTS_LABEL)
+			addTitle(WEEKLY)
 			if v.name and IsQuestFlaggedCompleted(v.id) then
-				GameTooltip:AddDoubleLine(v.itemID and GetItemLink(v.itemID) or v.name, COMPLETE, 1, 1, 1, .3, 1, .3)
+				GameTooltip:AddDoubleLine(v.name, COMPLETE, 1, 1, 1, .3, 1, .3)
 			else
-				GameTooltip:AddDoubleLine(v.itemID and GetItemLink(v.itemID) or v.name, INCOMPLETE, 1, 1, 1, 1, .3, .3)
+				GameTooltip:AddDoubleLine(v.name, INCOMPLETE, 1, 1, 1, 1, .3, .3)
 			end
 		end
 		
@@ -206,7 +203,7 @@ local function OnEnter(self)
 	-- Dungeon
 	title = false
 	for i = 1, GetNumSavedInstances() do
-		local name, _, reset, difficulty, locked, extended, _, _, _, difficultyName = GetSavedInstanceInfo(i)
+		local name, _, reset, difficulty, locked, extended, _, _, _, difficultyName, numEncounters, encounterProgress = GetSavedInstanceInfo(i)
 		-- 5h and 5m
 		if (difficulty == 2 or difficulty == 23) and (locked or extended) then
 			addTitle(DUNGEONS)
@@ -217,14 +214,14 @@ local function OnEnter(self)
 				r, g, b = 1, 1, 1
 			end
 		
-		GameTooltip:AddDoubleLine(difficultyName.." - "..name, SecondsToTime(reset, true, nil, 3), 1, 1, 1, r, g, b)
+		GameTooltip:AddDoubleLine(difficultyName.." "..name.." |cff4cff4c("..encounterProgress.."/"..numEncounters..")|r", SecondsToTime(reset, true, nil, 3), 1, 1, 1, r, g, b)
 		end
 	end
 
 	-- RAID
 	title = false
 	for i = 1, GetNumSavedInstances() do
-		local name, _, reset, _, locked, extended, _, isRaid, _, difficultyName  = GetSavedInstanceInfo(i)
+		local name, _, reset, _, locked, extended, _, isRaid, _, difficultyName, numEncounters, encounterProgress  = GetSavedInstanceInfo(i)
 
 		if isRaid and (locked or extended) then
 			addTitle(RAID)
@@ -235,7 +232,7 @@ local function OnEnter(self)
 				r, g, b = 1, 1, 1
 			end
 		
-		GameTooltip:AddDoubleLine(difficultyName.." - "..name, SecondsToTime(reset, true, nil, 3), 1, 1, 1, r, g, b)
+		GameTooltip:AddDoubleLine(difficultyName.." "..name.." |cff4cff4c("..encounterProgress.."/"..numEncounters..")|r", SecondsToTime(reset, true, nil, 3), 1, 1, 1, r, g, b)
 		end
 	end
 	

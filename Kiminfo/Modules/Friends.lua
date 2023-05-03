@@ -20,6 +20,56 @@ local friendOnline = gsub(ERR_FRIEND_ONLINE_SS, ".+h", "")	-- get string
 local friendOffline = gsub(ERR_FRIEND_OFFLINE_S, "%%s", "")
 local BNET_CLIENT_WOWC = "WoC"	-- custom string for classic
 
+local path = "Interface\\CHATFRAME\\"
+local bnet_client = {
+	["WoW"]  = path.."UI-ChatIcon-WoW",
+	["S1"]   = path.."UI-ChatIcon-SC",
+	["S2"]   = path.."UI-ChatIcon-SC2",
+	["OSI"]  = path.."UI-ChatIcon-DiabloIIResurrected",
+	["D3"]   = path.."UI-ChatIcon-D3",
+	["ANBS"] = path.."UI-ChatIcon-DiabloImmortal",
+	["WTCG"] = path.."UI-ChatIcon-WTCG",
+	["App"]  = path.."UI-ChatIcon-Battlenet",
+	["BSAp"] = path.."UI-ChatIcon-Battlenet",
+	["Hero"] = path.."UI-ChatIcon-HotS",
+	["Pro"]  = path.."UI-ChatIcon-Overwatch",
+	["DST2"] = path.."UI-ChatIcon-Destiny2",
+	["ZEUS"] = path.."UI-ChatIcon-CallofDutyBlackOpsColdWaricon",
+	["VIPR"] = path.."UI-ChatIcon-CallOfDutyBlackOps4",
+	["ODIN"] = path.."UI-ChatIcon-CallOfDutyMWicon",
+	["LAZR"] = path.."UI-ChatIcon-CallOfDutyMW2icon",
+	["W3"]   = path.."UI-ChatIcon-Warcraft3Reforged",
+	["RTRO"] = path.."UI-ChatIcon-BlizzardArcadeCollection",
+	["WLBY"] = path.."UI-ChatIcon-CrashBandicoot4",
+	["FORE"] = path.."UI-ChatIcon-CallOfDutyVanguard",
+	["GRY"]  = path.."UI-ChatIcon-WarcraftArclightRumble",
+}
+
+local region = {[1] = "US", [2] = "KR", [3] = "EU", [4] = "TW", [8] = "CN",}
+--[[
+local bnet_client = {
+	["WoW"]  = "World of Warcraft",
+	["S1"]   = "Starcraft: Remastered",
+	["S2"]   = "StarCraft 2",
+	["OSI"]  = "Diablo II: Resurrected",
+	["D3"]   = "Diablo III",
+	["ANBS"] = "Diablo Immortal",
+	["WTCG"] = "Hearthstone",
+	["App"]  = "Battle.net Desktop App",
+	["BSAp"] = "Battle.net Mobile App",
+	["Hero"] = "Hero of the Storm",
+	["Pro"]  = "Overwatch",
+	["DST2"] = "Destiny 2",
+	["ZEUS"] = "Call of Duty: Black Ops",
+	["VIPR"] = "Call of Duty: Black Ops 4",
+	["ODIN"] = "Call of Duty: Modern Warfare",
+	["LAZR"] = "Call of Duty: Modern Warfare 2",
+	["W3"]   = "Warcraft III: Reforged",
+	["RTRO"] = "Blizzard Arcade Collection",
+	["WLBY"] = "Crash Bandicoot 4",
+	["FORE"] = "Call of Duty: Vanguard",
+	["GRY"]  = "Warcraft Arclight Rumble",
+}]]--
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
 --=================================================--
@@ -108,7 +158,7 @@ local function bnOnClick(self, info, btn)
 	if btn == "LeftButton" and IsShiftKeyDown() then
 		-- BN invite / 戰網邀請
 		if info[5] == BNET_CLIENT_WOW then
-			InviteToGroup(info[4].."-"..info[10])
+			InviteToGroup(info[4].."-"..info[11])
 		end
 	elseif btn == "MiddleButton" then
 		-- BN msg / 戰網聊天
@@ -192,6 +242,7 @@ local function buildBNetTable(num)
 				local isGameBusy = gameAccountInfo.isGameBusy
 				local wowProjectID = gameAccountInfo.wowProjectID
 				local isMobile = gameAccountInfo.isWowMobile
+				local regionID = gameAccountInfo.regionID
 
 				charName = BNet_GetValidatedCharacterName(charName, battleTag, client)
 				class = F.ClassList[class]
@@ -239,7 +290,7 @@ local function buildBNetTable(num)
 				end
 				
 				--number - bn, tag, name, client, status, class, level, aera, app / 編號 - 戰網，TAG，名字，程式，狀態，職業，等級，地點，魔獸好戰友
-				tinsert(bnetTable, {i, accountName, battleTag, charName, client, faction, status, class, level, infoText, realmName, isMobile})
+				tinsert(bnetTable, {i, accountName, battleTag, charName, client, faction, status, class, level, infoText, realmName, isMobile, regionID})
 			end
 		end
 	end
@@ -374,16 +425,18 @@ local function OnEnter(self)
 				end
 				
 				if isShiftKeyDown then
-					tooltip:AddLine(icon.." "..levelc..info[9].."|r "..classc..info[4].."|r"..info[7]..G.OptionColor.." ("..info[3]..")", zonec..info[10])
+					tooltip:AddLine(icon.." "..levelc..info[9].."|r "..classc..info[4].."|r"..info[7]..G.OptionColor.." ("..info[3]..")", zonec..info[10].." - "..region[info[13]])
 				else
 					tooltip:AddLine(icon.." "..levelc..info[9].."|r "..classc..info[4].."|r"..info[7]..G.OptionColor.." ("..info[2]..")", zonec..info[10])
 				end
 			else
 				if isShiftKeyDown then
 					--CreateAtlasMarkup(BNet_GetBattlenetClientAtlas(info[5]), 14, 14)
-					tooltip:AddLine(BNet_GetClientEmbeddedAtlas(info[5], 12, 12).." "..G.OptionColor..info[3].."|r"..info[7], F.Hex(.65, .65, .65)..info[10])
+					--"|T-121261:12:12:0:0:50:50:2:48:2:48|t" /dump C_Texture.GetTitleIconTexture('D3', Enum.TitleIconVersion.Medium, print) get temp file id
+					--BNet_GetClientEmbeddedAtlas(info[5], 12, 12)
+					tooltip:AddLine(F.addIcon(bnet_client[info[5]], 12, 4, 46).." "..G.OptionColor..info[3].."|r"..info[7], F.Hex(.65, .65, .65)..info[10])
 				else
-					tooltip:AddLine(BNet_GetClientEmbeddedAtlas(info[5], 12, 12).." "..G.OptionColor..info[4].."|r"..info[7], F.Hex(.65, .65, .65)..info[10])
+					tooltip:AddLine(F.addIcon(bnet_client[info[5]], 12, 4, 46).." "..G.OptionColor..info[4].."|r"..info[7], F.Hex(.65, .65, .65)..info[10])
 				end
 			end
 			
