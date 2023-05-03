@@ -291,8 +291,10 @@ end
 		if button == "RightButton" then
 			BuildSpecMenu()
 			EasyMenu(newMenu, SpecMenuFrame, "cursor", 0, 0, "MENU", 3)
-		else
+		elseif button == "LeftButton" then
 			if not ClassTalentFrame then LoadAddOn("Blizzard_ClassTalentUI") end
 			if not ClassTalentFrame:IsShown() then ShowUIPanel(ClassTalentFrame) else HideUIPanel(ClassTalentFrame) end
+		else
+			return
 		end
 	end)

@@ -203,9 +203,9 @@ local function OnEnter(self)
 	
 	-- Options
 	GameTooltip:AddDoubleLine(" ", G.Line)
+	GameTooltip:AddDoubleLine(" ", G.OptionColor..ADDON_LIST..G.MiddleButton)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.ManualCollect..G.LeftButton)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.AutoCollect..(Kiminfo.AutoCollect and G.Enable or G.Disable)..G.RightButton)
-	GameTooltip:AddDoubleLine(" ", G.OptionColor..ADDON_LIST..G.MiddleButton)
 	
 	GameTooltip:Show()
 end

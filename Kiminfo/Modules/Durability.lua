@@ -171,8 +171,10 @@ end
 		if button == "RightButton" then
 			Kiminfo.AutoRepair = not Kiminfo.AutoRepair
 			OnEnter(self)
+		elseif button == "LeftButton" then
+			if not CharacterFrame:IsShown() then ShowUIPanel(CharacterFrame) ToggleCharacter("PaperDollFrame") else HideUIPanel(CharacterFrame) end
 		else
-			if not CharacterFrame:IsShown() then ShowUIPanel(CharacterFrame) else HideUIPanel(CharacterFrame) end
+			return
 		end
 	end)
 	
