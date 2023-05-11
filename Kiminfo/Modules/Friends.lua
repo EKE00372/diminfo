@@ -14,38 +14,37 @@ local LibShowUIPanel = LibStub("LibShowUIPanel-1.0")
 local ShowUIPanel = LibShowUIPanel.ShowUIPanel
 local HideUIPanel = LibShowUIPanel.HideUIPanel
 
-local title	-- Custom line
 local friendTable, bnetTable = {}, {}	-- build table
 local friendOnline = gsub(ERR_FRIEND_ONLINE_SS, ".+h", "")	-- get string
 local friendOffline = gsub(ERR_FRIEND_OFFLINE_S, "%%s", "")
 local BNET_CLIENT_WOWC = "WoC"	-- custom string for classic
 
-local path = "Interface\\CHATFRAME\\"
+local path = "Interface\\CHATFRAME\\UI-ChatIcon-"
 local bnet_client = {
-	["WoW"]  = path.."UI-ChatIcon-WoW",
-	["S1"]   = path.."UI-ChatIcon-SC",
-	["S2"]   = path.."UI-ChatIcon-SC2",
-	["OSI"]  = path.."UI-ChatIcon-DiabloIIResurrected",
-	["D3"]   = path.."UI-ChatIcon-D3",
-	["ANBS"] = path.."UI-ChatIcon-DiabloImmortal",
-	["WTCG"] = path.."UI-ChatIcon-WTCG",
-	["App"]  = path.."UI-ChatIcon-Battlenet",
-	["BSAp"] = path.."UI-ChatIcon-Battlenet",
-	["Hero"] = path.."UI-ChatIcon-HotS",
-	["Pro"]  = path.."UI-ChatIcon-Overwatch",
-	["DST2"] = path.."UI-ChatIcon-Destiny2",
-	["ZEUS"] = path.."UI-ChatIcon-CallofDutyBlackOpsColdWaricon",
-	["VIPR"] = path.."UI-ChatIcon-CallOfDutyBlackOps4",
-	["ODIN"] = path.."UI-ChatIcon-CallOfDutyMWicon",
-	["LAZR"] = path.."UI-ChatIcon-CallOfDutyMW2icon",
-	["W3"]   = path.."UI-ChatIcon-Warcraft3Reforged",
-	["RTRO"] = path.."UI-ChatIcon-BlizzardArcadeCollection",
-	["WLBY"] = path.."UI-ChatIcon-CrashBandicoot4",
-	["FORE"] = path.."UI-ChatIcon-CallOfDutyVanguard",
-	["GRY"]  = path.."UI-ChatIcon-WarcraftArclightRumble",
+	["WoW"]  = path.."WoW",
+	["S1"]   = path.."SC",
+	["S2"]   = path.."SC2",
+	["OSI"]  = path.."DiabloIIResurrected",
+	["D3"]   = path.."D3",
+	["ANBS"] = path.."DiabloImmortal",
+	["WTCG"] = path.."WTCG",
+	["App"]  = path.."Battlenet",
+	["BSAp"] = path.."Battlenet",
+	["Hero"] = path.."HotS",
+	["Pro"]  = path.."Overwatch",
+	["DST2"] = path.."Destiny2",
+	["ZEUS"] = path.."CallofDutyBlackOpsColdWaricon",
+	["VIPR"] = path.."CallOfDutyBlackOps4",
+	["ODIN"] = path.."CallOfDutyMWicon",
+	["LAZR"] = path.."CallOfDutyMW2icon",
+	["W3"]   = path.."Warcraft3Reforged",
+	["RTRO"] = path.."BlizzardArcadeCollection",
+	["WLBY"] = path.."CrashBandicoot4",
+	["FORE"] = path.."CallOfDutyVanguard",
+	["GRY"]  = path.."WarcraftArclightRumble",
 }
 
-local region = {[1] = "US", [2] = "KR", [3] = "EU", [4] = "TW", [8] = "CN",}
+local region = {[1] = "US", [2] = "KR", [3] = "EU", [4] = "TW", [5] = "CN",}
 --[[
 local bnet_client = {
 	["WoW"]  = "World of Warcraft",
@@ -131,14 +130,6 @@ StaticPopupDialogs.SET_BN_BROADCAST = {
 	whileDead = 1,
 	hideOnEscape = 1
 }
-
---[[ Custom api for add title line ]]--
-local function addLine(tooltip)
-	if not title then
-		tooltip:AddSeparator(2, .6, .8, 1)
-		title = true
-	end
-end
 
 --[[ Click function for in-game friends ]]--
 local function gameOnClick(self, info, btn)
@@ -243,6 +234,7 @@ local function buildBNetTable(num)
 				local wowProjectID = gameAccountInfo.wowProjectID
 				local isMobile = gameAccountInfo.isWowMobile
 				local regionID = gameAccountInfo.regionID
+				local regionCheck = gameAccountInfo.isInCurrentRegion
 
 				charName = BNet_GetValidatedCharacterName(charName, battleTag, client)
 				class = F.ClassList[class]
@@ -290,7 +282,7 @@ local function buildBNetTable(num)
 				end
 				
 				--number - bn, tag, name, client, status, class, level, aera, app / 編號 - 戰網，TAG，名字，程式，狀態，職業，等級，地點，魔獸好戰友
-				tinsert(bnetTable, {i, accountName, battleTag, charName, client, faction, status, class, level, infoText, realmName, isMobile, regionID})
+				tinsert(bnetTable, {i, accountName, battleTag, charName, client, faction, status, class, level, infoText, realmName, isMobile, regionID, regionCheck})
 			end
 		end
 	end
@@ -363,11 +355,10 @@ local function OnEnter(self)
 		
 		tooltip:AddLine(" ")
 		tooltip:AddLine(GAME, ZONE)
+		tooltip:AddSeparator(2, .6, .8, 1)
 		
-		title = false
 		for i = 1, #friendTable do
 			local info = friendTable[i]
-			addLine(tooltip)
 			
 			local zonec
 			if GetRealZoneText() == info[4] then
@@ -396,11 +387,10 @@ local function OnEnter(self)
 		
 		tooltip:AddLine(" ")
 		tooltip:AddLine(NAME, ZONE)
+		tooltip:AddSeparator(2, .6, .8, 1)
 		
-		title = false
 		for i = 1, #bnetTable do
 			local info = bnetTable[i]
-			addLine(tooltip)
 			
 			if F.Multicheck(info[5], BNET_CLIENT_WOW, BNET_CLIENT_WOWC) then
 				local zonec
@@ -418,7 +408,7 @@ local function OnEnter(self)
 				end
 				
 				local icon
-				if info[5] == BNET_CLIENT_WOW then
+				if (info[5] == BNET_CLIENT_WOW and info[14] == true) then
 					icon = (info[6] == "Horde" and F.addIcon(G.Horde, 12, 2, 48)) or (info[6] == "Alliance" and F.addIcon(G.Alliance, 12, 2, 48))
 				else
 					icon = F.addIcon(G.WOWIcon, 12, -2, 52)
