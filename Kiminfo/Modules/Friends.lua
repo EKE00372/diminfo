@@ -18,57 +18,60 @@ local friendTable, bnetTable = {}, {}	-- build table
 local friendOnline = gsub(ERR_FRIEND_ONLINE_SS, ".+h", "")	-- get string
 local friendOffline = gsub(ERR_FRIEND_OFFLINE_S, "%%s", "")
 local BNET_CLIENT_WOWC = "WoC"	-- custom string for classic
+local region = {[1] = "US", [2] = "KR", [3] = "EU", [4] = "TW", [5] = "CN",}
 
-local path = "Interface\\CHATFRAME\\UI-ChatIcon-"
+--==============================================--
+---------------    [[ Cache ]]     ---------------
+--==============================================--
+
+-- cahce client icon
+local cache = {}
+local function GetIconTexture(titleID)
+    if cache[titleID] then
+        return cache[titleID]
+    end
+
+    local titleID = titleID
+    C_Texture.GetTitleIconTexture(titleID, Enum.TitleIconVersion.Medium, function(success, texture)
+        if success then
+            cache[titleID] = texture
+        end
+    end)
+
+    return cache[titleID] or "Interface\\CHATFRAME\\UI-ChatIcon-Battlenet"
+end
+
+-- client list
 local bnet_client = {
-	["WoW"]  = path.."WoW",
-	["S1"]   = path.."SC",
-	["S2"]   = path.."SC2",
-	["OSI"]  = path.."DiabloIIResurrected",
-	["D3"]   = path.."D3",
-	["ANBS"] = path.."DiabloImmortal",
-	["WTCG"] = path.."WTCG",
-	["App"]  = path.."Battlenet",
-	["BSAp"] = path.."Battlenet",
-	["Hero"] = path.."HotS",
-	["Pro"]  = path.."Overwatch",
-	["DST2"] = path.."Destiny2",
-	["ZEUS"] = path.."CallofDutyBlackOpsColdWaricon",
-	["VIPR"] = path.."CallOfDutyBlackOps4",
-	["ODIN"] = path.."CallOfDutyMWicon",
-	["LAZR"] = path.."CallOfDutyMW2icon",
-	["W3"]   = path.."Warcraft3Reforged",
-	["RTRO"] = path.."BlizzardArcadeCollection",
-	["WLBY"] = path.."CrashBandicoot4",
-	["FORE"] = path.."CallOfDutyVanguard",
-	["GRY"]  = path.."WarcraftArclightRumble",
+	"WoW",	--WoW
+	"S1",	--SC
+	"S2" ,	--SC2
+	"OSI",	--DiabloII Resurrected
+	"D3",	--D3
+	"ANBS",	-- Diablo Immortal
+	"WTCG",	-- WTCG
+	"App",	--Battlenet
+	"BSAp",	-- Battlenet
+	"Hero",	-- HotS
+	"Pro",	--Overwatch
+	"DST2",	-- Destiny2
+	"ZEUS",	-- CallofDuty BlackOpsColdWaricon
+	"VIPR",	-- CallOfDuty BlackOps4
+	"ODIN",	-- CallOfDuty MWicon
+	"LAZR",	-- CallOfDuty MW2icon
+	"W3",	-- Warcraft3 Reforged
+	"RTRO",	-- Blizzard Arcade Collection
+	"WLBY",	-- Crash Bandicoot 4
+	"FORE",	-- CallOfDuty Vanguard
+	"GRY",	--Warcraft Arclight Rumble
+	"Fen",	--D4
 }
 
-local region = {[1] = "US", [2] = "KR", [3] = "EU", [4] = "TW", [5] = "CN",}
---[[
-local bnet_client = {
-	["WoW"]  = "World of Warcraft",
-	["S1"]   = "Starcraft: Remastered",
-	["S2"]   = "StarCraft 2",
-	["OSI"]  = "Diablo II: Resurrected",
-	["D3"]   = "Diablo III",
-	["ANBS"] = "Diablo Immortal",
-	["WTCG"] = "Hearthstone",
-	["App"]  = "Battle.net Desktop App",
-	["BSAp"] = "Battle.net Mobile App",
-	["Hero"] = "Hero of the Storm",
-	["Pro"]  = "Overwatch",
-	["DST2"] = "Destiny 2",
-	["ZEUS"] = "Call of Duty: Black Ops",
-	["VIPR"] = "Call of Duty: Black Ops 4",
-	["ODIN"] = "Call of Duty: Modern Warfare",
-	["LAZR"] = "Call of Duty: Modern Warfare 2",
-	["W3"]   = "Warcraft III: Reforged",
-	["RTRO"] = "Blizzard Arcade Collection",
-	["WLBY"] = "Crash Bandicoot 4",
-	["FORE"] = "Call of Duty: Vanguard",
-	["GRY"]  = "Warcraft Arclight Rumble",
-}]]--
+-- cache when load
+for k, v in ipairs(bnet_client) do
+	GetIconTexture(v)
+end
+
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
 --=================================================--
@@ -411,7 +414,7 @@ local function OnEnter(self)
 				if (info[5] == BNET_CLIENT_WOW and info[14] == true) then
 					icon = (info[6] == "Horde" and F.addIcon(G.Horde, 12, 2, 48)) or (info[6] == "Alliance" and F.addIcon(G.Alliance, 12, 2, 48))
 				else
-					icon = F.addIcon(G.WOWIcon, 12, -2, 52)
+					icon = "|T"..GetIconTexture(info[5])..":12:12:0:0:50:50|t"
 				end
 				
 				if isShiftKeyDown then
@@ -421,12 +424,9 @@ local function OnEnter(self)
 				end
 			else
 				if isShiftKeyDown then
-					--CreateAtlasMarkup(BNet_GetBattlenetClientAtlas(info[5]), 14, 14)
-					--"|T-121261:12:12:0:0:50:50:2:48:2:48|t" /dump C_Texture.GetTitleIconTexture('D3', Enum.TitleIconVersion.Medium, print) get temp file id
-					--BNet_GetClientEmbeddedAtlas(info[5], 12, 12)
-					tooltip:AddLine(F.addIcon(bnet_client[info[5]], 12, 4, 46).." "..G.OptionColor..info[3].."|r"..info[7], F.Hex(.65, .65, .65)..info[10])
+					tooltip:AddLine("|T"..GetIconTexture(info[5])..":12:12:0:0:50:50|t "..G.OptionColor..info[3].."|r"..info[7], F.Hex(.65, .65, .65)..info[10])
 				else
-					tooltip:AddLine(F.addIcon(bnet_client[info[5]], 12, 4, 46).." "..G.OptionColor..info[4].."|r"..info[7], F.Hex(.65, .65, .65)..info[10])
+					tooltip:AddLine("|T"..GetIconTexture(info[5])..":12:12:0:0:50:50|t "..G.OptionColor..info[4].."|r"..info[7], F.Hex(.65, .65, .65)..info[10])
 				end
 			end
 			
