@@ -98,7 +98,7 @@ local function OnEnter(self)
 	GameTooltip:AddDoubleLine(MONEY, GetMoneyString(money).." ", 1, 1, 1, 1, 1, 1)
 	
 	-- Currency
-	for i = 1, GetNumWatchedTokens() do
+	for i = 1, 10 do
 		local name, count, icon, currencyID = GetBackpackCurrencyInfo(i)
 		
 		if name and i == 1 then
@@ -120,11 +120,11 @@ local function OnEnter(self)
 		end
 	end
 	
-	local chargeInfo = C_CurrencyInfo_GetCurrencyInfo(2167) -- Tier charges
+	local chargeInfo = C_CurrencyInfo_GetCurrencyInfo(2533) -- 10.1
 	if chargeInfo then
 		if GetNumWatchedTokens() < 1 then GameTooltip:AddLine(" ") end
-		local iconTexture = " |T"..chargeInfo.iconFileID..":13:15:0:0:50:50:4:46:4:46|t"
-		GameTooltip:AddDoubleLine(iconTexture..chargeInfo.name, chargeInfo.quantity.."/"..chargeInfo.maxQuantity, 1, 1, 1, 1, 1, 1)
+		local iconTexture = "|T"..chargeInfo.iconFileID..":13:15:0:0:50:50:4:46:4:46|t"
+		GameTooltip:AddDoubleLine(iconTexture.." "..chargeInfo.name, chargeInfo.quantity.."/"..chargeInfo.maxQuantity, 1, 1, 1, 1, 1, 1)
 	end
 	
 	-- Options

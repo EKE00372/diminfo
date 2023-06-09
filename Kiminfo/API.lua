@@ -119,7 +119,6 @@ G.Ping = G.MediaFolder.."ping.tga"
 G.Mem = G.MediaFolder.."spell.tga"
 G.Alliance = G.MediaFolder.."Alliance"
 G.Horde = G.MediaFolder.."Horde"
-G.WOWIcon = G.MediaFolder.."WoW_Yellow"
 
 --G.LeftButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:230:307|t "
 --G.RightButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:333:411|t "
