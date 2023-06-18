@@ -35,6 +35,7 @@ local getLocale = GetLocale()
 		L.App = "魔獸好戰友"
 		L.Mobile = "行動裝置"
 		L.Desktop = "應用程式"
+		L.GrandHunts = "大狩獵"
 		
 	elseif getLocale == "zhCN" then
 		
@@ -69,6 +70,7 @@ local getLocale = GetLocale()
 		L.App = "随身助手"
 		L.Mobile = "移动装置"
 		L.Desktop = "桌面应用"
+		L.GrandHunts = "大狩猎"
 		
 	elseif getLocale == "ruRU" then
 		
@@ -103,6 +105,7 @@ local getLocale = GetLocale()
 		L.App = "Портативный помощник"
 		L.Mobile = "Мобильный"
 		L.Desktop = "Рабочий стол"
+		L.GrandHunts = "Grand Hunts"
 		
 	else
 		L.AutoSell = "Auto Sell junk: "
@@ -136,4 +139,5 @@ local getLocale = GetLocale()
 		L.App = "Companion"
 		L.Mobile = "Mobile"
 		L.Desktop = "Desktop"
+		L.GrandHunts = "Grand Hunts"
 	end
