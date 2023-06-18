@@ -4,6 +4,7 @@ if not C.Bags then return end
 
 local format = format
 local CreateFrame = CreateFrame
+local C_Timer_NewTicker = C_Timer.NewTicker
 
 local C_CurrencyInfo_GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo
 local C_CurrencyInfo_GetBackpackCurrencyInfo = C_CurrencyInfo.GetBackpackCurrencyInfo
@@ -79,12 +80,18 @@ local function OnEvent(self)
 	local free = getBagSlots()
 	Text:SetText(free)
 	self:SetAllPoints(Text)
+	
+	-- Update when login
+	C_WowTokenPublic.UpdateMarketPrice()
+	-- Update every 3 min
+	C_Timer_NewTicker(180, function () C_WowTokenPublic.UpdateMarketPrice() end)
 end
 
 --[[ Tooltip update ]]--
 local function OnEnter(self)
 	local free, total, used = getBagSlots()
 	local money = GetMoney()
+	local tokenMoney = C_WowTokenPublic.GetCurrentMarketPrice() or 0
 	
 	-- Title
 	GameTooltip:SetOwner(self, C.StickTop and "ANCHOR_BOTTOM" or "ANCHOR_TOP", 0, C.StickTop and -10 or 10)
@@ -96,6 +103,7 @@ local function OnEnter(self)
 	GameTooltip:AddLine(G.OptionColor..BAGSLOT)
 	GameTooltip:AddDoubleLine(USE, used, 1, 1, 1, 1, 1, 1)
 	GameTooltip:AddDoubleLine(MONEY, GetMoneyString(money).." ", 1, 1, 1, 1, 1, 1)
+	GameTooltip:AddDoubleLine(TOKEN_FILTER_LABEL, (tokenMoney > 0 and GetMoneyString(tokenMoney)) or UNAVAILABLE.." ", 1, 1, 1, 1, 1, 1)
 	
 	-- Currency
 	for i = 1, 10 do
