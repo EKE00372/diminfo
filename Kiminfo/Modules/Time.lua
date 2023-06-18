@@ -37,6 +37,11 @@ local TorghastWidgets, TorghastInfo = {
 	{nameID = 2929, levelID = 2940}, -- The Upper Reaches
 }
 
+-- Fuckking blizzard make the name on tooltip wrap like shit
+local function CleanupLevelName(text)
+	return gsub(text, "|n", "")
+end
+
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
 --=================================================--
