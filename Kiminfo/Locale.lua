@@ -70,7 +70,7 @@ local getLocale = GetLocale()
 		L.App = "随身助手"
 		L.Mobile = "移动装置"
 		L.Desktop = "桌面应用"
-		L.GrandHunts = "大狩猎"
+		L.GrandHunts = "洪荒狩猎"
 		
 	elseif getLocale == "ruRU" then
 		
