@@ -128,7 +128,7 @@ local function OnEnter(self)
 		end
 	end
 	
-	local chargeInfo = C_CurrencyInfo_GetCurrencyInfo(2533) -- 10.1
+	local chargeInfo = C_CurrencyInfo_GetCurrencyInfo(2796) -- 10.2
 	if chargeInfo then
 		if GetNumWatchedTokens() < 1 then GameTooltip:AddLine(" ") end
 		local iconTexture = "|T"..chargeInfo.iconFileID..":13:15:0:0:50:50:4:46:4:46|t"
