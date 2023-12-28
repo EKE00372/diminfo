@@ -73,7 +73,7 @@ end
 local function refreshDefaultLootSpec()
 	if not SpecIndex or SpecIndex == 5 then return end
 	local mult = (3 + numSpecs) or numSpecs
-	newMenu[numLocal - mult].text = format(LOOT_SPECIALIZATION_DEFAULT, select(2, GetSpecializationInfo(SpecIndex)))
+	newMenu[numLocal - mult].text = format(LOOT_SPECIALIZATION_DEFAULT, select(2, GetSpecializationInfo(SpecIndex)) or NONE)
 end
 
 -- Select talent

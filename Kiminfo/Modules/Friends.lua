@@ -37,13 +37,14 @@ local function GetIconTexture(titleID)
             cache[titleID] = texture
         end
     end)
-
+	
     return cache[titleID] or "Interface\\CHATFRAME\\UI-ChatIcon-Battlenet"
 end
 
 -- client list
 local bnet_client = {
 	"WoW",	--WoW
+	"WoC",	--WoW Classic
 	"S1",	--SC
 	"S2" ,	--SC2
 	"OSI",	--DiabloII Resurrected
