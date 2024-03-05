@@ -209,7 +209,7 @@ local function OnEnter(self)
 	-- Options
 	tooltip:AddLine(" ", G.Line)
 	tooltip:AddLine(G.OptionColor..G.LeftButton.."+ Shift "..INVITE)
-	tooltip:AddLine(G.OptionColor..G.MiddleButton..SLASH_WHISPER2:gsub("/(.*)","%1"), G.OptionColor..COMMUNITIES..G.LeftButton)
+	tooltip:AddLine(G.OptionColor..G.MiddleButton..WHISPER, G.OptionColor..COMMUNITIES..G.LeftButton)
 
 	tooltip:AddLine(" ")
 	tooltip:AddLine(MEMBERS, ZONE)
