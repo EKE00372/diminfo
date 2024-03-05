@@ -4,6 +4,8 @@ local C, F, G, L = unpack(ns)
 local getLocale = GetLocale()
 	if getLocale == "zhTW" then
 		
+		L.Calendar = SLASH_CALENDAR2:gsub("/(.*)","%1")
+		
 		L.AutoSell = "自動賣垃圾："
 		L.TrashSold = "垃圾售出："
 		
@@ -38,6 +40,8 @@ local getLocale = GetLocale()
 		L.GrandHunts = "大狩獵"
 		
 	elseif getLocale == "zhCN" then
+		
+		L.Calendar = "行事历"
 		
 		L.AutoSell = "自动卖垃圾："
 		L.TrashSold = "垃圾售出："
@@ -74,6 +78,8 @@ local getLocale = GetLocale()
 		
 	elseif getLocale == "ruRU" then
 		
+		L.Calendar = SLASH_CALENDAR1:gsub("/(.*)","%1")
+		
 		L.AutoSell = "Автопродажа барахла: "
 		L.TrashSold = "Мусор продал, заработал "
 		
@@ -108,6 +114,8 @@ local getLocale = GetLocale()
 		L.GrandHunts = "Grand Hunts"
 		
 	else
+		L.Calendar = SLASH_CALENDAR1:gsub("/(.*)","%1")
+		
 		L.AutoSell = "Auto Sell junk: "
 		L.TrashSold = "Trash sold, earned "
 		
