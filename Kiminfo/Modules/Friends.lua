@@ -351,7 +351,7 @@ local function OnEnter(self)
 	-- Options
 	tooltip:AddLine(" ", G.Line)
 	tooltip:AddLine(G.OptionColor..G.LeftButton.."+ Shift "..INVITE, G.OptionColor..FRIENDS..G.LeftButton)
-	tooltip:AddLine(G.OptionColor..G.MiddleButton..SLASH_WHISPER2:gsub("/(.*)","%1"), G.OptionColor..BATTLENET_BROADCAST..G.RightButton)
+	tooltip:AddLine(G.OptionColor..G.MiddleButton..WHISPER, G.OptionColor..BATTLENET_BROADCAST..G.RightButton)
 
 	-- In-game online friends list
 	if onlineFriends > 0 then

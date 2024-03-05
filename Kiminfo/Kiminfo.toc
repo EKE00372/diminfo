@@ -1,4 +1,4 @@
-## Interface: 100200
+## Interface: 100205
 ## Author: EK
 ## Title: |cff00ffffKim|rinfo
 ## Title-zhTW: |cff00ffffKim|rinfo 資訊條
@@ -7,7 +7,7 @@
 ## Notes-zhTW: 小巧資訊條。
 ## Notes-zhCN: 轻量级信息条。
 ## IconTexture: "Interface\\Buttons\\WHITE8x8"
-## Version: R4.4
+## Version: R4.5
 ## SavedVariables: Kiminfo
 ## X-Credits: Tukz, Loshine, Siweia, HopeASD, Peter
 

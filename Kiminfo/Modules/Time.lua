@@ -24,6 +24,8 @@ local questList = {
 	{name = GetSpellInfo(388945), id = 70866},	-- SoDK
 	{name = L.GrandHunts, id = 70906},	-- Grand hunt
 	{name = GetSpellInfo(386441), id = 70893},	-- Community feast
+	{name = C_TaskQuest.GetQuestInfoByQuestID(79226), id = 79226},	-- The big dig
+	{name = GetSpellInfo(418272), id = 78319},	-- The superbloom
 	--70221 工匠精神
 }
 
@@ -264,7 +266,7 @@ local function OnEnter(self)
 
 	GameTooltip:AddDoubleLine(" ", G.Line)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..RATED_PVP_WEEKLY_VAULT..G.MiddleButton)
-	GameTooltip:AddDoubleLine(" ", G.OptionColor..SLASH_CALENDAR1:gsub("/(.*)","%1")..G.LeftButton)
+	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.Calendar..G.LeftButton)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..STOPWATCH_TITLE..G.RightButton)
 	
 	GameTooltip:Show()
