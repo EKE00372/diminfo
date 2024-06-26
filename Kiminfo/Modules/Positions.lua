@@ -5,7 +5,7 @@ if not C.Positions then return end
 local format = format
 local CreateFrame = CreateFrame
 local C_Map_GetWorldPosFromMapPos, C_Map_GetBestMapForUnit = C_Map.GetWorldPosFromMapPos, C_Map.GetBestMapForUnit
-
+local GetZonePVPInfo = C_PvP and C_PvP.GetZonePVPInfo or GetZonePVPInfo
 local LibShowUIPanel = LibStub("LibShowUIPanel-1.0")
 local ShowUIPanel = LibShowUIPanel.ShowUIPanel
 local HideUIPanel = LibShowUIPanel.HideUIPanel
@@ -92,11 +92,11 @@ end
 --================================================--
 
 local function OnEvent(self)
-	subzone, zone, pvp = GetSubZoneText(), GetZoneText(), {GetZonePVPInfo()}
+	subzone, zone =  GetSubZoneText(), GetZoneText()
+	pvpType, _, faction = GetZonePVPInfo()
+	pvpType = pvpType or "neutral"
 	
-	if not pvp[1] then pvp[1] = "neutral" end
-	
-	local r, g, b = unpack(zoneColor[pvp[1]][2])
+	local r, g, b = unpack(zoneColor[pvpType][2])
 	
 	Text:SetText((subzone ~= "") and subzone or zone)
 	Text:SetTextColor(r, g, b)
@@ -118,12 +118,12 @@ local function OnEnter(self)
 	end
 	
 	-- Subzone
-	if pvp[1] and not IsInInstance() then
-		local r, g, b = unpack(zoneColor[pvp[1]][2])
+	if pvpType and not IsInInstance() then
+		local r, g, b = unpack(zoneColor[pvpType][2])
 		if subzone and subzone ~= zone then
 			GameTooltip:AddLine(subzone, r, g, b)
 		end
-		GameTooltip:AddLine(format(zoneColor[pvp[1]][1],pvp[3] or ""), r, g, b)
+		GameTooltip:AddLine(format(zoneColor[pvpType][1], faction or ""), r, g, b)
 	end
 	
 	-- Options

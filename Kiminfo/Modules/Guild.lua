@@ -7,7 +7,10 @@ local format, sort, wipe, Ambiguate = format, sort, wipe, Ambiguate
 local CreateFrame = CreateFrame
 local GetNumGuildMembers, GetGuildRosterInfo = GetNumGuildMembers, GetGuildRosterInfo
 local GetGuildFactionInfo = GetGuildFactionInfo
-local InviteToGroup = C_PartyInfo.InviteUnit -- Replace C. new api as old InviteToGroup()
+local InviteToGroup = C_PartyInfo.InviteUnit
+
+local C_Reputation_GetGuildFactionInfo
+if F.isNewPatch then C_Reputation_GetGuildFactionInfo =  C_Reputation.GetGuildFactionInfo else C_Reputation_GetGuildFactionInfo = GetGuildFactionInfo end
 
 local LibShowUIPanel = LibStub("LibShowUIPanel-1.0")
 local ShowUIPanel = LibShowUIPanel.ShowUIPanel
@@ -131,7 +134,7 @@ local function OnEvent(self, event, ...)
 	
 	if event == "PLAYER_ENTERING_WORLD" then
 		if not GuildFrame and IsInGuild() then
-			LoadAddOn("Blizzard_GuildUI")
+			C_AddOns.LoadAddOn("Blizzard_GuildUI")
 			UpdateGuildMessage()
 		end
 	end
@@ -167,7 +170,7 @@ local function OnEnter(self)
 	local total, online = GetNumGuildMembers()
 	local guildName, guildRank = GetGuildInfo("player")
 	local guildMotD = GetGuildRosterMOTD()
-	local _, _, standingID, barMin, barMax, barValue = GetGuildFactionInfo()
+	local _, _, standingID, barMin, barMax, barValue = C_Reputation_GetGuildFactionInfo()
 	
 	-- Get table
 	BuildGuildTable()
@@ -181,7 +184,7 @@ local function OnEnter(self)
 	tooltip:AddLine(" ")
 	tooltip:AddLine(GUILD)
 	tooltip:AddLine(G.OptionColor..RANK, G.OptionColor..guildRank)
-		
+
 	-- Guild reputation
 	if standingID == 8 then
 		tooltip:AddLine(G.OptionColor..REPUTATION, G.OptionColor.._G["FACTION_STANDING_LABEL"..8])
@@ -278,7 +281,7 @@ end
 		end]]--
 		
 		if button == "LeftButton" then
-			if not CommunitiesFrame then LoadAddOn("Blizzard_Communities") end
+			if not CommunitiesFrame then C_AddOns.LoadAddOn("Blizzard_Communities") end
 			if not CommunitiesFrame:IsShown() then ShowUIPanel(CommunitiesFrame) else HideUIPanel(CommunitiesFrame) end
 		else
 			return
