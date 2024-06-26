@@ -4,7 +4,7 @@ if not C.Memory then return end
 
 local format, min, max, sort, wipe = format, min, max, sort, wipe
 local CreateFrame = CreateFrame
-local GetNumAddOns, GetAddOnInfo, IsAddOnLoaded = GetNumAddOns, GetAddOnInfo, IsAddOnLoaded
+local C_AddOns_GetNumAddOns, C_AddOns_GetAddOnInfo, C_AddOns_IsAddOnLoaded = C_AddOns.GetNumAddOns, C_AddOns.GetAddOnInfo, C_AddOns.IsAddOnLoaded
 local UpdateAddOnMemoryUsage, GetAddOnMemoryUsage = UpdateAddOnMemoryUsage, GetAddOnMemoryUsage
 local collectgarbage, gcinfo = collectgarbage, gcinfo
 
@@ -76,11 +76,11 @@ end
 
 --[[ Get enable addon number ]]--
 local function updateMaxAddons()
-	local numAddons = GetNumAddOns()
+	local numAddons = C_AddOns_GetNumAddOns()
 	local totalNum = 0
 	
 	for i = 1, numAddons do
-		if IsAddOnLoaded(i) then
+		if C_AddOns_IsAddOnLoaded(i) then
 			totalNum = totalNum +1
 		end
 	end
@@ -90,13 +90,13 @@ end
 	
 --[[ Get addon list ]]--
 local function updateMemoryTable()
-	local numAddons = GetNumAddOns()
+	local numAddons = C_AddOns_GetNumAddOns()
 	if numAddons == #memoryTable then return end
 
 	wipe(memoryTable)
 	
 	for i = 1, numAddons do
-		memoryTable[i] = {i, select(2, GetAddOnInfo(i)), 0}
+		memoryTable[i] = {i, select(2, C_AddOns_GetAddOnInfo(i)), 0}
 	end
 end
 
@@ -176,7 +176,7 @@ local function OnEnter(self)
 	for i = 1, #memoryTable do
 		local value = memoryTable[i]
 		
-		if value and IsAddOnLoaded(value[1]) then
+		if value and C_AddOns_IsAddOnLoaded(value[1]) then
 			numEnabled = numEnabled + 1
 			
 			if numEnabled <= maxShown then

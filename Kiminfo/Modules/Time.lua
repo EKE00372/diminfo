@@ -10,7 +10,7 @@ local IsQuestFlaggedCompleted = C_QuestLog.IsQuestFlaggedCompleted
 local C_UIWidgetManager_GetTextWithStateWidgetVisualizationInfo =  C_UIWidgetManager.GetTextWithStateWidgetVisualizationInfo
 local C_MythicPlus_GetRunHistory = C_MythicPlus.GetRunHistory
 local C_ChallengeMode_GetMapUIInfo = C_ChallengeMode.GetMapUIInfo
-
+local C_Spell_GetSpellInfo = F.isNewPatch and C_Spell.GetSpellInfo or GetSpellInfo
 local GetCVarBool = GetCVarBool
 local TIMEMANAGER_TICKER_24HOUR, TIMEMANAGER_TICKER_12HOUR = TIMEMANAGER_TICKER_24HOUR, TIMEMANAGER_TICKER_12HOUR
 
@@ -21,11 +21,11 @@ local WeeklyRunsThreshold = 8
 
 local questList = {
 	-- PLAYER_DIFFICULTY_TIMEWALKER todo
-	{name = GetSpellInfo(388945), id = 70866},	-- SoDK
+	{name = C_Spell_GetSpellInfo(388945), id = 70866},	-- SoDK
 	{name = L.GrandHunts, id = 70906},	-- Grand hunt
-	{name = GetSpellInfo(386441), id = 70893},	-- Community feast
+	{name = C_Spell_GetSpellInfo(386441), id = 70893},	-- Community feast
 	{name = C_TaskQuest.GetQuestInfoByQuestID(79226), id = 79226},	-- The big dig
-	{name = GetSpellInfo(418272), id = 78319},	-- The superbloom
+	{name = C_Spell_GetSpellInfo(418272), id = 78319},	-- The superbloom
 	--70221 工匠精神
 }
 
