@@ -4,7 +4,7 @@ if not C.System then return end
 
 local format, min, max, sort, wipe = format, min, max, sort, wipe
 local CreateFrame = CreateFrame
-local GetNumAddOns, GetAddOnInfo = GetNumAddOns, GetAddOnInfo
+local C_AddOns_GetNumAddOns, C_AddOns_GetAddOnInfo, C_AddOns_IsAddOnLoaded = C_AddOns.GetNumAddOns, C_AddOns.GetAddOnInfo, C_AddOns.IsAddOnLoaded
 local UpdateAddOnCPUUsage, GetAddOnCPUUsage, ResetCPUUsage = UpdateAddOnCPUUsage, GetAddOnCPUUsage, ResetCPUUsage
 
 local r, g, b
@@ -96,12 +96,12 @@ end
 --==================================================--
 
 local function updateUsageTable()
-	local numAddons = GetNumAddOns()
+	local numAddons = C_AddOns_GetNumAddOns()
 	if numAddons == #usageTable then return end
 
 	wipe(usageTable)
 	for i = 1, numAddons do
-		usageTable[i] = {i, select(2, GetAddOnInfo(i)), 0}
+		usageTable[i] = {i, select(2, C_AddOns_GetAddOnInfo(i)), 0}
 	end
 end
 
@@ -187,7 +187,7 @@ local function OnEnter(self)
 			
 			for i = 1, #usageTable do
 				local value = usageTable[i]
-				if value and IsAddOnLoaded(value[1]) then
+				if value and C_AddOns_IsAddOnLoaded(value[1]) then
 					numEnabled = numEnabled + 1
 					if numEnabled <= maxShown then
 						local r = value[3] / totalCPU
