@@ -9,9 +9,6 @@ local GetNumGuildMembers, GetGuildRosterInfo = GetNumGuildMembers, GetGuildRoste
 local GetGuildFactionInfo = GetGuildFactionInfo
 local InviteToGroup = C_PartyInfo.InviteUnit
 
-local C_Reputation_GetGuildFactionInfo
-if F.isNewPatch then C_Reputation_GetGuildFactionInfo =  C_Reputation.GetGuildFactionInfo else C_Reputation_GetGuildFactionInfo = GetGuildFactionInfo end
-
 local LibShowUIPanel = LibStub("LibShowUIPanel-1.0")
 local ShowUIPanel = LibShowUIPanel.ShowUIPanel
 local HideUIPanel = LibShowUIPanel.HideUIPanel
@@ -170,7 +167,7 @@ local function OnEnter(self)
 	local total, online = GetNumGuildMembers()
 	local guildName, guildRank = GetGuildInfo("player")
 	local guildMotD = GetGuildRosterMOTD()
-	local _, _, standingID, barMin, barMax, barValue = C_Reputation_GetGuildFactionInfo()
+	
 	
 	-- Get table
 	BuildGuildTable()
@@ -185,11 +182,28 @@ local function OnEnter(self)
 	tooltip:AddLine(GUILD)
 	tooltip:AddLine(G.OptionColor..RANK, G.OptionColor..guildRank)
 
-	-- Guild reputation
-	if standingID == 8 then
-		tooltip:AddLine(G.OptionColor..REPUTATION, G.OptionColor.._G["FACTION_STANDING_LABEL"..8])
+	if F.isNewPatch then
+		local GetGuildFactionInfo = C_Reputation.GetGuildFactionData()
+		local standingID = GetGuildFactionInfo.reaction
+		local barMax = GetGuildFactionInfo.nextReactionThreshold
+		local barMin = GetGuildFactionInfo.currentReactionThreshold
+		local barValue = GetGuildFactionInfo.currentStanding
+		
+		-- Guild reputation
+		if standingID == 8 then
+			tooltip:AddLine(G.OptionColor..REPUTATION, G.OptionColor.._G["FACTION_STANDING_LABEL"..8])
+		else
+			tooltip:AddLine(G.OptionColor..REPUTATION, G.OptionColor.._G["FACTION_STANDING_LABEL"..standingID].." " ..(format("%.3f", (barValue/barMax))*100).."%")
+		end
+	
 	else
-		tooltip:AddLine(G.OptionColor..REPUTATION, G.OptionColor.._G["FACTION_STANDING_LABEL"..standingID].." " ..(format("%.3f", (barValue/barMax))*100).."%")
+		local _, _, standingID, barMin, barMax, barValue = GetGuildFactionInfo()
+		-- Guild reputation
+		if standingID == 8 then
+			tooltip:AddLine(G.OptionColor..REPUTATION, G.OptionColor.._G["FACTION_STANDING_LABEL"..8])
+		else
+			tooltip:AddLine(G.OptionColor..REPUTATION, G.OptionColor.._G["FACTION_STANDING_LABEL"..standingID].." " ..(format("%.3f", (barValue/barMax))*100).."%")
+		end
 	end
 	
 	-- Guild daily info
