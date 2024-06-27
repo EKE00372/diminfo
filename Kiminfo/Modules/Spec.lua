@@ -13,6 +13,7 @@ local SetLootSpecialization, SetSpecialization = SetLootSpecialization, SetSpeci
 local GetTalentInfo, GetPvpTalentInfoByID = GetTalentInfo, GetPvpTalentInfoByID
 local C_SpecializationInfo_CanPlayerUsePVPTalentUI = C_SpecializationInfo.CanPlayerUsePVPTalentUI
 local C_SpecializationInfo_GetAllSelectedPvpTalentIDs = C_SpecializationInfo.GetAllSelectedPvpTalentIDs
+local C_Spell_GetSpellInfo = F.isNewPatch and C_Spell.GetSpellInfo or GetSpellInfo
 
 local pvpTalents, SpecIndex, LootIndex, newMenu, numSpecs, numLocal
 local pvpTexture = C_CurrencyInfo.GetCurrencyInfo(104).iconFileID
@@ -40,6 +41,7 @@ local Text  = Stat:CreateFontString(nil, "OVERLAY")
 --================================================--
 ---------------    [[ feature ]]     ---------------
 --================================================--
+
 
 --[[ Right-click menu ]]--
 
@@ -140,6 +142,7 @@ local seperatorMenu = {
 
 -- Build menu
 local function BuildSpecMenu()
+	if F.isNewPatch then return end
 	if newMenu then return end
 	
 	-- Build menu
@@ -162,7 +165,7 @@ local function BuildSpecMenu()
 	
 	-- Build talent menu
 	tinsert(newMenu, seperatorMenu)
-	tinsert(newMenu, {text = GetSpellInfo(384255), isTitle = true, notCheckable = true})
+	tinsert(newMenu, {text = C_Spell_GetSpellInfo(384255), isTitle = true, notCheckable = true})
 	tinsert(newMenu, {text = BLUE_FONT_COLOR:WrapTextInColorCode(TALENT_FRAME_DROP_DOWN_STARTER_BUILD), func = selectCurrentConfig,
 		arg1 = STARTER_BUILD,	checked = function() return C_ClassTalents.GetStarterBuildActive() end,
 	})
@@ -289,11 +292,18 @@ end
 		GameTooltip:Hide()
 		
 		if button == "RightButton" then
-			BuildSpecMenu()
-			EasyMenu(newMenu, SpecMenuFrame, "cursor", 0, 0, "MENU", 3)
+			if not F.isNewPatch then 
+				BuildSpecMenu()
+				EasyMenu(newMenu, SpecMenuFrame, "cursor", 0, 0, "MENU", 3)
+			end
 		elseif button == "LeftButton" then
-			if not ClassTalentFrame then LoadAddOn("Blizzard_ClassTalentUI") end
-			if not ClassTalentFrame:IsShown() then ShowUIPanel(ClassTalentFrame) else HideUIPanel(ClassTalentFrame) end
+			if F.isNewPatch then
+				if not PlayerSpellsFrame then C_AddOns.LoadAddOn("Blizzard_PlayerSpells") end
+				if not PlayerSpellsFrame:IsShown() then ShowUIPanel(PlayerSpellsFrame) else HideUIPanel(PlayerSpellsFrame) end
+			else
+				if not ClassTalentFrame then C_AddOns.LoadAddOn("Blizzard_ClassTalentUI") end
+				if not ClassTalentFrame:IsShown() then ShowUIPanel(ClassTalentFrame) else HideUIPanel(ClassTalentFrame) end
+			end
 		else
 			return
 		end
