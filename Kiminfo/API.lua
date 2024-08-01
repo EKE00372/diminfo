@@ -7,7 +7,7 @@ local CreateFrame = CreateFrame
 local CreateColor = CreateColor
 
 -- multi version support prepare
-F.isNewPatch = select(4, GetBuildInfo()) >= 110000
+--F.isNewPatch = select(4, GetBuildInfo()) >= 110000
 
 --================================================--
 ---------------    [[ Convert ]]     ---------------
