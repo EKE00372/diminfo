@@ -102,8 +102,8 @@ local function OnEnter(self)
 	-- Bag slot
 	GameTooltip:AddLine(G.OptionColor..BAGSLOT)
 	GameTooltip:AddDoubleLine(USE, used, 1, 1, 1, 1, 1, 1)
-	GameTooltip:AddDoubleLine(MONEY, GetMoneyString(money).." ", 1, 1, 1, 1, 1, 1)
-	GameTooltip:AddDoubleLine(TOKEN_FILTER_LABEL, (tokenMoney > 0 and GetMoneyString(tokenMoney)) or UNAVAILABLE.." ", 1, 1, 1, 1, 1, 1)
+	GameTooltip:AddDoubleLine(MONEY, GetMoneyString(money), 1, 1, 1, 1, 1, 1)
+	GameTooltip:AddDoubleLine(TOKEN_FILTER_LABEL, (tokenMoney > 0 and GetMoneyString(tokenMoney)) or UNAVAILABLE, 1, 1, 1, 1, 1, 1)
 	
 	-- Currency
 	for i = 1, 10 do

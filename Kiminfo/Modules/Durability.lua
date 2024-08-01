@@ -172,7 +172,7 @@ end
 			Kiminfo.AutoRepair = not Kiminfo.AutoRepair
 			OnEnter(self)
 		elseif button == "LeftButton" then
-			if not CharacterFrame:IsShown() then ShowUIPanel(CharacterFrame) else HideUIPanel(CharacterFrame) end
+			if not CharacterFrame:IsShown() then ShowUIPanel(CharacterFrame) CharacterFrameTab2:Click() CharacterFrameTab1:Click() else HideUIPanel(CharacterFrame) end
 		else
 			return
 		end
