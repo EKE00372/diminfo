@@ -2,26 +2,24 @@ local addon, ns = ...
 local C, F, G, L = unpack(ns)
 if not C.Spec then return end
 
-local format, min, max, sort, wipe = format, min, max, sort, wipe
-local SPECIALIZATION, TALENTS_BUTTON = SPECIALIZATION, TALENTS_BUTTON
+local format, wipe = string.format, table.wipe
+local TALENTS, SPECIALIZATION, TALENTS_BUTTON = TALENTS, SPECIALIZATION, TALENTS_BUTTON
 local PVP_TALENTS, LOOT_SPECIALIZATION_DEFAULT = PVP_TALENTS, LOOT_SPECIALIZATION_DEFAULT
 
 local CreateFrame = CreateFrame
 local GetSpecialization, GetSpecializationInfo = GetSpecialization, GetSpecializationInfo
 local GetLootSpecialization, GetSpecializationInfoByID = GetLootSpecialization, GetSpecializationInfoByID
 local SetLootSpecialization, SetSpecialization = SetLootSpecialization, SetSpecialization
-local GetTalentInfo, GetPvpTalentInfoByID = GetTalentInfo, GetPvpTalentInfoByID
+local GetPvpTalentInfoByID = GetPvpTalentInfoByID
 local C_SpecializationInfo_CanPlayerUsePVPTalentUI = C_SpecializationInfo.CanPlayerUsePVPTalentUI
 local C_SpecializationInfo_GetAllSelectedPvpTalentIDs = C_SpecializationInfo.GetAllSelectedPvpTalentIDs
 local C_Spell_GetSpellInfo = C_Spell.GetSpellInfo
+local STARTER_BUILD = Constants.TraitConsts.STARTER_BUILD_TRAIT_CONFIG_ID
 
 local pvpTalents, SpecIndex, LootIndex, newMenu, numSpecs, numLocal
 local pvpTexture = C_CurrencyInfo.GetCurrencyInfo(104).iconFileID
 
 local LibEasyMenu = LibStub:GetLibrary("LibEasyMenu")
-local LibShowUIPanel = LibStub("LibShowUIPanel-1.0")
-local ShowUIPanel = LibShowUIPanel.ShowUIPanel
-local HideUIPanel = LibShowUIPanel.HideUIPanel
 
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
@@ -82,7 +80,6 @@ end
 -- Select talent
 local function selectCurrentConfig(_, configID, specID)
 	if InCombatLockdown() then UIErrorsFrame:AddMessage(DB.InfoColor..ERR_NOT_IN_COMBAT) return end
-	if not ClassTalentFrame then LoadAddOn("Blizzard_ClassTalentUI") end
 	if configID == STARTER_BUILD then
 		C_ClassTalents.SetStarterBuildActive(true)
 	else
@@ -235,7 +232,7 @@ local function OnEnter(self)
 	
 	-- PvP telent
 	if C_SpecializationInfo_CanPlayerUsePVPTalentUI() then
-		pvpTalents = C_SpecializationInfo.GetAllSelectedPvpTalentIDs()
+		pvpTalents = C_SpecializationInfo_GetAllSelectedPvpTalentIDs()
 		
 		if #pvpTalents > 0 then
 			-- PvP title
@@ -296,7 +293,7 @@ end
 			LibEasyMenu:EasyMenu(newMenu, SpecMenuFrame, "cursor", 0, 0, "MENU", 3)
 		elseif button == "LeftButton" then
 			if not PlayerSpellsFrame then C_AddOns.LoadAddOn("Blizzard_PlayerSpells") end
-			if not PlayerSpellsFrame:IsShown() then ShowUIPanel(PlayerSpellsFrame) else HideUIPanel(PlayerSpellsFrame) end
+			PlayerSpellsUtil.ToggleClassTalentOrSpecFrame()
 		else
 			return
 		end

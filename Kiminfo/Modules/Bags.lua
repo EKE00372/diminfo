@@ -6,12 +6,11 @@ local format = format
 local CreateFrame = CreateFrame
 local C_Timer_NewTicker = C_Timer.NewTicker
 
-local C_CurrencyInfo_GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo
-local C_CurrencyInfo_GetBackpackCurrencyInfo = C_CurrencyInfo.GetBackpackCurrencyInfo
-
-local GetContainerNumFreeSlots, GetContainerNumSlots = C_Container.GetContainerNumFreeSlots, C_Container.GetContainerNumSlots
-local UseContainerItem, GetContainerItemInfo = C_Container.UseContainerItem, C_Container.GetContainerItemInfo
-local GetContainerItemEquipmentSetInfo = C_Container.GetContainerItemEquipmentSetInfo
+local C_CurrencyInfo_GetCurrencyInfo, C_CurrencyInfo_GetBackpackCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo, C_CurrencyInfo.GetBackpackCurrencyInfo
+local C_WowTokenPublic_UpdateMarketPrice, C_WowTokenPublic_GetCurrentMarketPrice = C_WowTokenPublic.UpdateMarketPrice, C_WowTokenPublic.GetCurrentMarketPrice
+local C_Container_GetContainerNumFreeSlots, C_Container_GetContainerNumSlots = C_Container.GetContainerNumFreeSlots, C_Container.GetContainerNumSlots
+local C_Container_UseContainerItem, C_Container_GetContainerItemInfo = C_Container.UseContainerItem, C_Container.GetContainerItemInfo
+local C_Container_GetContainerItemEquipmentSetInfo = C_Container.GetContainerItemEquipmentSetInfo
 
 local LibShowUIPanel = LibStub("LibShowUIPanel-1.0")
 local ShowUIPanel = LibShowUIPanel.ShowUIPanel
@@ -49,11 +48,11 @@ local function getBagSlots()
 	local free, total, used = 0, 0, 0
 	
 	for i = 0, NUM_BAG_SLOTS do
-		free, total = free + GetContainerNumFreeSlots(i), total + GetContainerNumSlots(i)
+		free, total = free + C_Container_GetContainerNumFreeSlots(i), total + C_Container_GetContainerNumSlots(i)
 	end
 	used = total - free
 	
-	return free, total, used	
+	return free, total, used
 end
 
 --[[ GetCurrencyInfo ]]--
@@ -81,17 +80,17 @@ local function OnEvent(self)
 	Text:SetText(free)
 	self:SetAllPoints(Text)
 	
-	-- Update when login
-	C_WowTokenPublic.UpdateMarketPrice()
-	-- Update every 3 min
-	C_Timer_NewTicker(180, function () C_WowTokenPublic.UpdateMarketPrice() end)
+	-- Update token price when login
+	C_WowTokenPublic_UpdateMarketPrice()
+	-- Update token price every 3 min
+	C_Timer_NewTicker(180, function () C_WowTokenPublic_UpdateMarketPrice() end)
 end
 
 --[[ Tooltip update ]]--
 local function OnEnter(self)
 	local free, total, used = getBagSlots()
 	local money = GetMoney()
-	local tokenMoney = C_WowTokenPublic.GetCurrentMarketPrice() or 0
+	local tokenMoney = C_WowTokenPublic_GetCurrentMarketPrice() or 0
 	
 	-- Title
 	GameTooltip:SetOwner(self, C.StickTop and "ANCHOR_BOTTOM" or "ANCHOR_TOP", 0, C.StickTop and -10 or 10)
@@ -99,7 +98,7 @@ local function OnEnter(self)
 	GameTooltip:AddDoubleLine(BAGSLOT, free.."/"..total, 0, .6, 1, 0, .6, 1)
 	GameTooltip:AddLine(" ")
 	
-	-- Bag slot
+	-- Bag slot and money
 	GameTooltip:AddLine(G.OptionColor..BAGSLOT)
 	GameTooltip:AddDoubleLine(USE, used, 1, 1, 1, 1, 1, 1)
 	GameTooltip:AddDoubleLine(MONEY, GetMoneyString(money), 1, 1, 1, 1, 1, 1)
@@ -128,6 +127,7 @@ local function OnEnter(self)
 		end
 	end
 	
+	-- Tier charge
 	local chargeInfo = C_CurrencyInfo_GetCurrencyInfo(2912) -- S4
 	if chargeInfo then
 		if GetNumWatchedTokens() < 1 then GameTooltip:AddLine(" ") end
@@ -194,17 +194,17 @@ local sellGray = CreateFrame("Frame")
 			local c = 0
 			
 			for bag = 0, 4 do
-				for slot = 1, GetContainerNumSlots(bag) do
-					local info = GetContainerItemInfo(bag, slot)
+				for slot = 1, C_Container_GetContainerNumSlots(bag) do
+					local info = C_Container_GetContainerItemInfo(bag, slot)
 					if info then
 						local count, quality, link, noValue, itemID = info.stackCount, info.quality, info.hyperlink, info.hasNoValue, info.itemID
-						local isInSet = GetContainerItemEquipmentSetInfo(bag, slot)
+						local isInSet = C_Container_GetContainerItemEquipmentSetInfo(bag, slot)
 						
 						if link and not noValue and not isInSet and quality == 0 then
 							local price = select(11, GetItemInfo(link)) * count
 						
 							if price > 0 then
-								UseContainerItem(bag, slot)
+								C_Container_UseContainerItem(bag, slot)
 								c = c + price
 							end
 						end

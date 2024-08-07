@@ -6,7 +6,7 @@ local LibQTip = LibStub('LibQTip-1.0')
 local format, sort, wipe, Ambiguate = format, sort, wipe, Ambiguate
 local CreateFrame = CreateFrame
 local GetNumGuildMembers, GetGuildRosterInfo = GetNumGuildMembers, GetGuildRosterInfo
-local InviteToGroup = C_PartyInfo.InviteUnit
+local C_Reputation_GetGuildFactionData, C_PartyInfo_InviteUnit = C_Reputation.GetGuildFactionData, C_PartyInfo.InviteUnit
 
 local LibShowUIPanel = LibStub("LibShowUIPanel-1.0")
 local ShowUIPanel = LibShowUIPanel.ShowUIPanel
@@ -105,7 +105,7 @@ end
 --[[ Click function ]]--
 local function buttonOnClick(self, name, btn)
 	if btn == "LeftButton" and IsShiftKeyDown() then
-		InviteToGroup(name)
+		C_PartyInfo_InviteUnit(name)
 	elseif btn == "MiddleButton" then
 		ChatFrame_OpenChat("/w "..name.." ", SELECTED_DOCK_FRAME)
 	else
@@ -180,7 +180,7 @@ local function OnEnter(self)
 	tooltip:AddLine(GUILD)
 	tooltip:AddLine(G.OptionColor..RANK, G.OptionColor..guildRank)
 
-	local GetGuildFactionInfo = C_Reputation.GetGuildFactionData()
+	local GetGuildFactionInfo = C_Reputation_GetGuildFactionData()
 	local standingID = GetGuildFactionInfo.reaction
 	local barMax = GetGuildFactionInfo.nextReactionThreshold
 	local barMin = GetGuildFactionInfo.currentReactionThreshold

@@ -2,16 +2,15 @@ local addon, ns = ...
 local C, F, G, L = unpack(ns)
 if not C.Time then return end
 
-local format, time, date = string.format, time, date
-local C_Calendar_GetNumPendingInvites = C_Calendar.GetNumPendingInvites
-local C_DateAndTime_GetCurrentCalendarTime = C_DateAndTime.GetCurrentCalendarTime
+local format, date = string.format, date
+local CreateFrame = CreateFrame
+local C_DateAndTime_GetCurrentCalendarTime, C_Calendar_GetNumPendingInvites = C_DateAndTime.GetCurrentCalendarTime, C_Calendar.GetNumPendingInvites
 local C_AreaPoiInfo_GetAreaPOIInfo = C_AreaPoiInfo.GetAreaPOIInfo
-local IsQuestFlaggedCompleted = C_QuestLog.IsQuestFlaggedCompleted
+local C_QuestLog_IsQuestFlaggedCompleted = C_QuestLog.IsQuestFlaggedCompleted
 local C_UIWidgetManager_GetTextWithStateWidgetVisualizationInfo =  C_UIWidgetManager.GetTextWithStateWidgetVisualizationInfo
-local C_MythicPlus_GetRunHistory = C_MythicPlus.GetRunHistory
-local C_ChallengeMode_GetMapUIInfo = C_ChallengeMode.GetMapUIInfo
-local C_Spell_GetSpellInfo = F.isNewPatch and C_Spell.GetSpellInfo or GetSpellInfo
-local GetCVarBool = GetCVarBool
+local C_MythicPlus_GetRunHistory, C_ChallengeMode_GetMapUIInfo = C_MythicPlus.GetRunHistory, C_ChallengeMode.GetMapUIInfo
+local C_CVar_GetCVarBool, C_Spell_GetSpellName = C_CVar.GetCVarBool, C_Spell.GetSpellName
+local GetSavedInstanceInfo, GetSavedWorldBossInfo = GetSavedInstanceInfo, GetSavedWorldBossInfo
 local TIMEMANAGER_TICKER_24HOUR, TIMEMANAGER_TICKER_12HOUR = TIMEMANAGER_TICKER_24HOUR, TIMEMANAGER_TICKER_12HOUR
 
 local LibShowUIPanel = LibStub("LibShowUIPanel-1.0")
@@ -19,17 +18,29 @@ local ShowUIPanel = LibShowUIPanel.ShowUIPanel
 local HideUIPanel = LibShowUIPanel.HideUIPanel
 local WeeklyRunsThreshold = 8
 
+--[[ Weekly chest item link ]] --
+local itemCache = {}
+local function GetItemLink(itemID)
+	local link = itemCache[itemID]
+	if not link then
+		link = select(2, C_Item.GetItemInfo(itemID))
+		itemCache[itemID] = link
+	end
+	return link
+end
+
+--[[ Weekly quest ]] --
 local questList = {
 	-- PLAYER_DIFFICULTY_TIMEWALKER todo
-	{name = C_Spell_GetSpellInfo(388945), id = 70866},	-- SoDK
-	{name = L.GrandHunts, id = 70906},	-- Grand hunt
-	{name = C_Spell_GetSpellInfo(386441), id = 70893},	-- Community feast
-	{name = C_TaskQuest.GetQuestInfoByQuestID(79226), id = 79226},	-- The big dig
-	{name = C_Spell_GetSpellInfo(418272), id = 78319},	-- The superbloom
+	{name = C_Spell_GetSpellName(388945), id = 70866},	-- SoDK
+	{name = GetItemLink(200468), id = 70906},	-- Grand hunt
+	{name = C_Spell_GetSpellName(386441), id = 70893},	-- Community feast
+	{name = QuestUtils_GetQuestName(79226), id = 79226},	-- The big dig
+	{name = C_Spell_GetSpellName(418272), id = 78319},	-- The superbloom
 	--70221 工匠精神
 }
 
--- Torghast
+--[[ Torghast ]]--
 local TorghastWidgets, TorghastInfo = {
 	{nameID = 2925, levelID = 2930}, -- Fracture Chambers
 	{nameID = 2926, levelID = 2932}, -- Skoldus Hall
@@ -39,7 +50,7 @@ local TorghastWidgets, TorghastInfo = {
 	{nameID = 2929, levelID = 2940}, -- The Upper Reaches
 }
 
--- Fuckking blizzard make the name on tooltip wrap like shit
+-- Torghast fix: Fuckking blizzard make the name on tooltip wrap like shit
 local function CleanupLevelName(text)
 	return gsub(text, "|n", "")
 end
@@ -66,7 +77,7 @@ local Text  = Stat:CreateFontString(nil, "OVERLAY")
 
 --[[ Format 24/12 hour clock ]]--
 local function updateTimerFormat(hour, minute)
-	if GetCVarBool("timeMgrUseMilitaryTime") then
+	if C_CVar_GetCVarBool("timeMgrUseMilitaryTime") then
 		return format(TIMEMANAGER_TICKER_24HOUR, hour, minute)
 	else
 		local timerUnit = hour < 12 and " AM" or " PM"
@@ -87,17 +98,6 @@ local function addTitle(text)
 		GameTooltip:AddLine(text, .6, .8, 1)
 		title = true
 	end
-end
-
---[[ Weekly chest item link ]] --
-local itemCache = {}
-local function GetItemLink(itemID)
-	local link = itemCache[itemID]
-	if not link then
-		link = select(2, GetItemInfo(itemID))
-		itemCache[itemID] = link
-	end
-	return link
 end
 
 --[[ Mythic+ run history sort order ]]--
@@ -161,12 +161,12 @@ local function OnEnter(self)
 	GameTooltip:AddDoubleLine(TIMEMANAGER_TOOLTIP_REALMTIME, GameTime_GetGameTime(true), .6, .8, 1, 1, 1, 1)
 	
 	-- Mythic+ and Weekly chest quest only on max level
-	if UnitLevel("player") == MAX_PLAYER_LEVEL then
+	if UnitLevel("player") == GetMaxLevelForLatestExpansion() then
 		-- Quests
 		title = false
 		for _, v in pairs(questList) do
 			addTitle(WEEKLY)
-			if v.name and IsQuestFlaggedCompleted(v.id) then
+			if v.name and C_QuestLog_IsQuestFlaggedCompleted(v.id) then
 				GameTooltip:AddDoubleLine(v.name, COMPLETE, 1, 1, 1, .3, 1, .3)
 			else
 				GameTooltip:AddDoubleLine(v.name, INCOMPLETE, 1, 1, 1, 1, .3, .3)
@@ -177,6 +177,7 @@ local function OnEnter(self)
 		title = false
 		local runHistory = C_MythicPlus_GetRunHistory(false, true)
 		local numRuns = runHistory and #runHistory
+		
 		if numRuns > 0 then
 			GameTooltip:AddLine(" ")
 			GameTooltip:AddDoubleLine(format(WEEKLY_REWARDS_MYTHIC_TOP_RUNS, WeeklyRunsThreshold), "("..numRuns..")", .6, .8, 1)
@@ -247,7 +248,7 @@ local function OnEnter(self)
 	if not TorghastInfo then
 		TorghastInfo = C_AreaPoiInfo_GetAreaPOIInfo(1543, 6640)
 	end
-	if TorghastInfo and IsQuestFlaggedCompleted(60136) then
+	if TorghastInfo and C_QuestLog_IsQuestFlaggedCompleted(60136) then
 		title = false
 		for _, value in pairs(TorghastWidgets) do
 			local nameInfo = C_UIWidgetManager_GetTextWithStateWidgetVisualizationInfo(value.nameID)
