@@ -2,17 +2,17 @@ local addon, ns = ...
 local C, F, G, L = unpack(ns)
 if not C.Positions then return end
 
-local format = format
+local format, unpack = string.format, unpack
 local CreateFrame = CreateFrame
 local C_Map_GetWorldPosFromMapPos, C_Map_GetBestMapForUnit = C_Map.GetWorldPosFromMapPos, C_Map.GetBestMapForUnit
-local GetZonePVPInfo = C_PvP and C_PvP.GetZonePVPInfo or GetZonePVPInfo
+local C_PvP_GetZonePVPInfo = C_PvP.GetZonePVPInfo
+local GetSubZoneText, GetZoneText = GetSubZoneText, GetZoneText
 local LibShowUIPanel = LibStub("LibShowUIPanel-1.0")
 local ShowUIPanel = LibShowUIPanel.ShowUIPanel
 local HideUIPanel = LibShowUIPanel.HideUIPanel
 
-local subzone, zone, pvp
+local subzone, zone, pvpType, faction
 local coordX, coordY = 0, 0
-local mapRects = {}
 
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
@@ -50,6 +50,7 @@ local function formatCoords()
 end
 
 --[[ Get XY ]]--
+local mapRects = {}
 local tempVec2D = CreateVector2D(0, 0)
 local function GetPlayerMapPos(mapID)
 	tempVec2D.x, tempVec2D.y = UnitPosition("player")
@@ -93,7 +94,7 @@ end
 
 local function OnEvent(self)
 	subzone, zone =  GetSubZoneText(), GetZoneText()
-	pvpType, _, faction = GetZonePVPInfo()
+	pvpType, _, faction = C_PvP_GetZonePVPInfo()
 	pvpType = pvpType or "neutral"
 	
 	local r, g, b = unpack(zoneColor[pvpType][2])
