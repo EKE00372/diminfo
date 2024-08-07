@@ -7,9 +7,9 @@
 ## Notes-zhTW: 小巧資訊條。
 ## Notes-zhCN: 轻量级信息条。
 ## IconTexture: "Interface\\Buttons\\WHITE8x8"
-## Version: R5.2
+## Version: R5.3
 ## SavedVariables: Kiminfo
-## X-Credits: Tukz, Loshine, Siweia, HopeASD, Peter
+## X-Credits: Tukz, Loshine, Siweia, HopeASD, Peter, Rhythm
 
 Libs\Libs.xml
 Libs\TaintLess.xml

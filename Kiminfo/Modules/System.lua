@@ -2,7 +2,7 @@
 local C, F, G, L = unpack(ns)
 if not C.System then return end
 
-local format, min, max, sort, wipe = format, min, max, sort, wipe
+local format, min, max, sort, wipe = string.format, min, max, sort, table.wipe
 local CreateFrame = CreateFrame
 local C_AddOns_GetNumAddOns, C_AddOns_GetAddOnInfo, C_AddOns_IsAddOnLoaded = C_AddOns.GetNumAddOns, C_AddOns.GetAddOnInfo, C_AddOns.IsAddOnLoaded
 local UpdateAddOnCPUUsage, GetAddOnCPUUsage, ResetCPUUsage = UpdateAddOnCPUUsage, GetAddOnCPUUsage, ResetCPUUsage
