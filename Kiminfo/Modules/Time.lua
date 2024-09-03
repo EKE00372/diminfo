@@ -32,11 +32,11 @@ end
 --[[ Weekly quest ]] --
 local questList = {
 	-- PLAYER_DIFFICULTY_TIMEWALKER todo
-	{name = C_Spell_GetSpellName(388945), id = 70866},	-- SoDK
+	{name = C_Spell.GetSpellName(388945), id = 70866},	-- SoDK
 	{name = GetItemLink(200468), id = 70906},	-- Grand hunt
-	{name = C_Spell_GetSpellName(386441), id = 70893},	-- Community feast
+	{name = C_Spell.GetSpellName(386441), id = 70893},	-- Community feast
 	{name = QuestUtils_GetQuestName(79226), id = 79226},	-- The big dig
-	{name = C_Spell_GetSpellName(418272), id = 78319},	-- The superbloom
+	{name = C_Spell.GetSpellName(418272), id = 78319},	-- The superbloom
 	--70221 工匠精神
 }
 
