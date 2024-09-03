@@ -173,8 +173,12 @@ local function OnEnter(self)
 	if UnitLevel("player") == GetMaxLevelForLatestExpansion() then
 		-- Quests
 		title = false
-		for _, v in pairs(TWWQuestList) do
-			addTitle(WEEKLY)
+		local questList = IsShiftKeyDown() and DFQuestList or TWWQuestList
+		local weeklyTitle = IsShiftKeyDown() and EXPANSION_NAME9 or WEEKLY
+		
+		for _, v in pairs(questList) do
+			--addTitle(WEEKLY)
+			addTitle(weeklyTitle)
 			if v.name and C_QuestLog_IsQuestFlaggedCompleted(v.id) then
 				GameTooltip:AddDoubleLine(v.name, COMPLETE, 1, 1, 1, .3, 1, .3)
 			else
