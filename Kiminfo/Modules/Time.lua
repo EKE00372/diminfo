@@ -30,17 +30,25 @@ local function GetItemLink(itemID)
 end
 
 --[[ Weekly quest ]] --
-local questList = {
+local DFQuestList = {
 	-- PLAYER_DIFFICULTY_TIMEWALKER todo
 	{name = C_Spell_GetSpellName(388945), id = 70866},	-- SoDK
-	{name = GetItemLink(200468), id = 70906},	-- Grand hunt
+	{name = L.GrandHunts, id = 70906},	-- Grand hunt
 	{name = C_Spell_GetSpellName(386441), id = 70893},	-- Community feast
-	{name = QuestUtils_GetQuestName(79226), id = 79226},	-- The big dig
+	{name = QuestUtils_GetQuestName(79226), id = 79226},-- The big dig
 	{name = C_Spell_GetSpellName(418272), id = 78319},	-- The superbloom
 	--70221 工匠精神
 }
 
+local TWWQuestList = {
+	{name = QuestUtils_GetQuestName(83240), id = 83240},-- 劇團
+	{name = C_Map.GetAreaInfo(15141), id = 83333},-- 甦醒機械
+	{name = QuestUtils_GetQuestName(82946), id = 82946},-- 蠟塊
+	{name = QuestUtils_GetQuestName(76586), id = 76586},-- 散布光芒
+}
+
 --[[ Torghast ]]--
+--[[
 local TorghastWidgets, TorghastInfo = {
 	{nameID = 2925, levelID = 2930}, -- Fracture Chambers
 	{nameID = 2926, levelID = 2932}, -- Skoldus Hall
@@ -49,6 +57,7 @@ local TorghastWidgets, TorghastInfo = {
 	{nameID = 2928, levelID = 2938}, -- Mort'regar
 	{nameID = 2929, levelID = 2940}, -- The Upper Reaches
 }
+]]--
 
 -- Torghast fix: Fuckking blizzard make the name on tooltip wrap like shit
 local function CleanupLevelName(text)
@@ -164,7 +173,7 @@ local function OnEnter(self)
 	if UnitLevel("player") == GetMaxLevelForLatestExpansion() then
 		-- Quests
 		title = false
-		for _, v in pairs(questList) do
+		for _, v in pairs(TWWQuestList) do
 			addTitle(WEEKLY)
 			if v.name and C_QuestLog_IsQuestFlaggedCompleted(v.id) then
 				GameTooltip:AddDoubleLine(v.name, COMPLETE, 1, 1, 1, .3, 1, .3)
@@ -245,7 +254,7 @@ local function OnEnter(self)
 	end
 	
 	-- Torghast
-	if not TorghastInfo then
+	--[[if not TorghastInfo then
 		TorghastInfo = C_AreaPoiInfo_GetAreaPOIInfo(1543, 6640)
 	end
 	if TorghastInfo and C_QuestLog_IsQuestFlaggedCompleted(60136) then
@@ -263,7 +272,7 @@ local function OnEnter(self)
 				GameTooltip:AddDoubleLine(nameText, levelText, 1, 1, 1, 1, 1, 1)
 			end
 		end
-	end
+	end]]--
 
 	GameTooltip:AddDoubleLine(" ", G.Line)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..RATED_PVP_WEEKLY_VAULT..G.MiddleButton)
