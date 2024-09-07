@@ -18,7 +18,7 @@ local ShowUIPanel = LibShowUIPanel.ShowUIPanel
 local HideUIPanel = LibShowUIPanel.HideUIPanel
 local WeeklyRunsThreshold = 8
 
---[[ Weekly chest item link ]] --
+--[[ Cahce ]] --
 local itemCache = {}
 local function GetItemLink(itemID)
 	local link = itemCache[itemID]
@@ -29,23 +29,17 @@ local function GetItemLink(itemID)
 	return link
 end
 
---[[ Weekly quest ]] --
-local DFQuestList = {
-	-- PLAYER_DIFFICULTY_TIMEWALKER todo
-	{name = C_Spell_GetSpellName(388945), id = 70866},	-- SoDK
-	{name = L.GrandHunts, id = 70906},	-- Grand hunt
-	{name = C_Spell_GetSpellName(386441), id = 70893},	-- Community feast
-	{name = QuestUtils_GetQuestName(79226), id = 79226},-- The big dig
-	{name = C_Spell_GetSpellName(418272), id = 78319},	-- The superbloom
-	--70221 工匠精神
-}
-
-local TWWQuestList = {
-	{name = QuestUtils_GetQuestName(83240), id = 83240},-- 劇團
-	{name = C_Map.GetAreaInfo(15141), id = 83333},-- 甦醒機械
-	{name = QuestUtils_GetQuestName(82946), id = 82946},-- 蠟塊
-	{name = QuestUtils_GetQuestName(76586), id = 76586},-- 散布光芒
-}
+local function cacheIDs()
+	C_Spell.RequestLoadSpellData(388945)
+	C_Item.RequestLoadItemDataByID(200468)
+	C_Spell.RequestLoadSpellData(386441)
+	C_TaskQuest.RequestPreloadRewardData(79226)
+	C_Spell.RequestLoadSpellData(418272)
+	C_TaskQuest.RequestPreloadRewardData(83240)
+	--C_Map.GetAreaInfo(15141)
+	C_TaskQuest.RequestPreloadRewardData(82946)
+	C_TaskQuest.RequestPreloadRewardData(76586)
+end
 
 --[[ Torghast ]]--
 --[[
@@ -57,13 +51,30 @@ local TorghastWidgets, TorghastInfo = {
 	{nameID = 2928, levelID = 2938}, -- Mort'regar
 	{nameID = 2929, levelID = 2940}, -- The Upper Reaches
 }
-]]--
 
 -- Torghast fix: Fuckking blizzard make the name on tooltip wrap like shit
 local function CleanupLevelName(text)
 	return gsub(text, "|n", "")
 end
+]]--
 
+--[[ Weekly quest ]] --
+local DFQuestList = {
+	-- PLAYER_DIFFICULTY_TIMEWALKER todo
+	{name = C_Spell_GetSpellName(388945), id = 70866},	-- SoDK
+	{name = "", id = 70906, itemID = 200468},	-- Grand hunt
+	{name = C_Spell_GetSpellName(386441), id = 70893},	-- Community feast
+	{name = "", id = 79226, questName = true},-- The big dig
+	{name = C_Spell_GetSpellName(418272), id = 78319},	-- The superbloom
+	--70221 工匠精神
+}
+
+local TWWQuestList = {
+	{name = "", id = 83240, questName = true},-- 劇團
+	{name = C_Map.GetAreaInfo(15141), id = 83333},-- 甦醒機械
+	{name = "", id = 82946, questName = true},-- 蠟塊
+	{name = "", id = 76586, questName = true},-- 散布光芒
+}
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
 --=================================================--
@@ -123,6 +134,8 @@ end
 --================================================--
 
 local function OnEvent(self)
+	C_Timer.After(3, cacheIDs)
+
 	local r, g, b
 	if C_Calendar_GetNumPendingInvites() > 0 then 
 		r, g, b = .57, 1, .57
@@ -155,7 +168,7 @@ end
 local function OnEnter(self)
 	-- 獲取進度
 	RequestRaidInfo()
-	
+
 	local today = C_DateAndTime_GetCurrentCalendarTime()
 	local w, m, d, y = today.weekday, today.month, today.monthDay, today.year
 	
@@ -175,14 +188,14 @@ local function OnEnter(self)
 		title = false
 		local questList = IsShiftKeyDown() and DFQuestList or TWWQuestList
 		local weeklyTitle = IsShiftKeyDown() and EXPANSION_NAME9 or WEEKLY
-		
+
 		for _, v in pairs(questList) do
 			--addTitle(WEEKLY)
 			addTitle(weeklyTitle)
 			if v.name and C_QuestLog_IsQuestFlaggedCompleted(v.id) then
-				GameTooltip:AddDoubleLine(v.name, COMPLETE, 1, 1, 1, .3, 1, .3)
+				GameTooltip:AddDoubleLine(v.itemID and GetItemLink(v.itemID) or (v.questName and QuestUtils_GetQuestName(v.id)) or v.name, COMPLETE, 1, 1, 1, .3, 1, .3)
 			else
-				GameTooltip:AddDoubleLine(v.name, INCOMPLETE, 1, 1, 1, 1, .3, .3)
+				GameTooltip:AddDoubleLine(v.itemID and GetItemLink(v.itemID) or (v.questName and QuestUtils_GetQuestName(v.id)) or v.name, INCOMPLETE, 1, 1, 1, 1, .3, .3)
 			end
 		end
 		
@@ -322,10 +335,10 @@ end
 		if btn == "RightButton"  then
 			ToggleTimeManager()
 		elseif btn == "LeftButton"  then
-			if not CalendarFrame then LoadAddOn("Blizzard_Calendar") end
+			if not CalendarFrame then C_AddOns.LoadAddOn("Blizzard_Calendar") end
 				if not CalendarFrame:IsShown() then ShowUIPanel(CalendarFrame) else HideUIPanel(CalendarFrame) end
 		elseif btn == "MiddleButton" then
-			if not WeeklyRewardsFrame then LoadAddOn("Blizzard_WeeklyRewards") end
+			if not WeeklyRewardsFrame then C_AddOns.LoadAddOn("Blizzard_WeeklyRewards") end
 			if not WeeklyRewardsFrame:IsShown() then ShowUIPanel(WeeklyRewardsFrame) else HideUIPanel(WeeklyRewardsFrame) end
 		else
 			return
