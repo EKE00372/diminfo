@@ -18,7 +18,7 @@ local ShowUIPanel = LibShowUIPanel.ShowUIPanel
 local HideUIPanel = LibShowUIPanel.HideUIPanel
 local WeeklyRunsThreshold = 8
 
---[[ Cahce item link ]] --
+--[[ Cahce ]] --
 local itemCache = {}
 local function GetItemLink(itemID)
 	local link = itemCache[itemID]
@@ -40,6 +40,7 @@ local function cacheIDs()
 	C_TaskQuest.RequestPreloadRewardData(82946)
 	C_TaskQuest.RequestPreloadRewardData(76586)
 end
+
 --[[ Torghast ]]--
 --[[
 local TorghastWidgets, TorghastInfo = {
@@ -63,16 +64,16 @@ local DFQuestList = {
 	{name = C_Spell_GetSpellName(388945), id = 70866},	-- SoDK
 	{name = "", id = 70906, itemID = 200468},	-- Grand hunt
 	{name = C_Spell_GetSpellName(386441), id = 70893},	-- Community feast
-	{name = QuestUtils_GetQuestName(79226), id = 79226},-- The big dig
+	{name = "", id = 79226, questName = true},-- The big dig
 	{name = C_Spell_GetSpellName(418272), id = 78319},	-- The superbloom
 	--70221 工匠精神
 }
 
 local TWWQuestList = {
-	{name = QuestUtils_GetQuestName(83240), id = 83240},-- 劇團
+	{name = "", id = 83240, questName = true},-- 劇團
 	{name = C_Map.GetAreaInfo(15141), id = 83333},-- 甦醒機械
-	{name = QuestUtils_GetQuestName(82946), id = 82946},-- 蠟塊
-	{name = QuestUtils_GetQuestName(76586), id = 76586},-- 散布光芒
+	{name = "", id = 82946, questName = true},-- 蠟塊
+	{name = "", id = 76586, questName = true},-- 散布光芒
 }
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
@@ -192,9 +193,9 @@ local function OnEnter(self)
 			--addTitle(WEEKLY)
 			addTitle(weeklyTitle)
 			if v.name and C_QuestLog_IsQuestFlaggedCompleted(v.id) then
-				GameTooltip:AddDoubleLine(v.itemID and GetItemLink(v.itemID) or v.name, COMPLETE, 1, 1, 1, .3, 1, .3)
+				GameTooltip:AddDoubleLine(v.itemID and GetItemLink(v.itemID) or (v.questName and QuestUtils_GetQuestName(v.id)) or v.name, COMPLETE, 1, 1, 1, .3, 1, .3)
 			else
-				GameTooltip:AddDoubleLine(v.itemID and GetItemLink(v.itemID) or v.name, INCOMPLETE, 1, 1, 1, 1, .3, .3)
+				GameTooltip:AddDoubleLine(v.itemID and GetItemLink(v.itemID) or (v.questName and QuestUtils_GetQuestName(v.id)) or v.name, INCOMPLETE, 1, 1, 1, 1, .3, .3)
 			end
 		end
 		
@@ -334,10 +335,10 @@ end
 		if btn == "RightButton"  then
 			ToggleTimeManager()
 		elseif btn == "LeftButton"  then
-			if not CalendarFrame then LoadAddOn("Blizzard_Calendar") end
+			if not CalendarFrame then C_AddOns.LoadAddOn("Blizzard_Calendar") end
 				if not CalendarFrame:IsShown() then ShowUIPanel(CalendarFrame) else HideUIPanel(CalendarFrame) end
 		elseif btn == "MiddleButton" then
-			if not WeeklyRewardsFrame then LoadAddOn("Blizzard_WeeklyRewards") end
+			if not WeeklyRewardsFrame then C_AddOns.LoadAddOn("Blizzard_WeeklyRewards") end
 			if not WeeklyRewardsFrame:IsShown() then ShowUIPanel(WeeklyRewardsFrame) else HideUIPanel(WeeklyRewardsFrame) end
 		else
 			return
