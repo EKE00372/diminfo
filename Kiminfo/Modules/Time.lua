@@ -5,7 +5,7 @@ if not C.Time then return end
 local format, date = string.format, date
 local CreateFrame = CreateFrame
 local C_DateAndTime_GetCurrentCalendarTime, C_Calendar_GetNumPendingInvites = C_DateAndTime.GetCurrentCalendarTime, C_Calendar.GetNumPendingInvites
-local C_AreaPoiInfo_GetAreaPOIInfo = C_AreaPoiInfo.GetAreaPOIInfo
+local C_AreaPoiInfo_GetAreaPOIInfo, C_Map_GetMapInfo = C_AreaPoiInfo.GetAreaPOIInfo, C_Map.GetMapInfo
 local C_QuestLog_IsQuestFlaggedCompleted = C_QuestLog.IsQuestFlaggedCompleted
 local C_UIWidgetManager_GetTextWithStateWidgetVisualizationInfo =  C_UIWidgetManager.GetTextWithStateWidgetVisualizationInfo
 local C_MythicPlus_GetRunHistory, C_ChallengeMode_GetMapUIInfo = C_MythicPlus.GetRunHistory, C_ChallengeMode.GetMapUIInfo
@@ -227,7 +227,7 @@ local function OnEnter(self)
 			addTitle(DELVES_LABEL)
 			local delveInfo = C_AreaPoiInfo_GetAreaPOIInfo(v.uiMapID, v.delveID)
 			if delveInfo then
-				local mapName = C_Map.GetMapInfo(v.uiMapID).name
+				local mapName = C_Map_GetMapInfo(v.uiMapID).name
 				local delveName = C_AreaPoiInfo_GetAreaPOIInfo(v.uiMapID, v.delveID).name
 				GameTooltip:AddDoubleLine(mapName .. " - " .. delveName, SecondsToTime(GetQuestResetTime(), true, nil, 3), 1, 1, 1, 1, 1, 1)
 			end
@@ -304,27 +304,6 @@ local function OnEnter(self)
 		GameTooltip:AddDoubleLine(difficultyName.." "..name.." |cff4cff4c("..encounterProgress.."/"..numEncounters..")|r", SecondsToTime(reset, true, nil, 3), 1, 1, 1, r, g, b)
 		end
 	end
-	
-	-- Torghast
-	--[[if not TorghastInfo then
-		TorghastInfo = C_AreaPoiInfo_GetAreaPOIInfo(1543, 6640)
-	end
-	if TorghastInfo and C_QuestLog_IsQuestFlaggedCompleted(60136) then
-		title = false
-		for _, value in pairs(TorghastWidgets) do
-			local nameInfo = C_UIWidgetManager_GetTextWithStateWidgetVisualizationInfo(value.nameID)
-			if nameInfo and nameInfo.shownState == 1 then
-				addTitle(TorghastInfo.name)
-				local nameText = CleanupLevelName(nameInfo.text)
-				local levelInfo = C_UIWidgetManager_GetTextWithStateWidgetVisualizationInfo(value.levelID)
-				local levelText = AVAILABLE
-				if levelInfo and levelInfo.shownState == 1 then
-					levelText = CleanupLevelName(levelInfo.text)
-				end
-				GameTooltip:AddDoubleLine(nameText, levelText, 1, 1, 1, 1, 1, 1)
-			end
-		end
-	end]]--
 
 	GameTooltip:AddDoubleLine(" ", G.Line)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..RATED_PVP_WEEKLY_VAULT..G.MiddleButton)
