@@ -224,12 +224,11 @@ local function OnEnter(self)
 		--if C_QuestLog_IsQuestFlaggedCompleted(81514) then
 		title = false
 		for _, v in pairs(delveList) do
-			addTitle(DELVES_LABEL)
 			local delveInfo = C_AreaPoiInfo_GetAreaPOIInfo(v.uiMapID, v.delveID)
 			if delveInfo then
-				local mapName = C_Map_GetMapInfo(v.uiMapID).name
-				local delveName = C_AreaPoiInfo_GetAreaPOIInfo(v.uiMapID, v.delveID).name
-				GameTooltip:AddDoubleLine(mapName .. " - " .. delveName, SecondsToTime(GetQuestResetTime(), true, nil, 3), 1, 1, 1, 1, 1, 1)
+				addTitle(delveInfo.description)
+				local mapInfo = C_Map_GetMapInfo(v.uiMapID)
+				GameTooltip:AddDoubleLine(mapInfo.name .. " - " .. delveInfo.name, SecondsToTime(GetQuestResetTime(), true, nil, 3), 1, 1, 1, 1, 1, 1)
 			end
 		end
 		--end
