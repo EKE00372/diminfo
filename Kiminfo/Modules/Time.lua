@@ -18,6 +18,10 @@ local ShowUIPanel = LibShowUIPanel.ShowUIPanel
 local HideUIPanel = LibShowUIPanel.HideUIPanel
 local WeeklyRunsThreshold = 8
 
+--=============================================--
+---------------    [[ Data ]]     ---------------
+--=============================================--
+
 --[[ Cahce ]] --
 local itemCache = {}
 local function GetItemLink(itemID)
@@ -58,6 +62,22 @@ local function CleanupLevelName(text)
 end
 ]]--
 
+-- [[ Delves ]] --
+local delveList = {
+	{uiMapID = 2248, delveID = 7787}, -- Earthcrawl Mines
+	{uiMapID = 2248, delveID = 7781}, -- Kriegval's Rest
+	{uiMapID = 2248, delveID = 7779}, -- Fungal Folly
+	{uiMapID = 2215, delveID = 7789}, -- Skittering Breach
+	{uiMapID = 2215, delveID = 7785}, -- Nightfall Sanctum
+	{uiMapID = 2215, delveID = 7783}, -- The Sinkhole
+	{uiMapID = 2215, delveID = 7780}, -- Mycomancer Cavern
+	{uiMapID = 2214, delveID = 7782}, -- The Waterworks
+	{uiMapID = 2214, delveID = 7788}, -- The Dread Pit
+	{uiMapID = 2255, delveID = 7790}, -- The Spiral Weave
+	{uiMapID = 2255, delveID = 7784}, -- Tak-Rethan Abyss
+	{uiMapID = 2255, delveID = 7786}, -- TThe Underkeep
+}
+
 --[[ Weekly quest ]] --
 local DFQuestList = {
 	-- PLAYER_DIFFICULTY_TIMEWALKER todo
@@ -75,6 +95,7 @@ local TWWQuestList = {
 	{name = "", id = 82946, questName = true},-- 蠟塊
 	{name = "", id = 76586, questName = true},-- 散布光芒
 }
+
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
 --=================================================--
@@ -193,11 +214,25 @@ local function OnEnter(self)
 			--addTitle(WEEKLY)
 			addTitle(weeklyTitle)
 			if v.name and C_QuestLog_IsQuestFlaggedCompleted(v.id) then
-				GameTooltip:AddDoubleLine(v.itemID and GetItemLink(v.itemID) or (v.questName and QuestUtils_GetQuestName(v.id)) or v.name, COMPLETE, 1, 1, 1, .3, 1, .3)
+				GameTooltip:AddDoubleLine((v.itemID and GetItemLink(v.itemID)) or (v.questName and QuestUtils_GetQuestName(v.id)) or v.name, COMPLETE, 1, 1, 1, .3, 1, .3)
 			else
-				GameTooltip:AddDoubleLine(v.itemID and GetItemLink(v.itemID) or (v.questName and QuestUtils_GetQuestName(v.id)) or v.name, INCOMPLETE, 1, 1, 1, 1, .3, .3)
+				GameTooltip:AddDoubleLine((v.itemID and GetItemLink(v.itemID)) or (v.questName and QuestUtils_GetQuestName(v.id)) or v.name, INCOMPLETE, 1, 1, 1, 1, .3, .3)
 			end
 		end
+		
+		-- Delves
+		--if C_QuestLog_IsQuestFlaggedCompleted(81514) then
+		title = false
+		for _, v in pairs(delveList) do
+			addTitle(DELVES_LABEL)
+			local delveInfo = C_AreaPoiInfo_GetAreaPOIInfo(v.uiMapID, v.delveID)
+			if delveInfo then
+				local mapName = C_Map.GetMapInfo(v.uiMapID).name
+				local delveName = C_AreaPoiInfo_GetAreaPOIInfo(v.uiMapID, v.delveID).name
+				GameTooltip:AddDoubleLine(mapName .. " - " .. delveName, SecondsToTime(GetQuestResetTime(), true, nil, 3), 1, 1, 1, 1, 1, 1)
+			end
+		end
+		--end
 		
 		-- Mythic+ 8 runs
 		title = false
