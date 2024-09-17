@@ -5,7 +5,7 @@ if not C.Time then return end
 local format, date = string.format, date
 local CreateFrame = CreateFrame
 local C_DateAndTime_GetCurrentCalendarTime, C_Calendar_GetNumPendingInvites = C_DateAndTime.GetCurrentCalendarTime, C_Calendar.GetNumPendingInvites
-local C_AreaPoiInfo_GetAreaPOIInfo = C_AreaPoiInfo.GetAreaPOIInfo
+local C_AreaPoiInfo_GetAreaPOIInfo, C_Map_GetMapInfo = C_AreaPoiInfo.GetAreaPOIInfo, C_Map.GetMapInfo
 local C_QuestLog_IsQuestFlaggedCompleted = C_QuestLog.IsQuestFlaggedCompleted
 local C_UIWidgetManager_GetTextWithStateWidgetVisualizationInfo =  C_UIWidgetManager.GetTextWithStateWidgetVisualizationInfo
 local C_MythicPlus_GetRunHistory, C_ChallengeMode_GetMapUIInfo = C_MythicPlus.GetRunHistory, C_ChallengeMode.GetMapUIInfo
@@ -17,6 +17,10 @@ local LibShowUIPanel = LibStub("LibShowUIPanel-1.0")
 local ShowUIPanel = LibShowUIPanel.ShowUIPanel
 local HideUIPanel = LibShowUIPanel.HideUIPanel
 local WeeklyRunsThreshold = 8
+
+--=============================================--
+---------------    [[ Data ]]     ---------------
+--=============================================--
 
 --[[ Cahce ]] --
 local itemCache = {}
@@ -58,6 +62,22 @@ local function CleanupLevelName(text)
 end
 ]]--
 
+-- [[ Delves ]] --
+local delveList = {
+	{uiMapID = 2248, delveID = 7787}, -- Earthcrawl Mines
+	{uiMapID = 2248, delveID = 7781}, -- Kriegval's Rest
+	{uiMapID = 2248, delveID = 7779}, -- Fungal Folly
+	{uiMapID = 2215, delveID = 7789}, -- Skittering Breach
+	{uiMapID = 2215, delveID = 7785}, -- Nightfall Sanctum
+	{uiMapID = 2215, delveID = 7783}, -- The Sinkhole
+	{uiMapID = 2215, delveID = 7780}, -- Mycomancer Cavern
+	{uiMapID = 2214, delveID = 7782}, -- The Waterworks
+	{uiMapID = 2214, delveID = 7788}, -- The Dread Pit
+	{uiMapID = 2255, delveID = 7790}, -- The Spiral Weave
+	{uiMapID = 2255, delveID = 7784}, -- Tak-Rethan Abyss
+	{uiMapID = 2255, delveID = 7786}, -- TThe Underkeep
+}
+
 --[[ Weekly quest ]] --
 local DFQuestList = {
 	-- PLAYER_DIFFICULTY_TIMEWALKER todo
@@ -75,6 +95,7 @@ local TWWQuestList = {
 	{name = "", id = 82946, questName = true},-- 蠟塊
 	{name = "", id = 76586, questName = true},-- 散布光芒
 }
+
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
 --=================================================--
@@ -193,11 +214,24 @@ local function OnEnter(self)
 			--addTitle(WEEKLY)
 			addTitle(weeklyTitle)
 			if v.name and C_QuestLog_IsQuestFlaggedCompleted(v.id) then
-				GameTooltip:AddDoubleLine(v.itemID and GetItemLink(v.itemID) or (v.questName and QuestUtils_GetQuestName(v.id)) or v.name, COMPLETE, 1, 1, 1, .3, 1, .3)
+				GameTooltip:AddDoubleLine((v.itemID and GetItemLink(v.itemID)) or (v.questName and QuestUtils_GetQuestName(v.id)) or v.name, COMPLETE, 1, 1, 1, .3, 1, .3)
 			else
-				GameTooltip:AddDoubleLine(v.itemID and GetItemLink(v.itemID) or (v.questName and QuestUtils_GetQuestName(v.id)) or v.name, INCOMPLETE, 1, 1, 1, 1, .3, .3)
+				GameTooltip:AddDoubleLine((v.itemID and GetItemLink(v.itemID)) or (v.questName and QuestUtils_GetQuestName(v.id)) or v.name, INCOMPLETE, 1, 1, 1, 1, .3, .3)
 			end
 		end
+		
+		-- Delves
+		--if C_QuestLog_IsQuestFlaggedCompleted(81514) then
+		title = false
+		for _, v in pairs(delveList) do
+			local delveInfo = C_AreaPoiInfo_GetAreaPOIInfo(v.uiMapID, v.delveID)
+			if delveInfo then
+				addTitle(delveInfo.description)
+				local mapInfo = C_Map_GetMapInfo(v.uiMapID)
+				GameTooltip:AddDoubleLine(mapInfo.name .. " - " .. delveInfo.name, SecondsToTime(GetQuestResetTime(), true, nil, 3), 1, 1, 1, 1, 1, 1)
+			end
+		end
+		--end
 		
 		-- Mythic+ 8 runs
 		title = false
@@ -269,27 +303,6 @@ local function OnEnter(self)
 		GameTooltip:AddDoubleLine(difficultyName.." "..name.." |cff4cff4c("..encounterProgress.."/"..numEncounters..")|r", SecondsToTime(reset, true, nil, 3), 1, 1, 1, r, g, b)
 		end
 	end
-	
-	-- Torghast
-	--[[if not TorghastInfo then
-		TorghastInfo = C_AreaPoiInfo_GetAreaPOIInfo(1543, 6640)
-	end
-	if TorghastInfo and C_QuestLog_IsQuestFlaggedCompleted(60136) then
-		title = false
-		for _, value in pairs(TorghastWidgets) do
-			local nameInfo = C_UIWidgetManager_GetTextWithStateWidgetVisualizationInfo(value.nameID)
-			if nameInfo and nameInfo.shownState == 1 then
-				addTitle(TorghastInfo.name)
-				local nameText = CleanupLevelName(nameInfo.text)
-				local levelInfo = C_UIWidgetManager_GetTextWithStateWidgetVisualizationInfo(value.levelID)
-				local levelText = AVAILABLE
-				if levelInfo and levelInfo.shownState == 1 then
-					levelText = CleanupLevelName(levelInfo.text)
-				end
-				GameTooltip:AddDoubleLine(nameText, levelText, 1, 1, 1, 1, 1, 1)
-			end
-		end
-	end]]--
 
 	GameTooltip:AddDoubleLine(" ", G.Line)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..RATED_PVP_WEEKLY_VAULT..G.MiddleButton)
