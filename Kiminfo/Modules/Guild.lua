@@ -174,7 +174,7 @@ local function OnEnter(self)
 	local tooltip = LibQTip:Acquire("KiminfoGuildTooltip", 2, "LEFT", "RIGHT")
 	tooltip:SetPoint(C.StickTop and "TOP" or "BOTTOM", self, C.StickTop and "BOTTOM" or "TOP", 0, C.StickTop and -10 or 10)
 	tooltip:Clear()
-	tooltip:AddHeader(G.TitleColor..guildName, G.TitleColor..(format("%d/%d", (numOnline or allOnline, total)))
+	tooltip:AddHeader(G.TitleColor..guildName, G.TitleColor..(format("%d/%d", (numOnline or allOnline), total)))
 	
 	tooltip:AddLine(" ")
 	tooltip:AddLine(GUILD)
