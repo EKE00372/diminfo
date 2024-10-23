@@ -118,12 +118,12 @@ end
 --================================================--
 
 local function OnEvent(self, event, ...)
-	local online = select(3, GetNumGuildMembers())
+	local _, numOnline, allOnline = GetNumGuildMembers()
 	
 	if not IsInGuild() then
 		Text:SetText(L.Lonely)
 	else
-		Text:SetText(online)
+		Text:SetText(numOnline or allOnline)
 	end
 	
 	self:SetAllPoints(Text)
@@ -163,7 +163,7 @@ local function OnEnter(self)
 	if not IsInGuild() then return end
 	-- Get local
 	local isShiftKeyDown = IsShiftKeyDown()
-	local total, online = GetNumGuildMembers()
+	local total, numOnline, allOnline = GetNumGuildMembers()
 	local guildName, guildRank = GetGuildInfo("player")
 	local guildMotD = GetGuildRosterMOTD()
 	
@@ -174,7 +174,7 @@ local function OnEnter(self)
 	local tooltip = LibQTip:Acquire("KiminfoGuildTooltip", 2, "LEFT", "RIGHT")
 	tooltip:SetPoint(C.StickTop and "TOP" or "BOTTOM", self, C.StickTop and "BOTTOM" or "TOP", 0, C.StickTop and -10 or 10)
 	tooltip:Clear()
-	tooltip:AddHeader(G.TitleColor..guildName, G.TitleColor..(format("%d/%d", online, total)))
+	tooltip:AddHeader(G.TitleColor..guildName, G.TitleColor..(format("%d/%d", (numOnline or allOnline, total)))
 	
 	tooltip:AddLine(" ")
 	tooltip:AddLine(GUILD)
