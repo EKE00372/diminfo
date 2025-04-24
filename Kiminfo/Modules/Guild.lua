@@ -8,10 +8,6 @@ local CreateFrame = CreateFrame
 local GetNumGuildMembers, GetGuildRosterInfo = GetNumGuildMembers, GetGuildRosterInfo
 local C_Reputation_GetGuildFactionData, C_PartyInfo_InviteUnit = C_Reputation.GetGuildFactionData, C_PartyInfo.InviteUnit
 
-local LibShowUIPanel = LibStub("LibShowUIPanel-1.0")
-local ShowUIPanel = LibShowUIPanel.ShowUIPanel
-local HideUIPanel = LibShowUIPanel.HideUIPanel
-
 local guildTable = {}
 local name, rank, rankindex, level, zone, connected, status, class
 
@@ -164,6 +160,7 @@ local function OnEnter(self)
 	-- Get local
 	local isShiftKeyDown = IsShiftKeyDown()
 	local total, numOnline, allOnline = GetNumGuildMembers()
+	local online = numOnline or allOnline
 	local guildName, guildRank = GetGuildInfo("player")
 	local guildMotD = GetGuildRosterMOTD()
 	
@@ -276,14 +273,12 @@ end
 	
 	--[[ Options ]]--
 	Stat:SetScript("OnMouseDown", function(self, button)
-		--[[if InCombatLockdown() then
-			UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT)
-			return
-		end]]--
+		if InCombatLockdown() then UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT) return end
 		
 		if button == "LeftButton" then
 			if not CommunitiesFrame then C_AddOns.LoadAddOn("Blizzard_Communities") end
-			if not CommunitiesFrame:IsShown() then ShowUIPanel(CommunitiesFrame) else HideUIPanel(CommunitiesFrame) end
+			--ToggleGuildFrame()
+			ToggleCommunitiesFrame()
 		else
 			return
 		end

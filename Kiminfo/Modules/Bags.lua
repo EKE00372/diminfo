@@ -12,10 +12,6 @@ local C_Container_GetContainerNumFreeSlots, C_Container_GetContainerNumSlots = C
 local C_Container_UseContainerItem, C_Container_GetContainerItemInfo = C_Container.UseContainerItem, C_Container.GetContainerItemInfo
 local C_Container_GetContainerItemEquipmentSetInfo = C_Container.GetContainerItemEquipmentSetInfo
 
-local LibShowUIPanel = LibStub("LibShowUIPanel-1.0")
-local ShowUIPanel = LibShowUIPanel.ShowUIPanel
-local HideUIPanel = LibShowUIPanel.HideUIPanel
-
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
 --=================================================--
@@ -109,7 +105,7 @@ local function OnEnter(self)
 		local name, count, icon, currencyID = GetBackpackCurrencyInfo(i)
 		
 		if name and i == 1 then
-			local iconTexture = C_CurrencyInfo_GetCurrencyInfo(104).iconFileID
+			local iconTexture = C_CurrencyInfo_GetCurrencyInfo(1792).iconFileID
 			
 			GameTooltip:AddLine(" ")
 			GameTooltip:AddLine(F.addIcon(iconTexture, 14, 4, 46).." "..G.OptionColor..CURRENCY)
@@ -128,7 +124,7 @@ local function OnEnter(self)
 	end
 	
 	-- Tier charge
-	local chargeInfo = C_CurrencyInfo_GetCurrencyInfo(2813) -- TWW S1
+	local chargeInfo = C_CurrencyInfo_GetCurrencyInfo(3116) -- TWW S2
 	if chargeInfo then
 		if GetNumWatchedTokens() < 1 then GameTooltip:AddLine(" ") end
 		local iconTexture = "|T"..chargeInfo.iconFileID..":13:15:0:0:50:50:4:46:4:46|t"
@@ -178,7 +174,8 @@ end
 		elseif button == "LeftButton" then
 			ToggleAllBags()
 		elseif button == "MiddleButton" then
-			if not CharacterFrame:IsShown() then ShowUIPanel(CharacterFrame) ToggleCharacter("TokenFrame") else HideUIPanel(CharacterFrame) end
+			if InCombatLockdown() then UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT) return end
+			ToggleCharacter("TokenFrame")
 		else
 			return
 		end

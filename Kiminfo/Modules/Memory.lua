@@ -8,10 +8,6 @@ local C_AddOns_GetNumAddOns, C_AddOns_GetAddOnInfo, C_AddOns_IsAddOnLoaded = C_A
 local UpdateAddOnMemoryUsage, GetAddOnMemoryUsage = UpdateAddOnMemoryUsage, GetAddOnMemoryUsage
 local collectgarbage, gcinfo = collectgarbage, gcinfo
 
-local LibShowUIPanel = LibStub("LibShowUIPanel-1.0")
-local ShowUIPanel = LibShowUIPanel.ShowUIPanel
-local HideUIPanel = LibShowUIPanel.HideUIPanel
-
 local memoryTable, totalMemory  = {}, 0
 local eventCount = 0
 
@@ -243,6 +239,7 @@ end
 			Kiminfo.AutoCollect = not Kiminfo.AutoCollect
 			print(L.CollectWarning)
 		elseif btn == "MiddleButton" then
+			if InCombatLockdown() then UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT) return end
 			if AddonList:IsShown() then AddonList_OnCancel() else ShowUIPanel(AddonList) end
 		else
 			return

@@ -6,16 +6,14 @@ local format, floor, sort, modf, select = string.format, math.floor, table.sort,
 local CreateFrame = CreateFrame
 local GetInventoryItemLink, GetInventoryItemDurability, GetInventoryItemTexture = GetInventoryItemLink, GetInventoryItemDurability, GetInventoryItemTexture
 
-local LibShowUIPanel = LibStub("LibShowUIPanel-1.0")
-local ShowUIPanel = LibShowUIPanel.ShowUIPanel
-local HideUIPanel = LibShowUIPanel.HideUIPanel
-
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
 --=================================================--
 
 --[[ Create elements ]]--
 local Stat = CreateFrame("Frame", G.addon.."Dura", UIParent)
+--local Stat = CreateFrame("Button", G.addon.."Dura", UIParent, "SecureActionButtonTemplate")
+	--Stat:RegisterForClicks("AnyUp", "AnyDown")
 	Stat:SetHitRectInsets(-30, -5, -10, -10)
 	Stat:SetFrameStrata("BACKGROUND")
 
@@ -172,11 +170,13 @@ end
 			Kiminfo.AutoRepair = not Kiminfo.AutoRepair
 			OnEnter(self)
 		elseif button == "LeftButton" then
-			if not CharacterFrame:IsShown() then ShowUIPanel(CharacterFrame) CharacterFrameTab2:Click() CharacterFrameTab1:Click() else HideUIPanel(CharacterFrame) end
-		else
-			return
+			if InCombatLockdown() then UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT) return end
+			ToggleCharacter("PaperDollFrame")
 		end
 	end)
+
+	--Stat:SetAttribute("type1", "click")
+	--Stat:SetAttribute("clickbutton", CharacterMicroButton)
 	
 	--[[ Data text ]]--
 	Stat:RegisterEvent("UPDATE_INVENTORY_DURABILITY")
