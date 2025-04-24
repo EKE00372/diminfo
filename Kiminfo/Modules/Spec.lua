@@ -9,7 +9,7 @@ local PVP_TALENTS, LOOT_SPECIALIZATION_DEFAULT = PVP_TALENTS, LOOT_SPECIALIZATIO
 local CreateFrame = CreateFrame
 local GetSpecialization, GetSpecializationInfo = GetSpecialization, GetSpecializationInfo
 local GetLootSpecialization, GetSpecializationInfoByID = GetLootSpecialization, GetSpecializationInfoByID
-local SetLootSpecialization, SetSpecialization = SetLootSpecialization, SetSpecialization
+local SetLootSpecialization, SetSpecialization = SetLootSpecialization, C_SpecializationInfo.SetSpecialization
 local GetPvpTalentInfoByID = GetPvpTalentInfoByID
 local C_SpecializationInfo_CanPlayerUsePVPTalentUI = C_SpecializationInfo.CanPlayerUsePVPTalentUI
 local C_SpecializationInfo_GetAllSelectedPvpTalentIDs = C_SpecializationInfo.GetAllSelectedPvpTalentIDs
@@ -17,7 +17,7 @@ local C_Spell_GetSpellInfo = C_Spell.GetSpellInfo
 local STARTER_BUILD = Constants.TraitConsts.STARTER_BUILD_TRAIT_CONFIG_ID
 
 local pvpTalents, SpecIndex, LootIndex, newMenu, numSpecs, numLocal
-local pvpTexture = C_CurrencyInfo.GetCurrencyInfo(104).iconFileID
+local pvpTexture = C_CurrencyInfo.GetCurrencyInfo(1792).iconFileID
 
 local LibEasyMenu = LibStub:GetLibrary("LibEasyMenu")
 
@@ -292,6 +292,7 @@ end
 			BuildSpecMenu()
 			LibEasyMenu:EasyMenu(newMenu, SpecMenuFrame, "cursor", 0, 0, "MENU", 3)
 		elseif button == "LeftButton" then
+			if InCombatLockdown() then UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT) return end
 			if not PlayerSpellsFrame then C_AddOns.LoadAddOn("Blizzard_PlayerSpells") end
 			PlayerSpellsUtil.ToggleClassTalentOrSpecFrame()
 		else

@@ -10,10 +10,6 @@ local C_BattleNet_GetFriendAccountInfo = C_BattleNet.GetFriendAccountInfo
 local C_FriendList_GetNumOnlineFriends, BNGetNumFriends = C_FriendList.GetNumOnlineFriends, BNGetNumFriends
 local BNet_GetClientEmbeddedAtlas, InviteToGroup = BNet_GetClientEmbeddedAtlas, C_PartyInfo.InviteUnit -- Replace C. new api as old InviteToGroup()
 
-local LibShowUIPanel = LibStub("LibShowUIPanel-1.0")
-local ShowUIPanel = LibShowUIPanel.ShowUIPanel
-local HideUIPanel = LibShowUIPanel.HideUIPanel
-
 local friendTable, bnetTable = {}, {}	-- build table
 local friendOnline = gsub(ERR_FRIEND_ONLINE_SS, ".+h", "")	-- get string
 local friendOffline = gsub(ERR_FRIEND_OFFLINE_S, "%%s", "")
@@ -24,7 +20,7 @@ local region = {[1] = "US", [2] = "KR", [3] = "EU", [4] = "TW", [5] = "CN",}
 ---------------    [[ Cache ]]     ---------------
 --==============================================--
 
--- cahce client icon
+--[[ cahce client icon ]]--
 local cache = {}
 local function GetIconTexture(titleID)
     if cache[titleID] then
@@ -41,34 +37,44 @@ local function GetIconTexture(titleID)
     return cache[titleID] or "Interface\\CHATFRAME\\UI-ChatIcon-Battlenet"
 end
 
--- client list
+--[[ client list ]]--
 local bnet_client = {
-	"WoW",	--WoW
-	"WoC",	--WoW Classic
-	"S1",	--SC
-	"S2" ,	--SC2
-	"OSI",	--DiabloII Resurrected
-	"D3",	--D3
+	"WoW",	-- WoW
+	"WoC",	-- WoWC/WoW Classic
+	"GRY",	-- Warcraft Arclight Rumble
+	"W1",	-- Warcraft Orcs & Humans
+    "W1R",	-- Warcraft I Remastered
+    "W2",	-- Warcraft II Battle.net Edition
+    "W2R",	-- Warcraft II Remastered
+    "W3",	-- Warcraft III Reforged
+
+	"D1" ,	-- Diablo
+	"OSI",	-- Diablo II Resurrected
+	"D3",	-- Diablo III
+	"Fen",	-- Diablo IV
 	"ANBS",	-- Diablo Immortal
+
+	"S1",	-- SC
+	"S2" ,	-- SC2
 	"WTCG",	-- WTCG
-	"App",	--Battlenet
+	"App",	-- Battlenet
 	"BSAp",	-- Battlenet
 	"Hero",	-- HotS
-	"Pro",	--Overwatch
+	"Pro",	-- Overwatch
 	"DST2",	-- Destiny2
+	"RTRO",	-- Blizzard Arcade Collection
+	"WLBY",	-- Crash Bandicoot 4
+
+	"AUKS",	-- CallofDuty
 	"ZEUS",	-- CallofDuty BlackOpsColdWaricon
 	"VIPR",	-- CallOfDuty BlackOps4
 	"ODIN",	-- CallOfDuty MWicon
 	"LAZR",	-- CallOfDuty MW2icon
-	"W3",	-- Warcraft3 Reforged
-	"RTRO",	-- Blizzard Arcade Collection
-	"WLBY",	-- Crash Bandicoot 4
 	"FORE",	-- CallOfDuty Vanguard
-	"GRY",	--Warcraft Arclight Rumble
-	"Fen",	--D4
+	"SPOT",	-- CallofDuty Modern Warfare III
 }
 
--- cache when load
+--[[ cache when load ]]--
 for k, v in ipairs(bnet_client) do
 	GetIconTexture(v)
 end
@@ -138,8 +144,8 @@ StaticPopupDialogs.SET_BN_BROADCAST = {
 --[[ Click function for in-game friends ]]--
 local function gameOnClick(self, info, btn)
 	if btn == "LeftButton" and IsShiftKeyDown() then
-			-- In-game invite / 遊戲內邀請
-			InviteToGroup(info[1])
+		-- In-game invite / 遊戲內邀請
+		InviteToGroup(info[1])
 	elseif btn == "MiddleButton" then
 		-- In-game msg / 遊戲內密語
 		ChatFrame_OpenChat("/w "..info[1].." ", SELECTED_DOCK_FRAME)
@@ -488,14 +494,10 @@ end
 	end)
 	
 	--[[ Options ]]--
-	Stat:SetScript("OnMouseDown", function(self, button)
-		--[[if InCombatLockdown() then
-			UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT)
-			return
-		end]]--
-		
+	Stat:SetScript("OnMouseDown", function(self, button)		
 		if button == "LeftButton" then
-			if not FriendsFrame:IsShown() then ShowUIPanel(FriendsFrame) else HideUIPanel(FriendsFrame) end
+			if InCombatLockdown() then UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT) return end
+			ToggleFriendsFrame()
 		elseif button == "RightButton" then
 			StaticPopup_Show("SET_BN_BROADCAST")
 		else

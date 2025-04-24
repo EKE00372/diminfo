@@ -7,9 +7,6 @@ local CreateFrame = CreateFrame
 local C_Map_GetWorldPosFromMapPos, C_Map_GetBestMapForUnit = C_Map.GetWorldPosFromMapPos, C_Map.GetBestMapForUnit
 local C_PvP_GetZonePVPInfo = C_PvP.GetZonePVPInfo
 local GetSubZoneText, GetZoneText = GetSubZoneText, GetZoneText
-local LibShowUIPanel = LibStub("LibShowUIPanel-1.0")
-local ShowUIPanel = LibShowUIPanel.ShowUIPanel
-local HideUIPanel = LibShowUIPanel.HideUIPanel
 
 local subzone, zone, pvpType, faction
 local coordX, coordY = 0, 0
@@ -156,7 +153,8 @@ end
 	--[[ Options ]]--
 	Stat:SetScript("OnMouseUp", function(_, btn)
 		if btn == "LeftButton" then
-			if not WorldMapFrame:IsShown() then ShowUIPanel(WorldMapFrame) else HideUIPanel(WorldMapFrame) end
+			if InCombatLockdown() then UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT) return end
+			ToggleFrame(WorldMapFrame)
 		elseif btn == "RightButton" then
 			if not IsInInstance() then
 				local map = C_Map_GetBestMapForUnit("player")

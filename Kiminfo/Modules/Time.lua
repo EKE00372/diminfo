@@ -12,10 +12,6 @@ local C_MythicPlus_GetRunHistory, C_ChallengeMode_GetMapUIInfo = C_MythicPlus.Ge
 local C_CVar_GetCVarBool, C_Spell_GetSpellName = C_CVar.GetCVarBool, C_Spell.GetSpellName
 local GetSavedInstanceInfo, GetSavedWorldBossInfo = GetSavedInstanceInfo, GetSavedWorldBossInfo
 local TIMEMANAGER_TICKER_24HOUR, TIMEMANAGER_TICKER_12HOUR = TIMEMANAGER_TICKER_24HOUR, TIMEMANAGER_TICKER_12HOUR
-
-local LibShowUIPanel = LibStub("LibShowUIPanel-1.0")
-local ShowUIPanel = LibShowUIPanel.ShowUIPanel
-local HideUIPanel = LibShowUIPanel.HideUIPanel
 local WeeklyRunsThreshold = 8
 
 --=============================================--
@@ -63,6 +59,10 @@ end
 ]]--
 
 -- [[ Delves ]] --
+
+local delvesKeys = {84736, 84737, 84738, 84739}
+local keyName = C_CurrencyInfo.GetCurrencyInfo(3028).name
+
 local delveList = {
 	{uiMapID = 2248, delveID = 7787}, -- Earthcrawl Mines
 	{uiMapID = 2248, delveID = 7781}, -- Kriegval's Rest
@@ -76,6 +76,8 @@ local delveList = {
 	{uiMapID = 2255, delveID = 7790}, -- The Spiral Weave
 	{uiMapID = 2255, delveID = 7784}, -- Tak-Rethan Abyss
 	{uiMapID = 2255, delveID = 7786}, -- TThe Underkeep
+	{uiMapID = 2346, delveID = 8246}, -- Sidestree Sluice
+	{uiMapID = 2214, delveID = 8181}, -- Excavation Site 9
 }
 
 --[[ Weekly quest ]] --
@@ -219,6 +221,17 @@ local function OnEnter(self)
 				GameTooltip:AddDoubleLine((v.itemID and GetItemLink(v.itemID)) or (v.questName and QuestUtils_GetQuestName(v.id)) or v.name, INCOMPLETE, 1, 1, 1, 1, .3, .3)
 			end
 		end
+
+		local currentKeys, maxKeys = 0, #delvesKeys
+		for _, questID in pairs(delvesKeys) do
+			if C_QuestLog_IsQuestFlaggedCompleted(questID) then
+				currentKeys = currentKeys + 1
+			end
+		end
+		if currentKeys > 0 then
+			if currentKeys == maxKeys then r,g,b = 1,0,0 else r,g,b = 0,1,0 end
+			GameTooltip:AddDoubleLine(keyName, format("%d/%d", currentKeys, #delvesKeys), 1, 1, 1, r,g,b)
+		end
 		
 		-- Delves
 		--if C_QuestLog_IsQuestFlaggedCompleted(81514) then
@@ -344,13 +357,15 @@ end
 	Stat:SetScript("OnUpdate", OnUpdate)
 	
 	--[[ Options ]]--
-	Stat:SetScript("OnMouseDown", function(self, btn)
+	Stat:SetScript("OnMouseDown", function(self, btn)	
 		if btn == "RightButton"  then
 			ToggleTimeManager()
-		elseif btn == "LeftButton"  then
+		elseif btn == "LeftButton" then
+			if InCombatLockdown() then UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT) return end
 			if not CalendarFrame then C_AddOns.LoadAddOn("Blizzard_Calendar") end
-				if not CalendarFrame:IsShown() then ShowUIPanel(CalendarFrame) else HideUIPanel(CalendarFrame) end
+			ToggleCalendar()
 		elseif btn == "MiddleButton" then
+			if InCombatLockdown() then UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT) return end
 			if not WeeklyRewardsFrame then C_AddOns.LoadAddOn("Blizzard_WeeklyRewards") end
 			if not WeeklyRewardsFrame:IsShown() then ShowUIPanel(WeeklyRewardsFrame) else HideUIPanel(WeeklyRewardsFrame) end
 		else
