@@ -23,18 +23,18 @@ local region = {[1] = "US", [2] = "KR", [3] = "EU", [4] = "TW", [5] = "CN",}
 --[[ cahce client icon ]]--
 local cache = {}
 local function GetIconTexture(titleID)
-    if cache[titleID] then
-        return cache[titleID]
-    end
+	if cache[titleID] then
+		return cache[titleID]
+	end
 
-    local titleID = titleID
-    C_Texture.GetTitleIconTexture(titleID, Enum.TitleIconVersion.Medium, function(success, texture)
-        if success then
-            cache[titleID] = texture
-        end
-    end)
+	local titleID = titleID
+	C_Texture.GetTitleIconTexture(titleID, Enum.TitleIconVersion.Medium, function(success, texture)
+		if success then
+			cache[titleID] = texture
+		end
+	end)
 	
-    return cache[titleID] or "Interface\\CHATFRAME\\UI-ChatIcon-Battlenet"
+	return cache[titleID] or "Interface\\CHATFRAME\\UI-ChatIcon-Battlenet"
 end
 
 --[[ client list ]]--
@@ -43,10 +43,10 @@ local bnet_client = {
 	"WoC",	-- WoWC/WoW Classic
 	"GRY",	-- Warcraft Arclight Rumble
 	"W1",	-- Warcraft Orcs & Humans
-    "W1R",	-- Warcraft I Remastered
-    "W2",	-- Warcraft II Battle.net Edition
-    "W2R",	-- Warcraft II Remastered
-    "W3",	-- Warcraft III Reforged
+	"W1R",	-- Warcraft I Remastered
+	"W2",	-- Warcraft II Battle.net Edition
+	"W2R",	-- Warcraft II Remastered
+	"W3",	-- Warcraft III Reforged
 
 	"D1" ,	-- Diablo
 	"OSI",	-- Diablo II Resurrected

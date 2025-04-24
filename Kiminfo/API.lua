@@ -65,7 +65,7 @@ F.CreatePanel = function(anchor, parent, x, y, w, h, size, a)
 	local framelvl = parent:GetFrameLevel()
 	
 	-- 中間
-    panel:SetWidth(w)
+	panel:SetWidth(w)
 	panel:SetHeight(h)
 	panel:ClearAllPoints()
 	panel:SetPoint(anchor, parent, x, y)
