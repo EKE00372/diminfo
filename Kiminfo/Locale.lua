@@ -12,7 +12,7 @@ local getLocale = GetLocale()
 		L.AutoRepair = "自動修理："
 		L.None = "無裝備"
 		
-		L.Lonely = "沒人要"
+		L.Lonely = "獨行"
 		
 		L.Shift = "Shift 展開"
 		L.Hidden = HIDE
@@ -48,7 +48,7 @@ local getLocale = GetLocale()
 		L.AutoRepair = "自动修理："
 		L.None = "无装备"
 		
-		L.Lonely = "沒人要"
+		L.Lonely = "独行"
 		
 		L.Shift = "Shift 展开"
 		L.Hidden = HIDE
