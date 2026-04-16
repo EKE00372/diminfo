@@ -156,14 +156,19 @@ end
 			if InCombatLockdown() then UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT) return end
 			ToggleFrame(WorldMapFrame)
 		elseif btn == "RightButton" then
-			if not IsInInstance() then
-				local map = C_Map_GetBestMapForUnit("player")
-				local x, y = GetPlayerMapPos(map)
+			local inInstance, instanceType = IsInInstance()
+			if (not inInstance) and (instanceType == "none") then
+				local map = C_Map_GetBestMapForUnit("player") or ""
+				local x, y = GetPlayerMapPos(map) or 0, 0
 				local hasUnit = UnitExists("target") and not UnitIsPlayer("target")
 				local unitName = hasUnit and UnitName("target") or ""
 				
 				C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(map, x, y))
-				ChatFrame_OpenChat(format("%s %s (%s) %s", C_Map.GetUserWaypointHyperlink(), zone, formatCoords(), unitName), chatFrame)
+				if C_Map.CanSetUserWaypointOnMap(map) then
+					ChatFrame_OpenChat(format("%s %s (%s) %s", C_Map.GetUserWaypointHyperlink(), zone, formatCoords(), unitName), chatFrame)
+				else
+					ChatFrame_OpenChat(format("%s (%s) %s", zone, formatCoords(), unitName), chatFrame)
+				end
 			end
 		else
 			return
