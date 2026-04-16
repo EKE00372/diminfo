@@ -124,8 +124,8 @@ local function OnEnter(self)
 	end
 	
 	-- Tier charge
-	local chargeInfo = C_CurrencyInfo_GetCurrencyInfo(3116) -- TWW S2
-	if chargeInfo then
+	local chargeInfo = C_CurrencyInfo_GetCurrencyInfo(3378) -- TWW S2
+	if chargeInfo and IsPlayerAtEffectiveMaxLevel() then
 		if GetNumWatchedTokens() < 1 then GameTooltip:AddLine(" ") end
 		local iconTexture = "|T"..chargeInfo.iconFileID..":13:15:0:0:50:50:4:46:4:46|t"
 		GameTooltip:AddDoubleLine(iconTexture.." "..chargeInfo.name, chargeInfo.quantity.."/"..chargeInfo.maxQuantity, 1, 1, 1, 1, 1, 1)
