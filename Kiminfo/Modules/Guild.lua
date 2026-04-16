@@ -125,10 +125,7 @@ local function OnEvent(self, event, ...)
 	self:SetAllPoints(Text)
 	
 	if event == "PLAYER_ENTERING_WORLD" then
-		if not GuildFrame and IsInGuild() then
-			C_AddOns.LoadAddOn("Blizzard_GuildUI")
-			UpdateGuildMessage()
-		end
+		if IsInGuild() then UpdateGuildMessage() end
 	end
 end
 
@@ -162,7 +159,6 @@ local function OnEnter(self)
 	local total, numOnline, allOnline = GetNumGuildMembers()
 	local online = numOnline or allOnline
 	local guildName, guildRank = GetGuildInfo("player")
-	local guildMotD = GetGuildRosterMOTD()
 	
 	-- Get table
 	BuildGuildTable()
@@ -191,7 +187,7 @@ local function OnEnter(self)
 	end
 	
 	-- Guild daily info
-	if guildMotD then
+	if not InCombatLockdown() then
 		tooltip:AddLine(" ")
 		tooltip:AddLine(GUILD_MOTD)
 		
@@ -204,6 +200,7 @@ local function OnEnter(self)
 		end
 
 		local y, x = tooltip:AddLine()
+		local guildMotD = GetGuildRosterMOTD() or ""
 		tooltip:SetCell(y, 1, G.OptionColor..guildMotD, nil, "LEFT", 2, nil, 0, 0, width)
 	end
 	
