@@ -11,9 +11,9 @@ local collectgarbage, gcinfo = collectgarbage, gcinfo
 local memoryTable, totalMemory  = {}, 0
 local eventCount = 0
 
---=================================================--
----------------    [[ Elements ]]     ---------------
---=================================================--
+--==========================================--
+---------------	[[ Elements ]] ---------------
+--==========================================--
 
 --[[ Create elements ]]--
 local Stat = CreateFrame("Frame", G.addon.."Mem", UIParent)
@@ -34,9 +34,9 @@ local Text  = Stat:CreateFontString(nil, "OVERLAY")
 	Text:SetTextColor(1, 1, 1)
 	Stat:SetAllPoints(Text)
 
---===============================================--
----------------    [[ format ]]     ---------------
---===============================================--
+--========================================--
+---------------	[[ format ]] ---------------
+--========================================--
 
 --[[ Format memory for tooltip list ]]--
 local function formatMemory(value)
@@ -66,9 +66,9 @@ local function memoryColor(value, times)
 	end
 end
 
---==============================================--
----------------    [[ Table ]]     ---------------
---==============================================--
+--=======================================--
+---------------	[[ Table ]]	---------------
+--=======================================--
 
 --[[ Get enable addon number ]]--
 local function updateMaxAddons()
@@ -130,9 +130,9 @@ local function RefreshText()
 	end
 end
 
---================================================--
----------------    [[ Updates ]]     ---------------
---================================================--
+--=========================================--
+---------------	[[ Updates ]] ---------------
+--=========================================--
 
 --[[ Update when login ]]--
 local function OnEvent(self)
@@ -180,7 +180,7 @@ local function OnEnter(self)
 			end
 		end
 	end
-	
+
 	-- Merge line when not shift key down / 合併統計行
 	if not isShiftKeyDown and (numEnabled > maxAddOns) then
 		local hiddenMemory = 0
@@ -203,6 +203,7 @@ local function OnEnter(self)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.ManualCollect..G.LeftButton)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.AutoCollect..(Kiminfo.AutoCollect and G.Enable or G.Disable)..G.RightButton)
 	
+
 	GameTooltip:Show()
 end
 
@@ -219,9 +220,9 @@ local function OnLeave(self)
 	GameTooltip:Hide()
 end
 
---================================================--
----------------    [[ Scripts ]]     ---------------
---================================================--
+--=========================================--
+---------------	[[ Scripts ]] ---------------
+--=========================================--
 	
 	--[[ Data text ]]--
 	Stat:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -253,9 +254,9 @@ end
 	Stat:SetScript("OnEnter", OnEnter)
 	Stat:SetScript("OnLeave", OnLeave)
 
---=====================================================--
----------------    [[ Auto Collect ]]     ---------------
---=====================================================--
+--==============================================--
+---------------	[[ Auto Collect ]] ---------------
+--==============================================--
 
 local autoCollect = CreateFrame("Frame")
 	autoCollect:RegisterAllEvents()

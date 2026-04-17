@@ -11,9 +11,9 @@ local C_Reputation_GetGuildFactionData, C_PartyInfo_InviteUnit = C_Reputation.Ge
 local guildTable = {}
 local name, rank, rankindex, level, zone, connected, status, class
 
---=================================================--
----------------    [[ Elements ]]     ---------------
---=================================================--
+--==========================================--
+---------------	[[ Elements ]] ---------------
+--==========================================--
 
 --[[ Create elements ]]--
 local Stat = CreateFrame("Frame", G.addon.."Guild", UIParent)
@@ -35,9 +35,9 @@ local Text  = Stat:CreateFontString(nil, "OVERLAY")
 	Stat:SetAllPoints(Text)
 
 	
---==================================================--
----------------    [[ Functions ]]     ---------------
---==================================================--
+--===========================================--
+---------------	[[ Functions ]] ---------------
+--===========================================--
 
 --[[ Get daily massage ]]--
 local function UpdateGuildMessage()
@@ -103,15 +103,15 @@ local function buttonOnClick(self, name, btn)
 	if btn == "LeftButton" and IsShiftKeyDown() then
 		C_PartyInfo_InviteUnit(name)
 	elseif btn == "MiddleButton" then
-		ChatFrame_OpenChat("/w "..name.." ", SELECTED_DOCK_FRAME)
+		ChatFrameUtil.SendTell(name, SELECTED_DOCK_FRAME)
 	else
 		return
 	end
 end
 
---================================================--
----------------    [[ Updates ]]     ---------------
---================================================--
+--=========================================--
+---------------	[[ Updates ]] ---------------
+--=========================================--
 
 local function OnEvent(self, event, ...)
 	local _, numOnline, allOnline = GetNumGuildMembers()
@@ -245,9 +245,9 @@ local function OnEnter(self)
 	self.tooltip = tooltip
 end
 
---================================================--
----------------    [[ Scripts ]]     ---------------
---================================================--
+--=========================================--
+---------------	[[ Scripts ]] ---------------
+--=========================================--
 	
 	--[[ Tooltip ]]--
 	Stat:SetScript("OnEnter", function(self)

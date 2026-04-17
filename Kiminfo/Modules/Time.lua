@@ -14,11 +14,12 @@ local GetSavedInstanceInfo, GetSavedWorldBossInfo = GetSavedInstanceInfo, GetSav
 local TIMEMANAGER_TICKER_24HOUR, TIMEMANAGER_TICKER_12HOUR = TIMEMANAGER_TICKER_24HOUR, TIMEMANAGER_TICKER_12HOUR
 local WeeklyRunsThreshold = 8
 
---=============================================--
----------------    [[ Data ]]     ---------------
---=============================================--
+--======================================--
+--------------- [[ Data ]] ---------------
+--======================================--
 
 --[[ Cahce ]] --
+
 local itemCache = {}
 local function GetItemLink(itemID)
 	local link = itemCache[itemID]
@@ -41,46 +42,26 @@ local function cacheIDs()
 	C_TaskQuest.RequestPreloadRewardData(76586)
 end
 
---[[ Torghast ]]--
---[[
-local TorghastWidgets, TorghastInfo = {
-	{nameID = 2925, levelID = 2930}, -- Fracture Chambers
-	{nameID = 2926, levelID = 2932}, -- Skoldus Hall
-	{nameID = 2924, levelID = 2934}, -- Soulforges
-	{nameID = 2927, levelID = 2936}, -- Coldheart Interstitia
-	{nameID = 2928, levelID = 2938}, -- Mort'regar
-	{nameID = 2929, levelID = 2940}, -- The Upper Reaches
-}
-
--- Torghast fix: Fuckking blizzard make the name on tooltip wrap like shit
-local function CleanupLevelName(text)
-	return gsub(text, "|n", "")
-end
-]]--
-
 -- [[ Delves ]] --
 
-local delvesKeys = {84736, 84737, 84738, 84739}
+local delvesKeys = {91175, 91176, 91177, 91178}
 local keyName = C_CurrencyInfo.GetCurrencyInfo(3028).name
 
 local delveList = {
-	{uiMapID = 2248, delveID = 7787}, -- Earthcrawl Mines
-	{uiMapID = 2248, delveID = 7781}, -- Kriegval's Rest
-	{uiMapID = 2248, delveID = 7779}, -- Fungal Folly
-	{uiMapID = 2215, delveID = 7789}, -- Skittering Breach
-	{uiMapID = 2215, delveID = 7785}, -- Nightfall Sanctum
-	{uiMapID = 2215, delveID = 7783}, -- The Sinkhole
-	{uiMapID = 2215, delveID = 7780}, -- Mycomancer Cavern
-	{uiMapID = 2214, delveID = 7782}, -- The Waterworks
-	{uiMapID = 2214, delveID = 7788}, -- The Dread Pit
-	{uiMapID = 2255, delveID = 7790}, -- The Spiral Weave
-	{uiMapID = 2255, delveID = 7784}, -- Tak-Rethan Abyss
-	{uiMapID = 2255, delveID = 7786}, -- TThe Underkeep
-	{uiMapID = 2346, delveID = 8246}, -- Sidestree Sluice
-	{uiMapID = 2214, delveID = 8181}, -- Excavation Site 9
+	{uiMapID = 2393, delveID = 8426}, -- 學院災禍
+	{uiMapID = 2424, delveID = 8428}, -- 幻日廣場
+	{uiMapID = 2405, delveID = 8430}, -- 戮日者聖所
+	{uiMapID = 2405, delveID = 8432}, -- 影衛崗哨
+	{uiMapID = 2413, delveID = 8434}, -- 怨鬥坑洞
+	{uiMapID = 2413, delveID = 8436}, -- 回憶裂口
+	{uiMapID = 2395, delveID = 8438}, -- 暗影領區
+	{uiMapID = 2393, delveID = 8440}, -- 黑暗之途
+	{uiMapID = 2437, delveID = 8442}, -- 暮光墓穴
+	{uiMapID = 2437, delveID = 8444}, -- 阿塔阿曼
 }
 
 --[[ Weekly quest ]] --
+
 local DFQuestList = {
 	-- PLAYER_DIFFICULTY_TIMEWALKER todo
 	{name = C_Spell_GetSpellName(388945), id = 70866},	-- SoDK
@@ -98,9 +79,9 @@ local TWWQuestList = {
 	{name = "", id = 76586, questName = true},-- 散布光芒
 }
 
---=================================================--
----------------    [[ Elements ]]     ---------------
---=================================================--
+--==========================================--
+---------------	[[ Elements ]] ---------------
+--==========================================--
 
 --[[ Create elements ]]--
 local Stat = CreateFrame("Frame", G.addon.."Time", UIParent)
@@ -114,9 +95,9 @@ local Text  = Stat:CreateFontString(nil, "OVERLAY")
 	Text:SetTextColor(1, 1, 1)
 	Stat:SetAllPoints(Text)
 
---==================================================--
----------------    [[ Functions ]]     ---------------
---==================================================--
+--===========================================--
+---------------	[[ Functions ]] ---------------
+--===========================================--
 
 --[[ Format 24/12 hour clock ]]--
 local function updateTimerFormat(hour, minute)
@@ -152,9 +133,9 @@ local function sortHistory(entry1, entry2)
 	end
 end
 
---================================================--
----------------    [[ Updates ]]     ---------------
---================================================--
+--=========================================--
+---------------	[[ Updates ]] ---------------
+--=========================================--
 
 local function OnEvent(self)
 	C_Timer.After(3, cacheIDs)
@@ -207,21 +188,35 @@ local function OnEnter(self)
 	
 	-- Mythic+ and Weekly chest quest only on max level
 	if UnitLevel("player") == GetMaxLevelForLatestExpansion() then
+		
 		-- Quests
-		title = false
-		local questList = IsShiftKeyDown() and DFQuestList or TWWQuestList
-		local weeklyTitle = IsShiftKeyDown() and EXPANSION_NAME9 or WEEKLY
 
-		for _, v in pairs(questList) do
-			--addTitle(WEEKLY)
-			addTitle(weeklyTitle)
-			if v.name and C_QuestLog_IsQuestFlaggedCompleted(v.id) then
-				GameTooltip:AddDoubleLine((v.itemID and GetItemLink(v.itemID)) or (v.questName and QuestUtils_GetQuestName(v.id)) or v.name, COMPLETE, 1, 1, 1, .3, 1, .3)
-			else
-				GameTooltip:AddDoubleLine((v.itemID and GetItemLink(v.itemID)) or (v.questName and QuestUtils_GetQuestName(v.id)) or v.name, INCOMPLETE, 1, 1, 1, 1, .3, .3)
+		if IsShiftKeyDown() then
+			-- DF
+			title = false
+			for _, v in pairs(DFQuestList) do
+				addTitle(EXPANSION_NAME9)
+				if v.name and C_QuestLog_IsQuestFlaggedCompleted(v.id) then
+					GameTooltip:AddDoubleLine((v.itemID and GetItemLink(v.itemID)) or (v.questName and QuestUtils_GetQuestName(v.id)) or v.name, COMPLETE, 1, 1, 1, .3, 1, .3)
+				else
+					GameTooltip:AddDoubleLine((v.itemID and GetItemLink(v.itemID)) or (v.questName and QuestUtils_GetQuestName(v.id)) or v.name, INCOMPLETE, 1, 1, 1, 1, .3, .3)
+				end
+			end
+
+			-- TWW
+			title = false
+			for _, v in pairs(TWWQuestList) do
+				addTitle(EXPANSION_NAME10)
+				if v.name and C_QuestLog_IsQuestFlaggedCompleted(v.id) then
+					GameTooltip:AddDoubleLine((v.itemID and GetItemLink(v.itemID)) or (v.questName and QuestUtils_GetQuestName(v.id)) or v.name, COMPLETE, 1, 1, 1, .3, 1, .3)
+				else
+					GameTooltip:AddDoubleLine((v.itemID and GetItemLink(v.itemID)) or (v.questName and QuestUtils_GetQuestName(v.id)) or v.name, INCOMPLETE, 1, 1, 1, 1, .3, .3)
+				end
 			end
 		end
-
+		
+		-- Delve key
+		title = false
 		local currentKeys, maxKeys = 0, #delvesKeys
 		for _, questID in pairs(delvesKeys) do
 			if C_QuestLog_IsQuestFlaggedCompleted(questID) then
@@ -230,11 +225,11 @@ local function OnEnter(self)
 		end
 		if currentKeys > 0 then
 			if currentKeys == maxKeys then r,g,b = 1,0,0 else r,g,b = 0,1,0 end
+			addTitle(WEEKLY)
 			GameTooltip:AddDoubleLine(keyName, format("%d/%d", currentKeys, #delvesKeys), 1, 1, 1, r,g,b)
 		end
 		
 		-- Delves
-		--if C_QuestLog_IsQuestFlaggedCompleted(81514) then
 		title = false
 		for _, v in pairs(delveList) do
 			local delveInfo = C_AreaPoiInfo_GetAreaPOIInfo(v.uiMapID, v.delveID)
@@ -325,9 +320,9 @@ local function OnEnter(self)
 	GameTooltip:Show()
 end
 
---================================================--
----------------    [[ Scripts ]]     ---------------
---================================================--
+--=========================================--
+---------------	[[ Scripts ]] ---------------
+--=========================================--
 	
 	--[[ Tooltip ]]--
 	Stat:SetScript("OnEnter", function(self)
