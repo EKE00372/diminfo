@@ -118,8 +118,8 @@ StaticPopupDialogs.SET_BN_BROADCAST = {
 	end,
 	
 	OnShow = function(self)
-		self.editBox:SetText(select(4, BNGetInfo()))
-		self.editBox:SetFocus()
+		self.EditBox:SetText(select(4, BNGetInfo()))
+		self.EditBox:SetFocus()
 	end,
 	
 	OnHide = ChatEdit_FocusActiveWindow,
@@ -410,9 +410,9 @@ local function OnEnter(self)
 				
 				local icon
 				if (info[5] == BNET_CLIENT_WOW and info[14] == true) then
-					icon = (info[6] == "Horde" and F.addIcon(G.Horde, 12, 2, 48)) or (info[6] == "Alliance" and F.addIcon(G.Alliance, 12, 2, 48))
+					icon = (info[6] == "Horde" and F.addIcon(G.Horde, 14, 2, 48)) or (info[6] == "Alliance" and F.addIcon(G.Alliance, 14, 2, 48))
 				else
-					icon = "|T"..GetIconTexture("WoW")..":12:12:0:0:50:50|t"
+					icon = "|T"..GetIconTexture("WoW")..":14:14:0:0:50:50|t"
 				end
 				
 				if isShiftKeyDown then
@@ -422,9 +422,9 @@ local function OnEnter(self)
 				end
 			else
 				if isShiftKeyDown then
-					tooltip:AddLine("|T"..GetIconTexture(info[5])..":12:12:0:0:50:50|t "..G.OptionColor..info[3].."|r"..info[7], F.Hex(.65, .65, .65)..info[10])
+					tooltip:AddLine("|T"..GetIconTexture(info[5])..":14:14:0:0:50:50|t "..G.OptionColor..info[3].."|r"..info[7], F.Hex(.65, .65, .65)..info[10])
 				else
-					tooltip:AddLine("|T"..GetIconTexture(info[5])..":12:12:0:0:50:50|t "..G.OptionColor..info[4].."|r"..info[7], F.Hex(.65, .65, .65)..info[10])
+					tooltip:AddLine("|T"..GetIconTexture(info[5])..":14:14:0:0:50:50|t "..G.OptionColor..info[4].."|r"..info[7], F.Hex(.65, .65, .65)..info[10])
 				end
 			end
 			
