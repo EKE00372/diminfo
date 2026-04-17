@@ -6,9 +6,9 @@ local format, floor, sort, modf, select = string.format, math.floor, table.sort,
 local CreateFrame = CreateFrame
 local GetInventoryItemLink, GetInventoryItemDurability, GetInventoryItemTexture = GetInventoryItemLink, GetInventoryItemDurability, GetInventoryItemTexture
 
---=================================================--
----------------    [[ Elements ]]     ---------------
---=================================================--
+--==========================================--
+---------------	[[ Elements ]] ---------------
+--==========================================--
 
 --[[ Create elements ]]--
 local Stat = CreateFrame("Frame", G.addon.."Dura", UIParent)
@@ -31,9 +31,9 @@ local Text  = Stat:CreateFontString(nil, "OVERLAY")
 	Text:SetTextColor(1, 1, 1)
 	Stat:SetAllPoints(Text)
 
---==================================================--
----------------    [[ Functions ]]     ---------------
---==================================================--
+--===========================================--
+---------------	[[ Functions ]]	---------------
+--===========================================--
 
 --[[ Data text color gardient ]]--
 local function GradientColor(perc)
@@ -90,9 +90,9 @@ local function getItemDurability()
 	return numSlots
 end
 
---================================================--
----------------    [[ Updates ]]     ---------------
---================================================--
+--=========================================--
+---------------	[[ Updates ]] ---------------
+--=========================================--
 
 --[[ Data text update ]]--
 local function OnEvent(self)
@@ -144,9 +144,9 @@ local function OnEnter(self)
 	GameTooltip:Show()
 end
 
---================================================--
----------------    [[ Scripts ]]     ---------------
---================================================--
+--=========================================--
+---------------	[[ Scripts ]] ---------------
+--=========================================--
 	
 	--[[ Tooltip ]]--
 	Stat:SetScript("OnEnter", function(self)
@@ -184,9 +184,9 @@ end
 	Stat:RegisterEvent("PLAYER_ENTERING_WORLD")
 	Stat:SetScript("OnEvent", OnEvent)
 
---====================================================--
----------------    [[ Auto repair ]]     ---------------
---====================================================--
+--=============================================--
+---------------	[[ Auto repair ]] ---------------
+--=============================================--
 
 local RepairGear = CreateFrame("Frame")
 	RepairGear:RegisterEvent("MERCHANT_SHOW")

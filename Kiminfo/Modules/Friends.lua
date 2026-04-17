@@ -11,14 +11,12 @@ local C_FriendList_GetNumOnlineFriends, BNGetNumFriends = C_FriendList.GetNumOnl
 local BNet_GetClientEmbeddedAtlas, InviteToGroup = BNet_GetClientEmbeddedAtlas, C_PartyInfo.InviteUnit -- Replace C. new api as old InviteToGroup()
 
 local friendTable, bnetTable = {}, {}	-- build table
-local friendOnline = gsub(ERR_FRIEND_ONLINE_SS, ".+h", "")	-- get string
-local friendOffline = gsub(ERR_FRIEND_OFFLINE_S, "%%s", "")
-local BNET_CLIENT_WOWC = "WoC"	-- custom string for classic
+local BNET_CLIENT_WOWC = "WoWC"	-- custom string for classic
 local region = {[1] = "US", [2] = "KR", [3] = "EU", [4] = "TW", [5] = "CN",}
 
---==============================================--
----------------    [[ Cache ]]     ---------------
---==============================================--
+--=======================================--
+--------------- [[ Cache ]] ---------------
+--=======================================--
 
 --[[ cahce client icon ]]--
 local cache = {}
@@ -30,7 +28,7 @@ local function GetIconTexture(titleID)
 	local titleID = titleID
 	C_Texture.GetTitleIconTexture(titleID, Enum.TitleIconVersion.Medium, function(success, texture)
 		if success then
-			cache[titleID] = texture
+		cache[titleID] = texture
 		end
 	end)
 	
@@ -40,7 +38,7 @@ end
 --[[ client list ]]--
 local bnet_client = {
 	"WoW",	-- WoW
-	"WoC",	-- WoWC/WoW Classic
+	"WoWC",	-- WoWC/WoW Classic
 	"GRY",	-- Warcraft Arclight Rumble
 	"W1",	-- Warcraft Orcs & Humans
 	"W1R",	-- Warcraft I Remastered
@@ -79,9 +77,9 @@ for k, v in ipairs(bnet_client) do
 	GetIconTexture(v)
 end
 
---=================================================--
----------------    [[ Elements ]]     ---------------
---=================================================--
+--==========================================--
+--------------- [[ Elements ]] ---------------
+--==========================================--
 
 --[[ Create elements ]]--
 local Stat = CreateFrame("Frame", G.addon.."Friends", UIParent)
@@ -102,9 +100,9 @@ local Text  = Stat:CreateFontString(nil, "OVERLAY")
 	Text:SetTextColor(1, 1, 1)
 	Stat:SetAllPoints(Text)
 	
---==================================================--
----------------    [[ Functions ]]     ---------------
---==================================================--
+--===========================================--
+--------------- [[ Functions ]] ---------------
+--===========================================--
 	
 --[[ create a popup for bn broadcast / 推送戰網廣播 ]]--
 StaticPopupDialogs.SET_BN_BROADCAST = {
@@ -148,7 +146,7 @@ local function gameOnClick(self, info, btn)
 		InviteToGroup(info[1])
 	elseif btn == "MiddleButton" then
 		-- In-game msg / 遊戲內密語
-		ChatFrame_OpenChat("/w "..info[1].." ", SELECTED_DOCK_FRAME)
+		ChatFrameUtil.SendTell(info[1], SELECTED_DOCK_FRAME)
 	else
 		return
 	end
@@ -163,15 +161,15 @@ local function bnOnClick(self, info, btn)
 		end
 	elseif btn == "MiddleButton" then
 		-- BN msg / 戰網聊天
-		ChatFrame_SendBNetTell(info[2])
+		ChatFrameUtil.SendBNetTell(info[2], SELECTED_DOCK_FRAME)
 	else
 		return
 	end
 end
 
---====================================================--
----------------    [[ Build Table ]]     ---------------
---====================================================--
+--=============================================--
+--------------- [[ Build Table ]] ---------------
+--=============================================--
 
 --[[ Sort in-game friends by level ]] --
 local function sortFriends(a, b)
@@ -300,21 +298,15 @@ local function buildBNetTable(num)
 	sort(bnetTable, sortBNFriends)
 end
 
---================================================--
----------------    [[ Updates ]]     ---------------
---================================================--
+--=========================================--
+--------------- [[ Updates ]] ---------------
+--=========================================--
 
 local function OnEvent(self, event, ...)
 	local onlineFriends = C_FriendList_GetNumOnlineFriends()
 	local _, numBNetOnline = BNGetNumFriends()
 	local online = onlineFriends + numBNetOnline
 	
-	-- Refresh when online and offline / 上下線時強制更新
-	if event == "CHAT_MSG_SYSTEM" then
-		local message = select(1, ...)
-		if not (string.find(message, friendOnline) or string.find(message, friendOffline)) then return end
-	end
-
 	Text:SetText(online)
 	self:SetAllPoints(Text)
 end
@@ -412,7 +404,6 @@ local function OnEnter(self)
 				
 				local levelc = F.Hex(GetQuestDifficultyColor(info[9]))
 				local classc = F.Hex((CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[info[8]])
-			
 				if classc == nil then
 					classc = levelc
 				end
@@ -421,7 +412,7 @@ local function OnEnter(self)
 				if (info[5] == BNET_CLIENT_WOW and info[14] == true) then
 					icon = (info[6] == "Horde" and F.addIcon(G.Horde, 12, 2, 48)) or (info[6] == "Alliance" and F.addIcon(G.Alliance, 12, 2, 48))
 				else
-					icon = "|T"..GetIconTexture(info[5])..":12:12:0:0:50:50|t"
+					icon = "|T"..GetIconTexture("WoW")..":12:12:0:0:50:50|t"
 				end
 				
 				if isShiftKeyDown then
@@ -469,9 +460,9 @@ local function OnUpdate(self, elapsed)
 	end
 end
 
---================================================--
----------------    [[ Scripts ]]     ---------------
---================================================--
+--=========================================--
+--------------- [[ Scripts ]] ---------------
+--=========================================--
 	
 	--[[ Tooltip ]]--
 	Stat:SetScript("OnEnter", function(self)
@@ -510,5 +501,4 @@ end
 	Stat:RegisterEvent("BN_FRIEND_INFO_CHANGED")
 	Stat:RegisterEvent("FRIENDLIST_UPDATE")
 	Stat:RegisterEvent("PLAYER_ENTERING_WORLD")
-	Stat:RegisterEvent("CHAT_MSG_SYSTEM")
 	Stat:SetScript("OnEvent", OnEvent)

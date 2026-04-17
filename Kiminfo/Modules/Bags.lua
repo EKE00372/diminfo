@@ -12,9 +12,9 @@ local C_Container_GetContainerNumFreeSlots, C_Container_GetContainerNumSlots = C
 local C_Container_UseContainerItem, C_Container_GetContainerItemInfo = C_Container.UseContainerItem, C_Container.GetContainerItemInfo
 local C_Container_GetContainerItemEquipmentSetInfo = C_Container.GetContainerItemEquipmentSetInfo
 
---=================================================--
----------------    [[ Elements ]]     ---------------
---=================================================--
+--==========================================--
+---------------	[[ Elements ]] ---------------
+--==========================================--
 
 --[[ Create elements ]]--
 local Stat = CreateFrame("Frame", G.addon.."Bags", UIParent)
@@ -35,9 +35,9 @@ local Text  = Stat:CreateFontString(nil, "OVERLAY")
 	Text:SetTextColor(1, 1, 1)
 	Stat:SetAllPoints(Text)
 
---==================================================--
----------------    [[ Functions ]]     ---------------
---==================================================--
+--===========================================--
+---------------	[[ Functions ]] ---------------
+--===========================================--
 
 --[[ Bag slots ]]--
 local function getBagSlots()
@@ -62,9 +62,9 @@ local function GetBackpackCurrencyInfo(id)
 	return nil
 end
 
---================================================--
----------------    [[ Updates ]]     ---------------
---================================================--
+--=========================================--
+---------------	[[ Updates ]] ---------------
+--=========================================--
 
 --[[ Data text update ]]--
 local function OnEvent(self)
@@ -140,9 +140,9 @@ local function OnEnter(self)
 	GameTooltip:Show()
 end
 
---================================================--
----------------    [[ Scripts ]]     ---------------
---================================================--
+--=========================================--
+---------------	[[ Scripts ]] ---------------
+--=========================================--
 	
 	--[[ Tooltip ]]--
 	Stat:SetScript("OnEnter", function(self)
@@ -181,9 +181,9 @@ end
 		end
 	end)
 
---=======================================================--
----------------    [[ Auto sell gray ]]     ---------------
---=======================================================--
+--================================================--
+---------------	[[ Auto sell gray ]] ---------------
+--================================================--
 
 local sellGray = CreateFrame("Frame")
 	sellGray:SetScript("OnEvent", function()

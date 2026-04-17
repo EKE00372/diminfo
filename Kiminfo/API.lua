@@ -1,17 +1,16 @@
 local addon, ns = ... 
 local C, F, G, L = unpack(ns)
 
--- localized references for global functions (about 50% faster)
 local format = string.format
 local CreateFrame = CreateFrame
 local CreateColor = CreateColor
 
 -- multi version support prepare
---F.isNewPatch = select(4, GetBuildInfo()) >= 110000
+--F.isNewPatch = select(4, GetBuildInfo()) >= 120000
 
---================================================--
----------------    [[ Convert ]]     ---------------
---================================================--
+--=========================================--
+---------------	[[ Convert ]] ---------------
+--=========================================--
 
 F.Hex = function(r, g, b)
 	-- 未定義則白色
@@ -35,7 +34,7 @@ for k, v in pairs(LOCALIZED_CLASS_NAMES_MALE) do
 end
 
 --===================================================--
----------------    [[ Custom api ]]     ---------------
+---------------	[[ Custom api ]]	 ---------------
 --===================================================--
 
 -- 多重條件
@@ -55,9 +54,9 @@ F.addIcon = function(texture, size, cut1, cut2)
 	return texture
 end
 
---==============================================--
----------------    [[ Panel ]]     ---------------
---==============================================--
+--=======================================--
+---------------	[[ Panel ]] ---------------
+--=======================================--
 
 -- 創建框架
 F.CreatePanel = function(anchor, parent, x, y, w, h, size, a)
@@ -108,9 +107,9 @@ F.CreatePanel = function(anchor, parent, x, y, w, h, size, a)
 	return panel
 end
 
---================================================--
----------------    [[ Texture ]]     ---------------
---================================================--
+--=========================================--
+---------------	[[ Texture ]] ---------------
+--=========================================--
 
 -- 材質，為免被瞎改還是藏起來吧
 G.Bags = G.MediaFolder.."bags.tga"
