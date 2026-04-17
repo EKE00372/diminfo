@@ -42,8 +42,8 @@ local C, F, G, L = unpack(ns)
 	
 	-- anchor, parent, x, y, width, height, alpha
 	-- 錨點，父級框體，x座標，y座標，寬度，高度，透明度
-	C.Panel1 = {"TOPLEFT", UIParent, 208, -20, 420, 36, 32, .8}
-	C.Panel2 = {"TOPLEFT", UIParent, 208, -60, 320, 36, 32, .8}
+	C.Panel1 = {"TOPLEFT", UIParent, 288, -20, 420, 36, 32, .8}
+	C.Panel2 = {"TOPLEFT", UIParent, 288, -60, 320, 36, 32, .8}
 	-- add if you need, max to C.Panel5 / 自己加，最多到C.Panel5
 
 --------------
@@ -56,7 +56,7 @@ local C, F, G, L = unpack(ns)
 	
 	-- Timer / 時鐘
 	C.Time = true
-	C.TimePoint =  {"TOPLEFT", UIParent, 230, -30}
+	C.TimePoint =  {"TOPLEFT", UIParent, 310, -30}
 	
 	-- Friends / 好友
 	C.Friends = true
@@ -81,7 +81,7 @@ local C, F, G, L = unpack(ns)
 	-- Memory / 記憶體占用列表
 	C.Memory = true
 	C.MaxAddOns = 30
-	C.MemoryPoint = {"TOPLEFT", UIParent, 245, -68}
+	C.MemoryPoint = {"TOPLEFT", UIParent, 325, -68}
 	
 	-- System: Fps and latency / 幀數與延遲
 	C.System = true
