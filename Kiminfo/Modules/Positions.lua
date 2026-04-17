@@ -106,14 +106,7 @@ local function OnEnter(self)
 	-- Title
 	GameTooltip:SetOwner(self, C.StickTop and "ANCHOR_BOTTOM" or "ANCHOR_TOP", 0, C.StickTop and -10 or 10)
 	GameTooltip:ClearLines()
-	
-	-- Coords
-	if not IsInInstance() then
-		GameTooltip:AddLine(zone, 0, .8, 1)
-		GameTooltip:AddLine(format("|cffffffff%s|r", formatCoords()), 1, 1, 1)
-	else
-		GameTooltip:AddLine(zone, 0, .8, 1)
-	end
+	GameTooltip:AddLine(zone, 0, .6, 1)
 	
 	-- Subzone
 	if pvpType and not IsInInstance() then
@@ -122,6 +115,11 @@ local function OnEnter(self)
 			GameTooltip:AddLine(subzone, r, g, b)
 		end
 		GameTooltip:AddLine(format(zoneColor[pvpType][1], faction or ""), r, g, b)
+	end
+
+	-- Coords
+	if not IsInInstance() then
+		GameTooltip:AddLine(format("|cffffffff%s|r", formatCoords()), 1, 1, 1)
 	end
 	
 	-- Options
