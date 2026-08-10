@@ -9,9 +9,9 @@ local C_AreaPoiInfo_GetAreaPOIInfo, C_Map_GetMapInfo = C_AreaPoiInfo.GetAreaPOII
 local C_QuestLog_IsQuestFlaggedCompleted = C_QuestLog.IsQuestFlaggedCompleted
 local C_UIWidgetManager_GetTextWithStateWidgetVisualizationInfo =  C_UIWidgetManager.GetTextWithStateWidgetVisualizationInfo
 local C_MythicPlus_GetRunHistory, C_ChallengeMode_GetMapUIInfo = C_MythicPlus.GetRunHistory, C_ChallengeMode.GetMapUIInfo
-local C_CVar_GetCVarBool, C_Spell_GetSpellName = C_CVar.GetCVarBool, C_Spell.GetSpellName
+local C_Spell_GetSpellName = C_Spell.GetSpellName
 local GetSavedInstanceInfo, GetSavedWorldBossInfo = GetSavedInstanceInfo, GetSavedWorldBossInfo
-local TIMEMANAGER_TICKER_24HOUR, TIMEMANAGER_TICKER_12HOUR = TIMEMANAGER_TICKER_24HOUR, TIMEMANAGER_TICKER_12HOUR
+local TIMEMANAGER_TICKER_24HOUR = TIMEMANAGER_TICKER_24HOUR
 local WeeklyRunsThreshold = 8
 
 --======================================--
@@ -99,19 +99,9 @@ local Text  = Stat:CreateFontString(nil, "OVERLAY")
 ---------------	[[ Functions ]] ---------------
 --===========================================--
 
---[[ Format 24/12 hour clock ]]--
+--[[ Format 24 hour clock ]]--
 local function updateTimerFormat(hour, minute)
-	if C_CVar_GetCVarBool("timeMgrUseMilitaryTime") then
-		return format(TIMEMANAGER_TICKER_24HOUR, hour, minute)
-	else
-		local timerUnit = hour < 12 and " AM" or " PM"
-		
-		if hour > 12 then
-			hour = hour - 12
-		end
-		
-		return format(TIMEMANAGER_TICKER_12HOUR..timerUnit, hour, minute)
-	end
+	return format(TIMEMANAGER_TICKER_24HOUR, hour, minute)
 end
 
 --[[ Custom api for add title line ]]--
@@ -183,8 +173,10 @@ local function OnEnter(self)
 	GameTooltip:AddLine(" ")
 	
 	-- Game time
-	GameTooltip:AddDoubleLine(TIMEMANAGER_TOOLTIP_LOCALTIME, GameTime_GetLocalTime(true), .6, .8, 1, 1, 1, 1)
-	GameTooltip:AddDoubleLine(TIMEMANAGER_TOOLTIP_REALMTIME, GameTime_GetGameTime(true), .6, .8, 1, 1, 1, 1)
+	local localHour, localMinute = tonumber(date("%H")), tonumber(date("%M"))
+	local realmHour, realmMinute = GetGameTime()
+	GameTooltip:AddDoubleLine(TIMEMANAGER_TOOLTIP_LOCALTIME, updateTimerFormat(localHour, localMinute), .6, .8, 1, 1, 1, 1)
+	GameTooltip:AddDoubleLine(TIMEMANAGER_TOOLTIP_REALMTIME, updateTimerFormat(realmHour, realmMinute), .6, .8, 1, 1, 1, 1)
 	
 	-- Mythic+ and Weekly chest quest only on max level
 	if UnitLevel("player") == GetMaxLevelForLatestExpansion() then

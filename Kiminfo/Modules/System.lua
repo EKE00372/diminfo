@@ -72,7 +72,7 @@ local function colorLatency(latency)
 	elseif (latency > 300 and latency < 500) then
 		return 1, 1, .43
 	else
-		return 1, .5, 25
+		return 1, .5, .25
 	end
 	
 	return r, g, b
@@ -81,7 +81,7 @@ end
 --[[ fps color on data text ]]--
 local function colorFPS(fps)
 	if fps < 15 then
-		return 1, .5, 25
+		return 1, .5, .25
 	elseif fps < 30 then
 		return 1, 1, .43
 	else

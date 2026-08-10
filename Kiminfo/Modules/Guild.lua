@@ -41,7 +41,7 @@ local Text  = Stat:CreateFontString(nil, "OVERLAY")
 
 --[[ Get daily massage ]]--
 local function UpdateGuildMessage()
-	guildMotD = GetGuildRosterMOTD()
+	guildMotD = C_GuildInfo.GetMOTD()
 end
 
 --[[ Sort by ]] --
@@ -73,7 +73,7 @@ local function BuildGuildTable()
 				elseif status == 2 then
 					status = "|TInterface\\ChatFrame\\UI-ChatIcon-ArmoryChat-BusyMobile:14:14:0:0:16:16:0:16:0:16|t"
 				else
-					status = ChatFrame_GetMobileEmbeddedTexture(73/255, 177/255, 73/255)
+					status = ChatFrameUtil.GetMobileEmbeddedTexture(73/255, 177/255, 73/255)
 				end
 		else
 			if status == 1 then
@@ -183,7 +183,7 @@ local function OnEnter(self)
 	if standingID == 8 then
 		tooltip:AddLine(G.OptionColor..REPUTATION, G.OptionColor.._G["FACTION_STANDING_LABEL"..8])
 	else
-		tooltip:AddLine(G.OptionColor..REPUTATION, G.OptionColor.._G["FACTION_STANDING_LABEL"..standingID].." " ..(format("%.3f", (barValue/barMax))*100).."%")
+		tooltip:AddLine(G.OptionColor..REPUTATION, G.OptionColor.._G["FACTION_STANDING_LABEL"..standingID].." " ..(format("%.3f", (barValue - barMin)/(barMax - barMin))*100).."%")
 	end
 	
 	-- Guild daily info
@@ -200,7 +200,7 @@ local function OnEnter(self)
 		end
 
 		local y, x = tooltip:AddLine()
-		local guildMotD = GetGuildRosterMOTD() or ""
+		local guildMotD = C_GuildInfo.GetMOTD() or ""
 		tooltip:SetCell(y, 1, G.OptionColor..guildMotD, nil, "LEFT", 2, nil, 0, 0, width)
 	end
 	

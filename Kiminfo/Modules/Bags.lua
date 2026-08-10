@@ -12,6 +12,8 @@ local C_Container_GetContainerNumFreeSlots, C_Container_GetContainerNumSlots = C
 local C_Container_UseContainerItem, C_Container_GetContainerItemInfo = C_Container.UseContainerItem, C_Container.GetContainerItemInfo
 local C_Container_GetContainerItemEquipmentSetInfo = C_Container.GetContainerItemEquipmentSetInfo
 
+local tokenPriceTicker
+
 --==========================================--
 ---------------	[[ Elements ]] ---------------
 --==========================================--
@@ -66,8 +68,12 @@ end
 ---------------	[[ Updates ]] ---------------
 --=========================================--
 
+local function UpdateTokenPrice()
+	C_WowTokenPublic_UpdateMarketPrice()
+end
+
 --[[ Data text update ]]--
-local function OnEvent(self)
+local function OnEvent(self, event)
 	if Kiminfo.AutoSell == nil then
 		Kiminfo.AutoSell = true
 	end
@@ -76,10 +82,10 @@ local function OnEvent(self)
 	Text:SetText(free)
 	self:SetAllPoints(Text)
 	
-	-- Update token price when login
-	C_WowTokenPublic_UpdateMarketPrice()
-	-- Update token price every 3 min
-	C_Timer_NewTicker(180, function () C_WowTokenPublic_UpdateMarketPrice() end)
+	if event == "PLAYER_LOGIN" then
+		UpdateTokenPrice()
+		tokenPriceTicker = tokenPriceTicker or C_Timer_NewTicker(180, UpdateTokenPrice)
+	end
 end
 
 --[[ Tooltip update ]]--
@@ -125,7 +131,7 @@ local function OnEnter(self)
 	
 	-- Tier charge
 	local chargeInfo = C_CurrencyInfo_GetCurrencyInfo(3378) -- TWW S2
-	if chargeInfo and IsPlayerAtEffectiveMaxLevel() then
+	if chargeInfo and UnitLevel("player") >= GetMaxLevelForPlayerExpansion() then
 		if GetNumWatchedTokens() < 1 then GameTooltip:AddLine(" ") end
 		local iconTexture = "|T"..chargeInfo.iconFileID..":13:15:0:0:50:50:4:46:4:46|t"
 		GameTooltip:AddDoubleLine(iconTexture.." "..chargeInfo.name, chargeInfo.quantity.."/"..chargeInfo.maxQuantity, 1, 1, 1, 1, 1, 1)
