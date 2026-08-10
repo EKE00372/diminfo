@@ -4,12 +4,22 @@ if not C.Positions then return end
 
 local format, unpack = string.format, unpack
 local CreateFrame = CreateFrame
+local canaccessvalue = canaccessvalue
 local C_Map_GetWorldPosFromMapPos, C_Map_GetBestMapForUnit = C_Map.GetWorldPosFromMapPos, C_Map.GetBestMapForUnit
 local C_PvP_GetZonePVPInfo = C_PvP.GetZonePVPInfo
+local C_CVar_GetCVarBool, C_CVar_SetCVar = C_CVar.GetCVarBool, C_CVar.SetCVar
 local GetSubZoneText, GetZoneText = GetSubZoneText, GetZoneText
 
 local subzone, zone, pvpType, faction
 local coordX, coordY = 0, 0
+local secretValueCVars = {
+	"addonChatRestrictionsForced",
+	"addonEncounterRestrictionsForced",
+	"addonChallengeModeRestrictionsForced",
+	"addonPvPMatchRestrictionsForced",
+	"addonMapRestrictionsForced",
+	"addonCombatRestrictionsForced",
+}
 
 --==========================================--
 ---------------	[[ Elements ]] ---------------
@@ -46,19 +56,42 @@ local function formatCoords()
 	return format("%.1f, %.1f", coordX*100, coordY*100)
 end
 
+--[[ Secret value test CVars ]]--
+local function AreSecretValueCVarsEnabled()
+	for i = 1, #secretValueCVars do
+		if not C_CVar_GetCVarBool(secretValueCVars[i]) then
+			return false
+		end
+	end
+
+	return true
+end
+
+local function SetSecretValueCVarsEnabled(enabled)
+	local value = enabled and "1" or "0"
+
+	for i = 1, #secretValueCVars do
+		C_CVar_SetCVar(secretValueCVars[i], value)
+	end
+end
+
 --[[ Get XY ]]--
 local mapRects = {}
 local tempVec2D = CreateVector2D(0, 0)
 local function GetPlayerMapPos(mapID)
+	if not mapID then return end
+
 	tempVec2D.x, tempVec2D.y = UnitPosition("player")
 	if not tempVec2D.x then return end
 	
 	local mapRect = mapRects[mapID]
 	if not mapRect then
-		mapRect = {}
-		mapRect[1] = select(2, C_Map_GetWorldPosFromMapPos(mapID, CreateVector2D(0, 0)))
-		mapRect[2] = select(2, C_Map_GetWorldPosFromMapPos(mapID, CreateVector2D(1, 1)))
-		mapRect[2]:Subtract(mapRect[1])
+		local _, mapOrigin = C_Map_GetWorldPosFromMapPos(mapID, CreateVector2D(0, 0))
+		local _, mapExtent = C_Map_GetWorldPosFromMapPos(mapID, CreateVector2D(1, 1))
+		if not mapOrigin or not mapExtent then return end
+
+		mapExtent:Subtract(mapOrigin)
+		mapRect = {mapOrigin, mapExtent}
 	
 		mapRects[mapID] = mapRect
 	end
@@ -77,7 +110,6 @@ local function UpdateCoords(self, elapsed)
 			coordX, coordY = x, y
 		else
 			coordX, coordY = 0, 0
-			self:SetScript("OnUpdate", nil)
 		end
 		self:GetScript("OnEnter")(self)
 		
@@ -101,7 +133,12 @@ local function OnEvent(self)
 end
 
 local function OnEnter(self)
-	self:SetScript("OnUpdate", UpdateCoords)
+	local inInstance = IsInInstance()
+	if inInstance then
+		self:SetScript("OnUpdate", nil)
+	elseif not self:GetScript("OnUpdate") then
+		self:SetScript("OnUpdate", UpdateCoords)
+	end
 	
 	-- Title
 	GameTooltip:SetOwner(self, C.StickTop and "ANCHOR_BOTTOM" or "ANCHOR_TOP", 0, C.StickTop and -10 or 10)
@@ -109,7 +146,7 @@ local function OnEnter(self)
 	GameTooltip:AddLine(zone, 0, .6, 1)
 	
 	-- Subzone
-	if pvpType and not IsInInstance() then
+	if pvpType and not inInstance then
 		local r, g, b = unpack(zoneColor[pvpType][2])
 		if subzone and subzone ~= zone then
 			GameTooltip:AddLine(subzone, r, g, b)
@@ -118,8 +155,13 @@ local function OnEnter(self)
 	end
 
 	-- Coords
-	if not IsInInstance() then
+	if not inInstance then
 		GameTooltip:AddLine(format("|cffffffff%s|r", formatCoords()), 1, 1, 1)
+	end
+
+	if IsControlKeyDown() then
+		GameTooltip:AddLine(" ")
+		GameTooltip:AddDoubleLine("Secret Value CVar", AreSecretValueCVarsEnabled() and G.Enable or G.Disable, 1, 1, 1, 1, 1, 1)
 	end
 	
 	-- Options
@@ -149,24 +191,40 @@ end
 	Stat:SetScript("OnEvent", OnEvent)
 	
 	--[[ Options ]]--
-	Stat:SetScript("OnMouseUp", function(_, btn)
-		if btn == "LeftButton" then
+	Stat:SetScript("OnMouseUp", function(self, btn)
+		if btn == "LeftButton" and IsControlKeyDown() then
+			SetSecretValueCVarsEnabled(not AreSecretValueCVarsEnabled())
+			OnEnter(self)
+		elseif btn == "LeftButton" then
 			if InCombatLockdown() then UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT) return end
 			ToggleFrame(WorldMapFrame)
 		elseif btn == "RightButton" then
 			local inInstance, instanceType = IsInInstance()
 			if (not inInstance) and (instanceType == "none") then
-				local map = C_Map_GetBestMapForUnit("player") or ""
-				local x, y = GetPlayerMapPos(map) or 0, 0
-				local hasUnit = UnitExists("target") and not UnitIsPlayer("target")
-				local unitName = hasUnit and UnitName("target") or ""
-				
-				C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(map, x, y))
-				if C_Map.CanSetUserWaypointOnMap(map) then
-					ChatFrame_OpenChat(format("%s %s (%s) %s", C_Map.GetUserWaypointHyperlink(), zone, formatCoords(), unitName), chatFrame)
-				else
-					ChatFrame_OpenChat(format("%s (%s) %s", zone, formatCoords(), unitName), chatFrame)
+				local map = C_Map_GetBestMapForUnit("player")
+				if not map then return end
+
+				local x, y = GetPlayerMapPos(map)
+				if not x or not y then return end
+
+				coordX, coordY = x, y
+				local unitName = ""
+				if UnitExists("target") and not UnitIsPlayer("target") then
+					local targetName = UnitName("target")
+					if canaccessvalue(targetName) then
+						unitName = targetName
+					end
 				end
+				
+				if C_Map.CanSetUserWaypointOnMap(map) and C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(map, x, y)) then
+					local waypointLink = C_Map.GetUserWaypointHyperlink()
+					if waypointLink then
+						ChatFrameUtil.OpenChat(format("%s %s (%s) %s", waypointLink, zone, formatCoords(), unitName))
+						return
+					end
+				end
+
+				ChatFrameUtil.OpenChat(format("%s (%s) %s", zone, formatCoords(), unitName))
 			end
 		else
 			return

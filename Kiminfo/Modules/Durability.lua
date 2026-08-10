@@ -216,7 +216,7 @@ local RepairGear = CreateFrame("Frame")
 					end
 				end
 				
-				if money > cost then
+				if money >= cost then
 					RepairAllItems()
 					print(format("|cff99CCFF"..REPAIR_COST.."|r%s", GetMoneyString(cost)))
 				else

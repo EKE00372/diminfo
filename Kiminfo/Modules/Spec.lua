@@ -78,7 +78,7 @@ end
 
 -- Select talent
 local function selectCurrentConfig(_, configID, specID)
-	if InCombatLockdown() then UIErrorsFrame:AddMessage(DB.InfoColor..ERR_NOT_IN_COMBAT) return end
+	if InCombatLockdown() then UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT) return end
 	if configID == STARTER_BUILD then
 		C_ClassTalents.SetStarterBuildActive(true)
 	else

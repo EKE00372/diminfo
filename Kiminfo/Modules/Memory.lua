@@ -262,12 +262,12 @@ local autoCollect = CreateFrame("Frame")
 	autoCollect:RegisterAllEvents()
 	autoCollect:SetScript("OnEvent", function(self, event)
 		if Kiminfo.AutoCollect == true then
-			eventcount = eventCount + 1
+			eventCount = eventCount + 1
 			
 			if InCombatLockdown() then return end
-			if eventcount > 15000 or event == "PLAYER_ENTERING_WORLD" or event == "PLAYER_REGEN_ENABLED" then
+			if eventCount > 15000 or event == "PLAYER_ENTERING_WORLD" or event == "PLAYER_REGEN_ENABLED" then
 				collectgarbage("collect")
-				eventcount = 0
+				eventCount = 0
 			end
 		end
 	end)

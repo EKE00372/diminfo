@@ -114,7 +114,7 @@ StaticPopupDialogs.SET_BN_BROADCAST = {
 	maxLetters = 127,
 	
 	OnAccept = function(self)
-		BNSetCustomMessage(self.editBox:GetText())
+		C_BattleNet.SetCustomMessage(self.EditBox:GetText())
 	end,
 	
 	OnShow = function(self)
@@ -122,10 +122,10 @@ StaticPopupDialogs.SET_BN_BROADCAST = {
 		self.EditBox:SetFocus()
 	end,
 	
-	OnHide = ChatEdit_FocusActiveWindow,
+	OnHide = ChatFrameUtil.FocusActiveWindow,
 	
 	EditBoxOnEnterPressed = function(self)
-		BNSetCustomMessage(self:GetText())
+		C_BattleNet.SetCustomMessage(self:GetText())
 		self:GetParent():Hide()
 	end,
 	
@@ -343,7 +343,7 @@ local function OnEnter(self)
 		end
 
 		local y, x = tooltip:AddLine()
-		tooltip:SetCell(y, 1, G.OptionColor..format(currentBroadcast), nil, "LEFT", 2, nil, 0, 0, width)
+		tooltip:SetCell(y, 1, G.OptionColor..currentBroadcast, nil, "LEFT", 2, nil, 0, 0, width)
 	end
 	
 	-- Options

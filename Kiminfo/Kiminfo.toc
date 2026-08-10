@@ -1,4 +1,4 @@
-## Interface: 120001, 120005
+## Interface: 120100
 ## Author: EK
 ## Title: |cff00ffffKim|rinfo
 ## Title-zhTW: |cff00ffffKim|rinfo 資訊條
