@@ -2,7 +2,7 @@ local addon, ns = ...
 local C, F, G, L = unpack(ns)
 if not C.Durability then return end
 
-local format, floor, sort, modf, select = string.format, math.floor, table.sort, math.modf, select
+local format, floor, min, sort, modf, select = string.format, math.floor, math.min, table.sort, math.modf, select
 local CreateFrame = CreateFrame
 local GetInventoryItemLink, GetInventoryItemDurability, GetInventoryItemTexture = GetInventoryItemLink, GetInventoryItemDurability, GetInventoryItemTexture
 
@@ -197,21 +197,20 @@ local RepairGear = CreateFrame("Frame")
 			
 			-- Can repair and cost more than 0 / 可以修裝而且花費大於零
 			if canRepair and cost > 0 then
-				if IsInGuild() then
+				if IsInGuild() and CanGuildBankRepair() then
 					local guildMoney = GetGuildBankWithdrawMoney()
-					
-					-- When withdraw amount more than guild money / 可提領金額大於公會餘額
-					if guildMoney > GetGuildBankMoney() then
-						guildMoney = GetGuildBankMoney()
+					local guildBankMoney = GetGuildBankMoney()
+
+					-- Guild leaders use -1 for an unlimited withdrawal allowance.
+					if guildMoney == -1 then
+						guildMoney = guildBankMoney
+					else
+						guildMoney = min(guildMoney, guildBankMoney)
 					end
 					-- Use guild repair if you can / 優先使用公會修理
-					if guildMoney >= cost and CanGuildBankRepair() then
-						RepairAllItems(1)
+					if guildMoney >= cost then
+						RepairAllItems(true)
 						print(format("|cff99CCFF"..GUILDCONTROL_OPTION15.."|r %s", GetMoneyString(cost)))
-						return
-					elseif guildMoney == 0 and IsGuildLeader() then
-						RepairAllItems(1)
-						print(format("|cff99CCFF"..REPAIR_COST.."|r %s", GetMoneyString(cost)))
 						return
 					end
 				end
