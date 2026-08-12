@@ -8,7 +8,8 @@ local C_DateAndTime_GetCurrentCalendarTime, C_Calendar_GetNumPendingInvites = C_
 local C_AreaPoiInfo_GetAreaPOIInfo, C_Map_GetMapInfo = C_AreaPoiInfo.GetAreaPOIInfo, C_Map.GetMapInfo
 local C_QuestLog_IsQuestFlaggedCompleted = C_QuestLog.IsQuestFlaggedCompleted
 local C_UIWidgetManager_GetTextWithStateWidgetVisualizationInfo =  C_UIWidgetManager.GetTextWithStateWidgetVisualizationInfo
-local C_MythicPlus_GetRunHistory, C_ChallengeMode_GetMapUIInfo = C_MythicPlus.GetRunHistory, C_ChallengeMode.GetMapUIInfo
+local C_MythicPlus_GetRunHistory, C_MythicPlus_RequestMapInfo = C_MythicPlus.GetRunHistory, C_MythicPlus.RequestMapInfo
+local C_ChallengeMode_GetMapUIInfo = C_ChallengeMode.GetMapUIInfo
 local C_Spell_GetSpellName = C_Spell.GetSpellName
 local GetSavedInstanceInfo, GetSavedWorldBossInfo = GetSavedInstanceInfo, GetSavedWorldBossInfo
 local TIMEMANAGER_TICKER_24HOUR = TIMEMANAGER_TICKER_24HOUR
@@ -127,7 +128,12 @@ end
 ---------------	[[ Updates ]] ---------------
 --=========================================--
 
-local function OnEvent(self)
+local function OnEvent(self, event)
+	if event == "PLAYER_ENTERING_WORLD" then
+		RequestRaidInfo()
+		C_MythicPlus_RequestMapInfo()
+	end
+
 	C_Timer.After(3, cacheIDs)
 
 	local r, g, b
@@ -160,9 +166,6 @@ end
 
 --[[ Update tooltip ]]--
 local function OnEnter(self)
-	-- 獲取進度
-	RequestRaidInfo()
-
 	local today = C_DateAndTime_GetCurrentCalendarTime()
 	local w, m, d, y = today.weekday, today.month, today.monthDay, today.year
 	
@@ -320,6 +323,8 @@ end
 	Stat:SetScript("OnEnter", function(self)
 		-- mouseover color
 		Text:SetTextColor(0, 1, 1)
+		RequestRaidInfo()
+		C_MythicPlus_RequestMapInfo()
 		-- tooltip show
 		OnEnter(self)
 	end)
@@ -339,7 +344,6 @@ end
 	--Stat:RegisterEvent("CALENDAR_EVENT_ALARM")
 	--Stat:RegisterEvent("CALENDAR_UPDATE_EVENT_LIST")
 	--Stat:RegisterEvent("CALENDAR_UPDATE_INVITE_LIST")
-	--Stat:RegisterEvent("UPDATE_INSTANCE_INFO")
 	Stat:SetScript("OnEvent", OnEvent)
 	Stat:SetScript("OnUpdate", OnUpdate)
 	
