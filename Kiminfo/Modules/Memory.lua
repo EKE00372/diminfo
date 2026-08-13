@@ -10,6 +10,7 @@ local collectgarbage, gcinfo = collectgarbage, gcinfo
 
 local memoryTable, totalMemory  = {}, 0
 local eventCount = 0
+local autoCollect = CreateFrame("Frame")
 
 --==========================================--
 ---------------	[[ Elements ]] ---------------
@@ -134,12 +135,29 @@ end
 ---------------	[[ Updates ]] ---------------
 --=========================================--
 
+-- [[ Register switch ]]--
+local function updateAutoCollect()
+	if Kiminfo.AutoCollect then
+		autoCollect:RegisterAllEvents()
+	else
+		autoCollect:UnregisterAllEvents()
+		eventCount = 0
+	end
+end
+
 --[[ Update when login ]]--
-local function OnEvent(self)
+local function OnEvent(self, event, loadedAddon)
 	-- Setting
-	if Kiminfo.AutoCollect == nil then
-		-- I'm not sure but somebody said auto collect will make client crash so default false it
-		Kiminfo.AutoCollect = false
+	if event == "ADDON_LOADED" then
+		if loadedAddon ~= addon then return end
+
+		if Kiminfo.AutoCollect == nil then
+			-- I'm not sure but somebody said auto collect will make client crash so default false it
+			Kiminfo.AutoCollect = false
+		end
+
+		updateAutoCollect()
+		self:UnregisterEvent("ADDON_LOADED")
 	end
 	
 	-- Data text
@@ -161,6 +179,7 @@ local function OnEnter(self)
 	local isShiftKeyDown = IsShiftKeyDown()
 	local maxShown = isShiftKeyDown and #memoryTable or min(maxAddOns, #memoryTable)
 	local numEnabled = 0
+	local hiddenMemory = 0
 
 	-- Title
 	GameTooltip:SetOwner(self, C.StickTop and "ANCHOR_BOTTOM" or "ANCHOR_TOP", 0, C.StickTop and -10 or 10)
@@ -177,19 +196,15 @@ local function OnEnter(self)
 			
 			if numEnabled <= maxShown then
 				GameTooltip:AddDoubleLine(value[2], formatMemory(value[3]), 1, 1, 1, memoryColor(value[3], 5))
+			else
+				hiddenMemory = hiddenMemory + value[3]
 			end
 		end
 	end
 
 	-- Merge line when not shift key down / 合併統計行
-	if not isShiftKeyDown and (numEnabled > maxAddOns) then
-		local hiddenMemory = 0
-		
-		for i = (maxAddOns + 1), numEnabled do
-			hiddenMemory = hiddenMemory + memoryTable[i][3]
-		end
-		
-		GameTooltip:AddDoubleLine(format("%d %s (%s)", numEnabled - maxAddOns, L.Hidden, L.Shift), formatMemory(hiddenMemory), .6, .8, 1, .6, .8, 1)
+	if numEnabled > maxShown then
+		GameTooltip:AddDoubleLine(format("%d %s (%s)", numEnabled - maxShown, L.Hidden, L.Shift), formatMemory(hiddenMemory), .6, .8, 1, .6, .8, 1)
 	end
 
 	-- Total
@@ -238,6 +253,7 @@ end
 			print(format("|cff66C6FF%s|r%s", L.Collected, formatMemory(before - gcinfo())))
 		elseif btn == "RightButton" then
 			Kiminfo.AutoCollect = not Kiminfo.AutoCollect
+			updateAutoCollect()
 			print(L.CollectWarning)
 		elseif btn == "MiddleButton" then
 			if InCombatLockdown() then UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT) return end
@@ -258,8 +274,6 @@ end
 ---------------	[[ Auto Collect ]] ---------------
 --==============================================--
 
-local autoCollect = CreateFrame("Frame")
-	autoCollect:RegisterAllEvents()
 	autoCollect:SetScript("OnEvent", function(self, event)
 		if Kiminfo.AutoCollect == true then
 			eventCount = eventCount + 1
