@@ -27,12 +27,6 @@ F.Hex = function(r, g, b)
 	return ("|cff%02x%02x%02x"):format(r * 255, g * 255, b * 255)
 end
 
--- 職業列表轉換
-F.ClassList = {}
-for k, v in pairs(LOCALIZED_CLASS_NAMES_MALE) do
-	F.ClassList[v] = k
-end
-
 --===================================================--
 ---------------	[[ Custom api ]]	 ---------------
 --===================================================--
