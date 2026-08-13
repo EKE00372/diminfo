@@ -7,10 +7,8 @@ local CreateFrame = CreateFrame
 local C_DateAndTime_GetCurrentCalendarTime, C_Calendar_GetNumPendingInvites = C_DateAndTime.GetCurrentCalendarTime, C_Calendar.GetNumPendingInvites
 local C_AreaPoiInfo_GetAreaPOIInfo, C_Map_GetMapInfo = C_AreaPoiInfo.GetAreaPOIInfo, C_Map.GetMapInfo
 local C_QuestLog_IsQuestFlaggedCompleted = C_QuestLog.IsQuestFlaggedCompleted
-local C_UIWidgetManager_GetTextWithStateWidgetVisualizationInfo =  C_UIWidgetManager.GetTextWithStateWidgetVisualizationInfo
 local C_MythicPlus_GetRunHistory, C_MythicPlus_RequestMapInfo = C_MythicPlus.GetRunHistory, C_MythicPlus.RequestMapInfo
 local C_ChallengeMode_GetMapUIInfo = C_ChallengeMode.GetMapUIInfo
-local C_Spell_GetSpellName = C_Spell.GetSpellName
 local GetSavedInstanceInfo, GetSavedWorldBossInfo = GetSavedInstanceInfo, GetSavedWorldBossInfo
 local TIMEMANAGER_TICKER_24HOUR = TIMEMANAGER_TICKER_24HOUR
 local WeeklyRunsThreshold = 8
@@ -19,28 +17,36 @@ local WeeklyRunsThreshold = 8
 --------------- [[ Data ]] ---------------
 --======================================--
 
---[[ Cahce ]] --
+--[[ Cache ]] --
 
 local itemCache = {}
-local function GetItemLink(itemID)
-	local link = itemCache[itemID]
-	if not link then
-		link = select(2, C_Item.GetItemInfo(itemID))
-		itemCache[itemID] = link
-	end
-	return link
+local function LoadItemLink(itemID)
+	local item = Item:CreateFromItemID(itemID)
+	item:ContinueOnItemLoad(function()
+		local link = item:GetItemLink()
+		if link then
+			itemCache[itemID] = link
+		end
+	end)
 end
 
-local function cacheIDs()
-	C_Spell.RequestLoadSpellData(388945)
-	C_Item.RequestLoadItemDataByID(200468)
-	C_Spell.RequestLoadSpellData(386441)
-	C_TaskQuest.RequestPreloadRewardData(79226)
-	C_Spell.RequestLoadSpellData(418272)
-	C_TaskQuest.RequestPreloadRewardData(83240)
-	--C_Map.GetAreaInfo(15141)
-	C_TaskQuest.RequestPreloadRewardData(82946)
-	C_TaskQuest.RequestPreloadRewardData(76586)
+local function LoadSpellName(entry)
+	local spell = Spell:CreateFromSpellID(entry.spellID)
+	spell:ContinueOnSpellLoad(function()
+		local name = spell:GetSpellName()
+		if name then
+			entry.name = name
+		end
+	end)
+end
+
+local function LoadQuestName(entry)
+	QuestEventListener:AddCallback(entry.questID, function()
+		local name = QuestUtils_GetQuestName(entry.questID)
+		if name and name ~= "" then
+			entry.name = name
+		end
+	end)
 end
 
 -- [[ Delves ]] --
@@ -65,20 +71,46 @@ local delveList = {
 
 local DFQuestList = {
 	-- PLAYER_DIFFICULTY_TIMEWALKER todo
-	{name = C_Spell_GetSpellName(388945), id = 70866},	-- SoDK
-	{name = "", id = 70906, itemID = 200468},	-- Grand hunt
-	{name = C_Spell_GetSpellName(386441), id = 70893},	-- Community feast
-	{name = "", id = 79226, questName = true},-- The big dig
-	{name = C_Spell_GetSpellName(418272), id = 78319},	-- The superbloom
+	{name = "", questID = 70866, spellID = 388945},	-- SoDK
+	{name = "", questID = 70906, itemID = 200468},	-- Grand hunt
+	{name = "", questID = 70893, spellID = 386441},	-- Community feast
+	{name = "", questID = 79226},-- The big dig
+	{name = "", questID = 78319, spellID = 418272},	-- The superbloom
 	--70221 工匠精神
 }
 
 local TWWQuestList = {
-	{name = "", id = 83240, questName = true},-- 劇團
-	{name = C_Map.GetAreaInfo(15141), id = 83333},-- 甦醒機械
-	{name = "", id = 82946, questName = true},-- 蠟塊
-	{name = "", id = 76586, questName = true},-- 散布光芒
+	{name = "", questID = 83240},-- 劇團
+	{name = "", questID = 83333, areaID = 15141},-- 甦醒機械
+	{name = "", questID = 82946},-- 蠟塊
+	{name = "", questID = 76586},-- 散布光芒
 }
+
+local function LoadQuestListNames(questList)
+	for _, entry in ipairs(questList) do
+		if entry.itemID then
+			if not itemCache[entry.itemID] then
+				LoadItemLink(entry.itemID)
+			end
+		elseif not entry.name or entry.name == "" then
+			if entry.spellID then
+				LoadSpellName(entry)
+			elseif entry.areaID then
+				local name = C_Map.GetAreaInfo(entry.areaID)
+				if name then
+					entry.name = name
+				end
+			else
+				LoadQuestName(entry)
+			end
+		end
+	end
+end
+
+local function LoadQuestNames()
+	LoadQuestListNames(DFQuestList)
+	LoadQuestListNames(TWWQuestList)
+end
 
 --==========================================--
 ---------------	[[ Elements ]] ---------------
@@ -115,6 +147,19 @@ local function addTitle(text)
 	end
 end
 
+local function addQuestList(text, questList)
+	title = false
+	for _, entry in ipairs(questList) do
+		addTitle(text)
+		local name = (entry.itemID and itemCache[entry.itemID]) or entry.name or ""
+		if C_QuestLog_IsQuestFlaggedCompleted(entry.questID) then
+			GameTooltip:AddDoubleLine(name, COMPLETE, 1, 1, 1, .3, 1, .3)
+		else
+			GameTooltip:AddDoubleLine(name, INCOMPLETE, 1, 1, 1, 1, .3, .3)
+		end
+	end
+end
+
 --[[ Mythic+ run history sort order ]]--
 local function sortHistory(entry1, entry2)
 	if entry1.level == entry2.level then
@@ -128,44 +173,8 @@ end
 ---------------	[[ Updates ]] ---------------
 --=========================================--
 
-local function OnEvent(self, event)
-	if event == "PLAYER_ENTERING_WORLD" then
-		RequestRaidInfo()
-		C_MythicPlus_RequestMapInfo()
-	end
-
-	C_Timer.After(3, cacheIDs)
-
-	local r, g, b
-	if C_Calendar_GetNumPendingInvites() > 0 then 
-		r, g, b = .57, 1, .57
-	else
-		r, g, b = 1, 1, 1
-	end
-	
-	Text:SetTextColor(r, g, b)
-end
-
---[[ Update data text ]]--
-local function OnUpdate(self, elapsed)
-	self.timer = (self.timer or 3) + elapsed
-	-- Limit frequency / 限制一下更新速率
-	if self.timer > 5 then
-		-- Local time / 本地時間
-		local hour, minute
-		if GetCVarBool("timeMgrUseLocalTime") then
-			hour, minute = tonumber(date("%H")), tonumber(date("%M"))
-		else
-			hour, minute = GetGameTime()
-		end
-		Text:SetText(updateTimerFormat(hour, minute))
-		
-		self.timer = 0
-	end
-end
-
 --[[ Update tooltip ]]--
-local function OnEnter(self)
+local function OnEnter(self, isShiftDown)
 	local today = C_DateAndTime_GetCurrentCalendarTime()
 	local w, m, d, y = today.weekday, today.month, today.monthDay, today.year
 	
@@ -186,52 +195,41 @@ local function OnEnter(self)
 		
 		-- Quests
 
-		if IsShiftKeyDown() then
+		if isShiftDown then
 			-- DF
-			title = false
-			for _, v in pairs(DFQuestList) do
-				addTitle(EXPANSION_NAME9)
-				if v.name and C_QuestLog_IsQuestFlaggedCompleted(v.id) then
-					GameTooltip:AddDoubleLine((v.itemID and GetItemLink(v.itemID)) or (v.questName and QuestUtils_GetQuestName(v.id)) or v.name, COMPLETE, 1, 1, 1, .3, 1, .3)
-				else
-					GameTooltip:AddDoubleLine((v.itemID and GetItemLink(v.itemID)) or (v.questName and QuestUtils_GetQuestName(v.id)) or v.name, INCOMPLETE, 1, 1, 1, 1, .3, .3)
-				end
-			end
+			addQuestList(EXPANSION_NAME9, DFQuestList)
 
 			-- TWW
-			title = false
-			for _, v in pairs(TWWQuestList) do
-				addTitle(EXPANSION_NAME10)
-				if v.name and C_QuestLog_IsQuestFlaggedCompleted(v.id) then
-					GameTooltip:AddDoubleLine((v.itemID and GetItemLink(v.itemID)) or (v.questName and QuestUtils_GetQuestName(v.id)) or v.name, COMPLETE, 1, 1, 1, .3, 1, .3)
-				else
-					GameTooltip:AddDoubleLine((v.itemID and GetItemLink(v.itemID)) or (v.questName and QuestUtils_GetQuestName(v.id)) or v.name, INCOMPLETE, 1, 1, 1, 1, .3, .3)
-				end
-			end
+			addQuestList(EXPANSION_NAME10, TWWQuestList)
 		end
 		
 		-- Delve key
 		title = false
 		local currentKeys, maxKeys = 0, #delvesKeys
-		for _, questID in pairs(delvesKeys) do
+		for _, questID in ipairs(delvesKeys) do
 			if C_QuestLog_IsQuestFlaggedCompleted(questID) then
 				currentKeys = currentKeys + 1
 			end
 		end
 		if currentKeys > 0 then
-			if currentKeys == maxKeys then r,g,b = 1,0,0 else r,g,b = 0,1,0 end
+			local r, g, b
+			if currentKeys == maxKeys then r, g, b = 1, 0, 0 else r, g, b = 0, 1, 0 end
 			addTitle(WEEKLY)
-			GameTooltip:AddDoubleLine(keyName, format("%d/%d", currentKeys, #delvesKeys), 1, 1, 1, r,g,b)
+			GameTooltip:AddDoubleLine(keyName, format("%d/%d", currentKeys, #delvesKeys), 1, 1, 1, r, g, b)
 		end
 		
 		-- Delves
-		title = false
-		for _, v in pairs(delveList) do
-			local delveInfo = C_AreaPoiInfo_GetAreaPOIInfo(v.uiMapID, v.delveID)
-			if delveInfo then
-				addTitle(delveInfo.description)
-				local mapInfo = C_Map_GetMapInfo(v.uiMapID)
-				GameTooltip:AddDoubleLine(mapInfo.name .. " - " .. delveInfo.name, SecondsToTime(GetQuestResetTime(), true, nil, 3), 1, 1, 1, 1, 1, 1)
+		if not isShiftDown then
+			title = false
+			for _, v in ipairs(delveList) do
+				local delveInfo = C_AreaPoiInfo_GetAreaPOIInfo(v.uiMapID, v.delveID)
+				if delveInfo then
+					local mapInfo = C_Map_GetMapInfo(v.uiMapID)
+					if mapInfo then
+						addTitle(delveInfo.description)
+						GameTooltip:AddDoubleLine(mapInfo.name .. " - " .. delveInfo.name, SecondsToTime(GetQuestResetTime(), true, nil, 3), 1, 1, 1, 1, 1, 1)
+					end
+				end
 			end
 		end
 		--end
@@ -315,6 +313,53 @@ local function OnEnter(self)
 	GameTooltip:Show()
 end
 
+--[[ Update data text ]]--
+local function OnEvent(self, event, key)
+	if event == "MODIFIER_STATE_CHANGED" then
+		local isShiftKey = key == "LSHIFT" or key == "RSHIFT"
+		if isShiftKey and GameTooltip:IsShown() and GameTooltip:GetOwner() == self then
+			local isShiftDown = IsShiftKeyDown()
+			if isShiftDown ~= self.isShiftDown then
+				self.isShiftDown = isShiftDown
+				OnEnter(self, isShiftDown)
+			end
+		end
+		return
+	end
+
+	if event == "PLAYER_ENTERING_WORLD" then
+		RequestRaidInfo()
+		C_MythicPlus_RequestMapInfo()
+		LoadQuestNames()
+	end
+
+	local r, g, b
+	if C_Calendar_GetNumPendingInvites() > 0 then 
+		r, g, b = .57, 1, .57
+	else
+		r, g, b = 1, 1, 1
+	end
+	
+	Text:SetTextColor(r, g, b)
+end
+
+local function OnUpdate(self, elapsed)
+	self.timer = (self.timer or 3) + elapsed
+	-- Limit frequency / 限制一下更新速率
+	if self.timer > 5 then
+		-- Local time / 本地時間
+		local hour, minute
+		if GetCVarBool("timeMgrUseLocalTime") then
+			hour, minute = tonumber(date("%H")), tonumber(date("%M"))
+		else
+			hour, minute = GetGameTime()
+		end
+		Text:SetText(updateTimerFormat(hour, minute))
+		
+		self.timer = 0
+	end
+end
+
 --=========================================--
 ---------------	[[ Scripts ]] ---------------
 --=========================================--
@@ -323,13 +368,17 @@ end
 	Stat:SetScript("OnEnter", function(self)
 		-- mouseover color
 		Text:SetTextColor(0, 1, 1)
+		self.isShiftDown = IsShiftKeyDown()
+		self:RegisterEvent("MODIFIER_STATE_CHANGED")
 		RequestRaidInfo()
 		C_MythicPlus_RequestMapInfo()
 		-- tooltip show
-		OnEnter(self)
+		OnEnter(self, self.isShiftDown)
 	end)
 	
 	Stat:SetScript("OnLeave", function(self)
+		self:UnregisterEvent("MODIFIER_STATE_CHANGED")
+		self.isShiftDown = nil
 		-- normal color
 		--Text:SetTextColor(1, 1, 1)
 		OnEvent(self)
