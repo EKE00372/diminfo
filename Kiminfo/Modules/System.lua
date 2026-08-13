@@ -7,8 +7,7 @@ local CreateFrame = CreateFrame
 local C_AddOns_GetNumAddOns, C_AddOns_GetAddOnInfo, C_AddOns_IsAddOnLoaded = C_AddOns.GetNumAddOns, C_AddOns.GetAddOnInfo, C_AddOns.IsAddOnLoaded
 local UpdateAddOnCPUUsage, GetAddOnCPUUsage, ResetCPUUsage = UpdateAddOnCPUUsage, GetAddOnCPUUsage, ResetCPUUsage
 
-local r, g, b
-local loginTime = GetTime()	-- Get log in time at all of first
+local cpuUsageStartTime = GetTime()
 local usageTable = {}
 local usageString = "%.3f ms"
 
@@ -58,7 +57,7 @@ local Icon2 = Stat:CreateTexture(nil, "OVERLAY")
 local function colorLatencyTooltip(latency)
 	if latency < 300 then
 		return "|cff0CD809"..latency
-	elseif (latency > 300 and latency < 500) then
+	elseif latency < 500 then
 		return "|cffE8DA0F"..latency
 	else
 		return "|cffD80909"..latency
@@ -69,13 +68,11 @@ end
 local function colorLatency(latency)
 	if latency < 300 then
 		return .57, 1, .57
-	elseif (latency > 300 and latency < 500) then
+	elseif latency < 500 then
 		return 1, 1, .43
 	else
 		return 1, .5, .25
 	end
-	
-	return r, g, b
 end
 
 --[[ fps color on data text ]]--
@@ -87,8 +84,6 @@ local function colorFPS(fps)
 	else
 		return .57, 1, .57
 	end
-	
-	return r, g, b
 end
 
 --===========================================--
@@ -144,16 +139,16 @@ local function OnUpdate(self, elapsed)
 			
 			local fps = floor(GetFramerate())
 			local lat = math.max(latencyHome, latencyWorld)
-			local fr, fb, fg = colorFPS(fps)
-			local lr, lb, lg = colorLatency(lat)
+			local fr, fg, fb = colorFPS(fps)
+			local lr, lg, lb = colorLatency(lat)
 
 			Text1:SetText(lat)
-			Text1:SetTextColor(lr, lb, lg)
-			Icon1:SetVertexColor(lr, lb, lg)
+			Text1:SetTextColor(lr, lg, lb)
+			Icon1:SetVertexColor(lr, lg, lb)
 
 			Text2:SetText(fps)
-			Text2:SetTextColor(fr, fb, fg)
-			Icon2:SetVertexColor(fr, fb, fg)
+			Text2:SetTextColor(fr, fg, fb)
+			Icon2:SetVertexColor(fr, fg, fb)
 			
 			self.timer = 0
 		end
@@ -177,6 +172,7 @@ local function OnEnter(self)
 	if GetCVar("scriptProfile") == "1" then
 		updateUsageTable()
 		local totalCPU = updateUsage()
+		local passedTime = max(1, GetTime() - cpuUsageStartTime)
 		GameTooltip:AddLine(" ")
 		
 		if totalCPU > 0 then
@@ -184,6 +180,7 @@ local function OnEnter(self)
 			local isShiftKeyDown = IsShiftKeyDown()
 			local maxShown = isShiftKeyDown and #usageTable or min(maxAddOns, #usageTable)
 			local numEnabled = 0
+			local hiddenUsage = 0
 			
 			for i = 1, #usageTable do
 				local value = usageTable[i]
@@ -192,23 +189,21 @@ local function OnEnter(self)
 					if numEnabled <= maxShown then
 						local r = value[3] / totalCPU
 						local g = 1.5 - r
-						GameTooltip:AddDoubleLine(value[2], format(usageString, value[3] / max(1, GetTime() - loginTime)), 1, 1, 1, r, g, 0)
+						GameTooltip:AddDoubleLine(value[2], format(usageString, value[3] / passedTime), 1, 1, 1, r, g, 0)
+					else
+						hiddenUsage = hiddenUsage + value[3]
 					end
 				end
 			end
 
-			if not isShiftKeyDown and (numEnabled > maxAddOns) then
-				local hiddenUsage = 0
-				for i = (maxAddOns + 1), numEnabled do
-					hiddenUsage = hiddenUsage + usageTable[i][3]
-				end
-				GameTooltip:AddDoubleLine(format("%d %s (%s)", numEnabled - maxAddOns, L.Hidden, L.Shift), format(usageString, hiddenUsage), .6, .8, 1, .6, .8, 1)
+			if not isShiftKeyDown and numEnabled > maxShown then
+				GameTooltip:AddDoubleLine(format("%d %s (%s)", numEnabled - maxShown, L.Hidden, L.Shift), format(usageString, hiddenUsage / passedTime), .6, .8, 1, .6, .8, 1)
 			end
 			
 		end
 		
 		GameTooltip:AddLine(" ")
-		GameTooltip:AddDoubleLine(TOTAL, format(usageString, totalCPU/ max(1, GetTime() - loginTime)), .6, .8, 1, 1, 1, 1)
+		GameTooltip:AddDoubleLine(TOTAL, format(usageString, totalCPU / passedTime), .6, .8, 1, 1, 1, 1)
 	end
 	
 	-- Options
@@ -240,6 +235,7 @@ end
 			ReloadUI()
 		elseif btn == "LeftButton" then
 			ResetCPUUsage()
+			cpuUsageStartTime = GetTime()
 		end
 		
 		OnEnter(self)
