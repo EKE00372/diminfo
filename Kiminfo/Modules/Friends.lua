@@ -1,4 +1,4 @@
-﻿local addon, ns = ... 
+﻿local _, ns = ...
 local C, F, G, L = unpack(ns)
 if not C.Friends then return end
 
@@ -8,24 +8,38 @@ local CreateFrame = CreateFrame
 local C_FriendList_GetFriendInfoByIndex = C_FriendList.GetFriendInfoByIndex
 local C_BattleNet_GetFriendAccountInfo = C_BattleNet.GetFriendAccountInfo
 local C_FriendList_GetNumOnlineFriends, BNGetNumFriends = C_FriendList.GetNumOnlineFriends, BNGetNumFriends
-local BNet_GetClientEmbeddedAtlas, InviteToGroup = BNet_GetClientEmbeddedAtlas, C_PartyInfo.InviteUnit -- Replace C. new api as old InviteToGroup()
+local InviteToGroup = C_PartyInfo.InviteUnit -- Replace old InviteToGroup()
 
 local friendTable, bnetTable = {}, {}	-- build table
 local BNET_CLIENT_WOWC = "WoWC"	-- custom string for classic
+local BNET_CLIENT_BSAP = "BSAp"
 local region = {[1] = "US", [2] = "KR", [3] = "EU", [4] = "TW", [5] = "CN",}
+local normalColor = F.Hex(1, 1, 1)
+local zoneColor = F.Hex(.3, 1, .3)
+local mutedColor = F.Hex(.65, .65, .65)
+local classFilenameByLocalizedName = {}
+
+for classFilename, className in pairs(LOCALIZED_CLASS_NAMES_MALE) do
+	classFilenameByLocalizedName[className] = classFilename
+end
+
+if LOCALIZED_CLASS_NAMES_FEMALE then
+	for classFilename, className in pairs(LOCALIZED_CLASS_NAMES_FEMALE) do
+		classFilenameByLocalizedName[className] = classFilename
+	end
+end
 
 --=======================================--
 --------------- [[ Cache ]] ---------------
 --=======================================--
 
---[[ cahce client icon ]]--
+--[[ cache client icon ]]--
 local cache = {}
 local function GetIconTexture(titleID)
 	if cache[titleID] then
 		return cache[titleID]
 	end
 
-	local titleID = titleID
 	C_Texture.GetTitleIconTexture(titleID, Enum.TitleIconVersion.Medium, function(success, texture)
 		if success then
 		cache[titleID] = texture
@@ -37,7 +51,7 @@ end
 
 --[[ client list ]]--
 local bnet_client = {
-	"WoW",	-- WoW
+	BNET_CLIENT_WOW,	-- WoW
 	"WoWC",	-- WoWC/WoW Classic
 	"GRY",	-- Warcraft Arclight Rumble
 	"W1",	-- Warcraft Orcs & Humans
@@ -55,8 +69,9 @@ local bnet_client = {
 	"S1",	-- SC
 	"S2" ,	-- SC2
 	"WTCG",	-- WTCG
-	"App",	-- Battlenet
-	"BSAp",	-- Battlenet
+	BNET_CLIENT_APP,	-- Battlenet desktop
+	BNET_CLIENT_CLNT,	-- Battlenet client
+	BNET_CLIENT_BSAP,	-- Battlenet mobile
 	"Hero",	-- HotS
 	"Pro",	-- Overwatch
 	"DST2",	-- Destiny2
@@ -73,7 +88,7 @@ local bnet_client = {
 }
 
 --[[ cache when load ]]--
-for k, v in ipairs(bnet_client) do
+for _, v in ipairs(bnet_client) do
 	GetIconTexture(v)
 end
 
@@ -114,18 +129,27 @@ StaticPopupDialogs.SET_BN_BROADCAST = {
 	maxLetters = 127,
 	
 	OnAccept = function(self)
-		C_BattleNet.SetCustomMessage(self.EditBox:GetText())
+		if BNFeaturesEnabled() and BNConnected() then
+			C_BattleNet.SetCustomMessage(self.EditBox:GetText())
+		end
 	end,
-	
+
 	OnShow = function(self)
-		self.EditBox:SetText(select(4, BNGetInfo()))
+		local currentBroadcast = ""
+		if BNFeaturesEnabled() and BNConnected() then
+			currentBroadcast = select(4, BNGetInfo()) or ""
+		end
+
+		self.EditBox:SetText(currentBroadcast)
 		self.EditBox:SetFocus()
 	end,
 	
 	OnHide = ChatFrameUtil.FocusActiveWindow,
 	
 	EditBoxOnEnterPressed = function(self)
-		C_BattleNet.SetCustomMessage(self:GetText())
+		if BNFeaturesEnabled() and BNConnected() then
+			C_BattleNet.SetCustomMessage(self:GetText())
+		end
 		self:GetParent():Hide()
 	end,
 	
@@ -139,31 +163,76 @@ StaticPopupDialogs.SET_BN_BROADCAST = {
 	hideOnEscape = 1
 }
 
+--[[ Get friend status texture ]]--
+local function getStatus(isAFK, isDND, defaultStatus)
+	if isAFK then
+		return G.AFK
+	elseif isDND then
+		return G.DND
+	end
+
+	return defaultStatus
+end
+
+--[[ Build a nil-safe character label ]]--
+local function getCharacterText(name, level, classFilename, status)
+	local levelColor = normalColor
+	local levelText = ""
+
+	if level then
+		levelColor = F.Hex(GetQuestDifficultyColor(level))
+		levelText = levelColor..level.."|r "
+	end
+
+	local classColor
+	if classFilename then
+		classColor = CUSTOM_CLASS_COLORS and CUSTOM_CLASS_COLORS[classFilename]
+		classColor = classColor or RAID_CLASS_COLORS[classFilename]
+	end
+
+	local nameColor = classColor and F.Hex(classColor) or levelColor
+	return levelText..nameColor..name.."|r"..status
+end
+
+--[[ Build location text without leaving empty separators ]]--
+local function getLocationText(area, regionName, currentZone)
+	local location = area
+
+	if regionName ~= "" then
+		location = location ~= "" and location.." - "..regionName or regionName
+	end
+
+	if location == "" then
+		return ""
+	end
+
+	local color = area ~= "" and area == currentZone and zoneColor or mutedColor
+	return color..location
+end
+
 --[[ Click function for in-game friends ]]--
-local function gameOnClick(self, info, btn)
+local function gameOnClick(_, info, btn)
+	if info.name == "" then return end
+
 	if btn == "LeftButton" and IsShiftKeyDown() then
 		-- In-game invite / 遊戲內邀請
-		InviteToGroup(info[1])
+		InviteToGroup(info.name)
 	elseif btn == "MiddleButton" then
 		-- In-game msg / 遊戲內密語
-		ChatFrameUtil.SendTell(info[1], SELECTED_DOCK_FRAME)
-	else
-		return
+		ChatFrameUtil.SendTell(info.name, SELECTED_DOCK_FRAME)
 	end
 end
 
 --[[ Click function for bn friends ]]--
-local function bnOnClick(self, info, btn)
+local function bnOnClick(_, info, btn)
 	if btn == "LeftButton" and IsShiftKeyDown() then
 		-- BN invite / 戰網邀請
-		if info[5] == BNET_CLIENT_WOW then
-			InviteToGroup(info[4].."-"..info[11])
+		if info.inviteTarget ~= "" then
+			InviteToGroup(info.inviteTarget)
 		end
-	elseif btn == "MiddleButton" then
+	elseif btn == "MiddleButton" and info.accountName ~= "" then
 		-- BN msg / 戰網聊天
-		ChatFrameUtil.SendBNetTell(info[2], SELECTED_DOCK_FRAME)
-	else
-		return
+		ChatFrameUtil.SendBNetTell(info.accountName, SELECTED_DOCK_FRAME)
 	end
 end
 
@@ -171,11 +240,9 @@ end
 --------------- [[ Build Table ]] ---------------
 --=============================================--
 
---[[ Sort in-game friends by level ]] --
+--[[ Sort in-game friends by name ]] --
 local function sortFriends(a, b)
-	if a[1] and b[1] then
-		return a[1] < b[1]
-	end
+	return a.name < b.name
 end
 
 --[[ Build in-game friend table ]]--
@@ -184,21 +251,18 @@ local function buildFriendTable(num)
 
 	for i = 1, num do
 		local info = C_FriendList_GetFriendInfoByIndex(i)
-		
+
 		if info and info.connected then
-			local status = FRIENDS_TEXTURE_ONLINE
-			if info.afk then
-				status = G.AFK
-			elseif info.dnd then
-				status = G.DND
-			else
-				status = " "
-			end
-			
-			local class = F.ClassList[info.className]
-			
-			-- name, level, class, area, status / 名字，等級，職業，地區，狀態
-			tinsert(friendTable, {info.name, info.level, class, info.area, status})
+			local name = info.name or ""
+			local area = info.area or ""
+			local classFilename = info.className and classFilenameByLocalizedName[info.className]
+			local status = getStatus(info.afk, info.dnd, " ")
+
+			tinsert(friendTable, {
+				name = name,
+				area = area,
+				nameText = getCharacterText(name, info.level, classFilename, status),
+			})
 		end
 	end
 
@@ -207,9 +271,11 @@ end
 
 --[[ Sort BN friends by client ]] --
 local function sortBNFriends(a, b)
-	if a[5] and b[5] then
-		return a[5] > b[5]
+	if a.client == b.client then
+		return a.sortName < b.sortName
 	end
+
+	return a.client > b.client
 end
 
 --[[ Build BN friends table ]]--
@@ -219,78 +285,95 @@ local function buildBNetTable(num)
 	for i = 1, num do
 		local accountInfo = C_BattleNet_GetFriendAccountInfo(i)
 		if accountInfo then
-			local accountName = accountInfo.accountName
-			local battleTag = accountInfo.battleTag
-			local isAFK = accountInfo.isAFK
-			local isDND = accountInfo.isDND
-
 			local gameAccountInfo = accountInfo.gameAccountInfo
-			local isOnline = gameAccountInfo.isOnline
-			local gameID = gameAccountInfo.gameAccountID
 
-			if isOnline and gameID then
-				local charName = gameAccountInfo.characterName
-				local client = gameAccountInfo.clientProgram
-				local class = gameAccountInfo.className or UNKNOWN
-				local faction = gameAccountInfo.factionName
-				local zoneName = gameAccountInfo.areaName or UNKNOWN
+			if gameAccountInfo and gameAccountInfo.isOnline and gameAccountInfo.gameAccountID then
+				local accountName = accountInfo.accountName or ""
+				local battleTag = accountInfo.battleTag or ""
+				local characterName = gameAccountInfo.characterName or ""
+				local client = gameAccountInfo.clientProgram or ""
+				local area = gameAccountInfo.areaName or ""
 				local realmName = gameAccountInfo.realmName or ""
-				local level = gameAccountInfo.characterLevel
-				local gameText = gameAccountInfo.richPresence or ""
-				local isGameAFK = gameAccountInfo.isGameAFK
-				local isGameBusy = gameAccountInfo.isGameBusy
-				local wowProjectID = gameAccountInfo.wowProjectID
-				local isMobile = gameAccountInfo.isWowMobile
-				local regionID = gameAccountInfo.regionID
-				local regionCheck = gameAccountInfo.isInCurrentRegion
-
-				charName = BNet_GetValidatedCharacterName(charName, battleTag, client)
-				class = F.ClassList[class]
-
-				local status = FRIENDS_TEXTURE_ONLINE
-				if isAFK or isGameAFK then
-					status = G.AFK
-				elseif isDND or isGameBusy then
-					status = G.DND
-				else
-					status = ""
+				local classFilename = gameAccountInfo.classFilename
+				if not classFilename or classFilename == "" then
+					classFilename = gameAccountInfo.className and classFilenameByLocalizedName[gameAccountInfo.className]
 				end
-				
+
+				local displayName = BNet_GetValidatedCharacterName(characterName, battleTag, client) or ""
+				if displayName == "" then
+					displayName = accountName
+				end
+
+				local status = getStatus(
+					accountInfo.isAFK or gameAccountInfo.isGameAFK,
+					accountInfo.isDND or gameAccountInfo.isGameBusy,
+					""
+				)
+
 				local infoText
 				if client == BNET_CLIENT_WOW then
-					-- Print area when friend is playing wow / 玩魔獸顯示地區
-					if (not zoneName or zoneName == "") then
-						infoText = UNKNOWN
-					else
-						infoText = zoneName
-					end
-				elseif client == BNET_CLIENT_APP then
-					-- Print moblie instead app name because it's a long string / 魔獸好戰友太囉嗦了
-					if isMobile then
-						infoText = L.App
-					else
-						if client == "BSAp" then
-							infoText = L.Mobile
-						else
-							infoText = L.Desktop
+					-- Print area when friend is playing WoW / 玩魔獸顯示地區
+					infoText = area
+				elseif gameAccountInfo.isWowMobile then
+					-- Runtime field still used by Blizzard although omitted from API docs.
+					infoText = L.App
+				elseif client == BNET_CLIENT_BSAP then
+					infoText = L.Mobile
+				elseif client == BNET_CLIENT_APP or client == BNET_CLIENT_CLNT then
+					infoText = L.Desktop
+				else
+					-- Print current activity when playing other games / 玩其他遊戲顯示狀態
+					infoText = gameAccountInfo.richPresence or ""
+				end
+
+				-- Check whether the friend is on the same WoW project / 判斷是否為相同魔獸版本
+				local wowProjectID = gameAccountInfo.wowProjectID
+				local isSameWoWProject = client == BNET_CLIENT_WOW and wowProjectID == WOW_PROJECT_ID
+				if client == BNET_CLIENT_WOW and wowProjectID and not isSameWoWProject then
+					client = BNET_CLIENT_WOWC
+				end
+
+				local isWoW = F.Multicheck(client, BNET_CLIENT_WOW, BNET_CLIENT_WOWC)
+				local icon
+				if isWoW then
+					icon = "|T"..GetIconTexture(BNET_CLIENT_WOW)..":14:14:0:0:50:50|t"
+					if isSameWoWProject then
+						if gameAccountInfo.factionName == "Horde" then
+							icon = F.addIcon(G.Horde, 14, 2, 48)
+						elseif gameAccountInfo.factionName == "Alliance" then
+							icon = F.addIcon(G.Alliance, 14, 2, 48)
 						end
 					end
 				else
-					-- Print currently activity when frined is playing other games / 玩其他遊戲顯示狀態
-					if gameText == "" then
-						infoText = UNKNOWN
-					else
-						infoText = gameText
+					icon = "|T"..GetIconTexture(client)..":14:14:0:0:50:50|t"
+				end
+
+				local inviteTarget = ""
+				if isSameWoWProject and characterName ~= "" then
+					inviteTarget = characterName
+					if realmName ~= "" then
+						inviteTarget = inviteTarget.."-"..realmName
 					end
 				end
-				
-				-- Check classic or retail / 區分經典和正式
-				if client == BNET_CLIENT_WOW and wowProjectID ~= WOW_PROJECT_ID then
-					client = BNET_CLIENT_WOWC
-				end
-				
-				--number - bn, tag, name, client, status, class, level, aera, app / 編號 - 戰網，TAG，名字，程式，狀態，職業，等級，地點，魔獸好戰友
-				tinsert(bnetTable, {i, accountName, battleTag, charName, client, faction, status, class, level, infoText, realmName, isMobile, regionID, regionCheck})
+
+				local characterText = getCharacterText(displayName, gameAccountInfo.characterLevel, classFilename, status)
+				local normalAccount = accountName ~= "" and G.OptionColor.." ("..accountName..")" or ""
+				local shiftAccount = battleTag ~= "" and G.OptionColor.." ("..battleTag..")" or normalAccount
+				local normalName = displayName
+				local shiftName = battleTag ~= "" and battleTag or normalName
+
+				tinsert(bnetTable, {
+					accountName = accountName,
+					area = area,
+					client = client,
+					infoText = infoText ~= "" and mutedColor..infoText or "",
+					inviteTarget = inviteTarget,
+					isWoW = isWoW,
+					nameText = isWoW and icon.." "..characterText..normalAccount or icon.." "..G.OptionColor..normalName.."|r"..status,
+					regionName = region[gameAccountInfo.regionID] or "",
+					shiftNameText = isWoW and icon.." "..characterText..shiftAccount or icon.." "..G.OptionColor..shiftName.."|r"..status,
+					sortName = accountName ~= "" and accountName or displayName,
+				})
 			end
 		end
 	end
@@ -302,35 +385,34 @@ end
 --------------- [[ Updates ]] ---------------
 --=========================================--
 
-local function OnEvent(self, event, ...)
-	local onlineFriends = C_FriendList_GetNumOnlineFriends()
-	local _, numBNetOnline = BNGetNumFriends()
-	local online = onlineFriends + numBNetOnline
-	
-	Text:SetText(online)
-	self:SetAllPoints(Text)
-end
-
 local function OnEnter(self)
 	-- Get local
-	local isShiftKeyDown = IsShiftKeyDown()
+	self.isShiftDown = IsShiftKeyDown()
+	local isShiftKeyDown = self.isShiftDown
 	local numberOfFriends = C_FriendList.GetNumFriends()
 	local onlineFriends = C_FriendList.GetNumOnlineFriends()
 	local totalBNet, numBNetOnline = BNGetNumFriends()
+	totalBNet = totalBNet or 0
+	numBNetOnline = numBNetOnline or 0
 	-- Get total
 	local totalonline = onlineFriends + numBNetOnline
 	local totalfriends = numberOfFriends + totalBNet
+	local currentZone = GetRealZoneText()
 	-- Get what ur murmuring
-	local currentBroadcast = select(4, BNGetInfo(1))
-	
+	local currentBroadcast = ""
+	if BNFeaturesEnabled() and BNConnected() then
+		currentBroadcast = select(4, BNGetInfo()) or ""
+	end
+
 	-- Create qtip
 	local tooltip = LibQTip:Acquire("KiminfoFriendsTooltip", 2, "LEFT", "RIGHT")
+	tooltip:ClearAllPoints()
 	tooltip:SetPoint(C.StickTop and "TOP" or "BOTTOM", self, C.StickTop and "BOTTOM" or "TOP", 0, C.StickTop and -10 or 10)
 	tooltip:Clear()
 	tooltip:AddHeader(G.TitleColor..FRIENDS, G.TitleColor..format("%s/%s", totalonline, totalfriends))
 
 	-- Show my BN roadcast
-	if currentBroadcast and currentBroadcast ~= "" then
+	if currentBroadcast ~= "" then
 		tooltip:AddLine(" ")
 		tooltip:AddLine(BATTLENET_BROADCAST)
 		
@@ -342,7 +424,7 @@ local function OnEnter(self)
 			width = 300
 		end
 
-		local y, x = tooltip:AddLine()
+		local y = tooltip:AddLine()
 		tooltip:SetCell(y, 1, G.OptionColor..currentBroadcast, nil, "LEFT", 2, nil, 0, 0, width)
 	end
 	
@@ -361,23 +443,8 @@ local function OnEnter(self)
 		
 		for i = 1, #friendTable do
 			local info = friendTable[i]
-			
-			local zonec
-			if GetRealZoneText() == info[4] then
-				zonec = F.Hex(.3, 1, .3)
-			else
-				zonec = F.Hex(.65, .65, .65)
-			end
-			
-			local levelc = F.Hex(GetQuestDifficultyColor(info[2]))
-			local classc = F.Hex((CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[info[3]])
-			
-			if classc == nil then
-				classc = levelc
-			end
-			
-			tooltip:AddLine(levelc..info[2].."|r "..classc..info[1].."|r"..info[5], zonec..info[4])
-			
+			tooltip:AddLine(info.nameText, getLocationText(info.area, "", currentZone))
+
 			local line = tooltip:GetLineCount()
 			tooltip:SetLineScript(line, "OnMouseUp", gameOnClick, info)
 		end
@@ -393,41 +460,15 @@ local function OnEnter(self)
 		
 		for i = 1, #bnetTable do
 			local info = bnetTable[i]
-			
-			if F.Multicheck(info[5], BNET_CLIENT_WOW, BNET_CLIENT_WOWC) then
-				local zonec
-				if GetRealZoneText() == info[10] then
-					zonec = F.Hex(.3, 1, .3)
-				else
-					zonec = F.Hex(.65, .65, .65)
-				end
-				
-				local levelc = F.Hex(GetQuestDifficultyColor(info[9]))
-				local classc = F.Hex((CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[info[8]])
-				if classc == nil then
-					classc = levelc
-				end
-				
-				local icon
-				if (info[5] == BNET_CLIENT_WOW and info[14] == true) then
-					icon = (info[6] == "Horde" and F.addIcon(G.Horde, 14, 2, 48)) or (info[6] == "Alliance" and F.addIcon(G.Alliance, 14, 2, 48))
-				else
-					icon = "|T"..GetIconTexture("WoW")..":14:14:0:0:50:50|t"
-				end
-				
-				if isShiftKeyDown then
-					tooltip:AddLine(icon.." "..levelc..info[9].."|r "..classc..info[4].."|r"..info[7]..G.OptionColor.." ("..info[3]..")", zonec..info[10].." - "..region[info[13]])
-				else
-					tooltip:AddLine(icon.." "..levelc..info[9].."|r "..classc..info[4].."|r"..info[7]..G.OptionColor.." ("..info[2]..")", zonec..info[10])
-				end
-			else
-				if isShiftKeyDown then
-					tooltip:AddLine("|T"..GetIconTexture(info[5])..":14:14:0:0:50:50|t "..G.OptionColor..info[3].."|r"..info[7], F.Hex(.65, .65, .65)..info[10])
-				else
-					tooltip:AddLine("|T"..GetIconTexture(info[5])..":14:14:0:0:50:50|t "..G.OptionColor..info[4].."|r"..info[7], F.Hex(.65, .65, .65)..info[10])
-				end
+			local nameText = isShiftKeyDown and info.shiftNameText or info.nameText
+			local locationText = info.infoText
+			if info.isWoW then
+				local regionName = isShiftKeyDown and info.regionName or ""
+				locationText = getLocationText(info.area, regionName, currentZone)
 			end
-			
+
+			tooltip:AddLine(nameText, locationText)
+
 			local line = tooltip:GetLineCount()
 			tooltip:SetLineScript(line, "OnMouseUp", bnOnClick, info)
 		end
@@ -441,6 +482,10 @@ end
 
 --[[ Hide QTip tooltip ]]--
 local function OnRelease(self)
+	self:UnregisterEvent("MODIFIER_STATE_CHANGED")
+	self:SetScript("OnUpdate", nil)
+	self.isShiftDown = nil
+	self.timer = nil
 	LibQTip:Release(self.tooltip)
 	self.tooltip = nil
 end
@@ -448,15 +493,36 @@ end
 --[[ Update mouseover tooltip ]]--
 local function OnUpdate(self, elapsed)
 	self.timer = (self.timer or 0) + elapsed
-	
+
 	if self.timer > .1 then
-		if not self:IsMouseOver() then
-			if not self.tooltip:IsMouseOver() then
-				OnRelease(self)
-				self:SetScript("OnUpdate", nil)
-			end
+		if not self:IsMouseOver() and (not self.tooltip or not self.tooltip:IsMouseOver()) then
+			OnRelease(self)
+			return
 		end
+
 		self.timer = 0
+	end
+end
+
+local function OnEvent(self, event, key)
+	if event == "MODIFIER_STATE_CHANGED" then
+		local isShiftKey = key == "LSHIFT" or key == "RSHIFT"
+		if isShiftKey and self.tooltip and IsShiftKeyDown() ~= self.isShiftDown then
+			OnEnter(self)
+		end
+		return
+	end
+
+	local onlineFriends = C_FriendList_GetNumOnlineFriends()
+	local _, numBNetOnline = BNGetNumFriends()
+	numBNetOnline = numBNetOnline or 0
+	local online = onlineFriends + numBNetOnline
+
+	Text:SetText(online)
+	self:SetAllPoints(Text)
+
+	if self.tooltip then
+		OnEnter(self)
 	end
 end
 
@@ -468,6 +534,7 @@ end
 	Stat:SetScript("OnEnter", function(self)
 		-- 先清除舊的tooltip，相當於重設一次，以避免重新指向stat的時候如果tooltip還沒隱藏可能出現的問題......大概吧
 		OnRelease(self)
+		self:RegisterEvent("MODIFIER_STATE_CHANGED")
 		-- Mouseover color
 		Icon:SetVertexColor(0, 1, 1)
 		Text:SetTextColor(0, 1, 1)
@@ -490,7 +557,9 @@ end
 			if InCombatLockdown() then UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT) return end
 			ToggleFriendsFrame()
 		elseif button == "RightButton" then
-			StaticPopup_Show("SET_BN_BROADCAST")
+			if BNFeaturesEnabled() and BNConnected() then
+				StaticPopup_Show("SET_BN_BROADCAST")
+			end
 		else
 			return
 		end
@@ -499,6 +568,11 @@ end
 	Stat:RegisterEvent("BN_FRIEND_ACCOUNT_ONLINE")
 	Stat:RegisterEvent("BN_FRIEND_ACCOUNT_OFFLINE")
 	Stat:RegisterEvent("BN_FRIEND_INFO_CHANGED")
+	Stat:RegisterEvent("BN_FRIEND_LIST_SIZE_CHANGED")
+	Stat:RegisterEvent("BN_CONNECTED")
+	Stat:RegisterEvent("BN_CUSTOM_MESSAGE_CHANGED")
+	Stat:RegisterEvent("BN_CUSTOM_MESSAGE_LOADED")
+	Stat:RegisterEvent("BN_DISCONNECTED")
 	Stat:RegisterEvent("FRIENDLIST_UPDATE")
 	Stat:RegisterEvent("PLAYER_ENTERING_WORLD")
 	Stat:SetScript("OnEvent", OnEvent)
