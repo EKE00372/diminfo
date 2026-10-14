@@ -9,7 +9,7 @@ local UpdateAddOnCPUUsage, GetAddOnCPUUsage, ResetCPUUsage = UpdateAddOnCPUUsage
 
 local cpuUsageStartTime = GetTime()
 local usageTable = {}
-local usageString = "%.3f ms"
+local usageString = "%.3f ms/s"
 
 --==========================================--
 ---------------	[[ Elements ]] ---------------
@@ -86,6 +86,23 @@ local function colorFPS(fps)
 	end
 end
 
+-- 保留最新樣本的正常色，離開 hover 時直接恢復；首次取樣前維持白色。
+local fpsR, fpsG, fpsB = 1, 1, 1
+local latencyR, latencyG, latencyB = 1, 1, 1
+
+local function UpdateColor(self)
+	local fr, fg, fb = fpsR, fpsG, fpsB
+	local lr, lg, lb = latencyR, latencyG, latencyB
+	if self.isHover then
+		fr, fg, fb = 0, 1, 1
+		lr, lg, lb = 0, 1, 1
+	end
+	Text1:SetTextColor(lr, lg, lb)
+	Icon1:SetVertexColor(lr, lg, lb)
+	Text2:SetTextColor(fr, fg, fb)
+	Icon2:SetVertexColor(fr, fg, fb)
+end
+
 --===========================================--
 ---------------	[[ Functions ]] ---------------
 --===========================================--
@@ -127,33 +144,21 @@ end
 --[[ Update data text ]]--
 local function OnUpdate(self, elapsed)
 	self.timer = (self.timer or 0) + elapsed
-	
-	if self.isHover == true then
-		Text1:SetTextColor(0, 1, 1)
-		Text2:SetTextColor(0, 1, 1)
-		Icon1:SetVertexColor(0, 1, 1)
-		Icon2:SetVertexColor(0, 1, 1)
-	else
-		if self.timer > 1 then
-			local _, _, latencyHome, latencyWorld = GetNetStats()
-			
-			local fps = floor(GetFramerate())
-			local lat = math.max(latencyHome, latencyWorld)
-			local fr, fg, fb = colorFPS(fps)
-			local lr, lg, lb = colorLatency(lat)
+	if self.timer <= 1 then return end
+	self.timer = 0
 
-			Text1:SetText(lat)
-			Text1:SetTextColor(lr, lg, lb)
-			Icon1:SetVertexColor(lr, lg, lb)
+	local _, _, latencyHome, latencyWorld = GetNetStats()
+	local fps = floor(GetFramerate())
+	local lat = max(latencyHome, latencyWorld)
+	fpsR, fpsG, fpsB = colorFPS(fps)
+	latencyR, latencyG, latencyB = colorLatency(lat)
 
-			Text2:SetText(fps)
-			Text2:SetTextColor(fr, fg, fb)
-			Icon2:SetVertexColor(fr, fg, fb)
-			self:Layout()
-			
-			self.timer = 0
-		end
+	Text1:SetText(lat)
+	Text2:SetText(fps)
+	if not self.isHover then
+		UpdateColor(self)
 	end
+	self:Layout()
 end
 
 --[[ Update tooltip ]]--
@@ -245,10 +250,12 @@ end
 	--[[ Tooltip ]]-- 
 	Stat:SetScript("OnEnter", function(self)
 		self.isHover = true
+		UpdateColor(self)
 		OnEnter(self)
 	end)
 	Stat:SetScript("OnLeave", function(self)
 		self.isHover = false
+		UpdateColor(self)
 		GameTooltip:Hide()
 	end)
 	
