@@ -26,15 +26,14 @@ local secretValueCVars = {
 --==========================================--
 
 --[[ Create elements ]]--
-local Stat = CreateFrame("Frame", G.addon.."Pos", UIParent)
-	Stat:SetHitRectInsets(-5, -5, -10, -10)
-	Stat:SetFrameStrata("BACKGROUND")
+local Stat = CreateFrame("Frame", G.addon.."Pos", UIParent, "HorizontalLayoutFrame")
 
 --[[ Create text ]]--
 local Text  = Stat:CreateFontString(nil, "OVERLAY")
+	Text.layoutIndex = 1
+	Text.align = "center"
 	Text:SetFont(G.Fonts, G.FontSize, G.FontFlag)
-	Text:SetPoint(unpack(C.PositionsPoint))
-	Stat:SetAllPoints(Text)
+	F.RegisterModule("Positions", Stat)
 
 --===========================================--
 ---------------	[[ Functions ]] ---------------
@@ -130,6 +129,7 @@ local function OnEvent(self)
 	
 	Text:SetText((subzone ~= "") and subzone or zone)
 	Text:SetTextColor(r, g, b)
+	self:Layout()
 end
 
 local function OnEnter(self)

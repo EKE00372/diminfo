@@ -16,38 +16,38 @@ local usageString = "%.3f ms"
 --==========================================--
 
 --[[ Create elements ]]--
-local Stat = CreateFrame("Frame", G.addon.."System", UIParent)
-	Stat:SetHitRectInsets(-65, -5, -10, -10)
-	Stat:SetFrameStrata("BACKGROUND")
+local Stat = CreateFrame("Frame", G.addon.."System", UIParent, "HorizontalLayoutFrame")
 
--- 反著錨點：PING值會爆，FPS最多只有三位數
+--[[ Create fps icon ]]--
+local Icon2 = Stat:CreateTexture(nil, "OVERLAY")
+	Icon2.layoutIndex = 1
+	Icon2.align = "center"
+	Icon2:SetSize(G.FontSize, G.FontSize)
+	Icon2:SetTexture(G.Fps)
+	Icon2:SetVertexColor(1, 1, 1)
 
---[[ Create ping text ]]--
-local Text1  = Stat:CreateFontString(nil, "OVERLAY")
-	Text1:SetFont(G.Fonts, G.FontSize, G.FontFlag)
-	Text1:SetPoint(unpack(C.SystemPoint))
-	Text1:SetTextColor(1, 1, 1)
-	Stat:SetAllPoints(Text1)
+--[[ Create fps text ]]--
+local Text2  = Stat:CreateFontString(nil, "OVERLAY")
+	Text2.layoutIndex = 2
+	Text2.align = "center"
+	Text2:SetFont(G.Fonts, G.FontSize, G.FontFlag)
+	Text2:SetTextColor(1, 1, 1)
 
 --[[ Create ping icon ]]--
 local Icon1 = Stat:CreateTexture(nil, "OVERLAY")
+	Icon1.layoutIndex = 3
+	Icon1.align = "center"
 	Icon1:SetSize(G.FontSize, G.FontSize)
-	Icon1:SetPoint("RIGHT", Stat, "LEFT", 0, 0)
 	Icon1:SetTexture(G.Ping)
 	Icon1:SetVertexColor(1, 1, 1)
-	
---[[ Create fps text ]]--
-local Text2  = Stat:CreateFontString(nil, "OVERLAY")
-	Text2:SetFont(G.Fonts, G.FontSize, G.FontFlag)
-	Text2:SetPoint("RIGHT", Icon1, "LEFT", 0, 0)
-	Text2:SetTextColor(1, 1, 1)
-	
---[[ Create fps icon ]]--
-local Icon2 = Stat:CreateTexture(nil, "OVERLAY")
-	Icon2:SetSize(G.FontSize, G.FontSize)
-	Icon2:SetPoint("RIGHT", Text2, "LEFT", 0, 0)
-	Icon2:SetTexture(G.Fps)
-	Icon2:SetVertexColor(1, 1, 1)
+
+--[[ Create ping text ]]--
+local Text1  = Stat:CreateFontString(nil, "OVERLAY")
+	Text1.layoutIndex = 4
+	Text1.align = "center"
+	Text1:SetFont(G.Fonts, G.FontSize, G.FontFlag)
+	Text1:SetTextColor(1, 1, 1)
+	F.RegisterModule("System", Stat)
 
 --=======================================--
 ---------------	[[ Color ]] ---------------
@@ -149,6 +149,7 @@ local function OnUpdate(self, elapsed)
 			Text2:SetText(fps)
 			Text2:SetTextColor(fr, fg, fb)
 			Icon2:SetVertexColor(fr, fg, fb)
+			self:Layout()
 			
 			self.timer = 0
 		end

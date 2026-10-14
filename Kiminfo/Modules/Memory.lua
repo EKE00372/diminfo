@@ -17,23 +17,23 @@ local autoCollect = CreateFrame("Frame")
 --==========================================--
 
 --[[ Create elements ]]--
-local Stat = CreateFrame("Frame", G.addon.."Mem", UIParent)
-	Stat:SetHitRectInsets(-30, -5, -10, -10)
-	Stat:SetFrameStrata("BACKGROUND")
+local Stat = CreateFrame("Frame", G.addon.."Mem", UIParent, "HorizontalLayoutFrame")
 
 --[[ Create icon ]]--
 local Icon = Stat:CreateTexture(nil, "OVERLAY")
+	Icon.layoutIndex = 1
+	Icon.align = "center"
 	Icon:SetSize(G.FontSize+6, G.FontSize+6)
-	Icon:SetPoint("RIGHT", Stat, "LEFT", 0, 0)
 	Icon:SetTexture(G.Mem)
 	Icon:SetVertexColor(1, 1, 1)
 
 --[[ Create text ]]--
 local Text  = Stat:CreateFontString(nil, "OVERLAY")
+	Text.layoutIndex = 2
+	Text.align = "center"
 	Text:SetFont(G.Fonts, G.FontSize, G.FontFlag)
-	Text:SetPoint(unpack(C.MemoryPoint))
 	Text:SetTextColor(1, 1, 1)
-	Stat:SetAllPoints(Text)
+	F.RegisterModule("Memory", Stat)
 
 --========================================--
 ---------------	[[ format ]] ---------------
@@ -129,6 +129,7 @@ local function RefreshText()
 	else
 		Text:SetText(format("%.1fmb", totalMemory/1024))
 	end
+	Stat:Layout()
 end
 
 --=========================================--
@@ -163,7 +164,7 @@ local function OnEvent(self, event, loadedAddon)
 	-- Data text
 	local totalNum = updateMaxAddons()
 	Text:SetText(totalNum)
-	self:SetAllPoints(Text)
+	self:Layout()
 end
 
 --[[ Update tooltip ]]--
@@ -226,6 +227,7 @@ local function OnLeave(self)
 	-- Data text
 	local totalNum = updateMaxAddons()
 	Text:SetText(totalNum)
+	self:Layout()
 	
 	-- Mouseover color
 	Icon:SetVertexColor(1, 1, 1)
