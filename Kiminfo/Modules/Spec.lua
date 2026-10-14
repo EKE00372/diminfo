@@ -16,10 +16,8 @@ local C_SpecializationInfo_GetAllSelectedPvpTalentIDs = C_SpecializationInfo.Get
 local C_Spell_GetSpellInfo = C_Spell.GetSpellInfo
 local STARTER_BUILD = Constants.TraitConsts.STARTER_BUILD_TRAIT_CONFIG_ID
 
-local pvpTalents, SpecIndex, LootIndex, newMenu, numSpecs, numLocal
+local pvpTalents, SpecIndex, LootIndex
 local pvpTexture = C_CurrencyInfo.GetCurrencyInfo(1792).iconFileID
-
-local LibEasyMenu = LibStub:GetLibrary("LibEasyMenu")
 
 --==========================================--
 ---------------	[[ Elements ]] ---------------
@@ -42,142 +40,87 @@ local Text  = Stat:CreateFontString(nil, "OVERLAY")
 
 --[[ Right-click menu ]]--
 
--- Create menu template
-local SpecMenuFrame = CreateFrame("Frame", "SpecMenu", UIParent, "UIDropDownMenuTemplate")
-
 -- Select spec
-local function selectSpec(_, specIndex)
-	if SpecIndex == specIndex then return end
+local function selectSpec(specIndex)
+	if GetSpecialization() == specIndex then return end
 	SetSpecialization(specIndex)
-	DropDownList1:Hide()
 end
 
 -- Check spec
-local function checkSpec(self)
-	return SpecIndex == self.arg1
+local function checkSpec(specIndex)
+	return (GetSpecialization() == specIndex)
 end
 
 -- Select loot spec
-local function selectLootSpec(_, index)
+local function selectLootSpec(index)
 	SetLootSpecialization(index)
-	DropDownList1:Hide()
 end
 
 -- Check loot spec
-local function checkLootSpec(self)
-	return LootIndex == self.arg1
-end
-
--- Refresh loot spec
-local function refreshDefaultLootSpec()
-	if not SpecIndex or SpecIndex == 5 then return end
-	local mult = (3 + numSpecs) or numSpecs
-	newMenu[numLocal - mult].text = format(LOOT_SPECIALIZATION_DEFAULT, select(2, GetSpecializationInfo(SpecIndex)) or NONE)
+local function checkLootSpec(index)
+	return (GetLootSpecialization() == index)
 end
 
 -- Select talent
-local function selectCurrentConfig(_, configID, specID)
+local function selectCurrentConfig(data)
 	if InCombatLockdown() then UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT) return end
+	local configID = data.configID
 	if configID == STARTER_BUILD then
 		C_ClassTalents.SetStarterBuildActive(true)
 	else
 		C_ClassTalents.LoadConfig(configID, true)
 		C_ClassTalents.SetStarterBuildActive(false)
 	end
-	C_ClassTalents.UpdateLastSelectedSavedConfigID(specID or GetSpecializationInfo(SpecIndex), configID)
+	C_ClassTalents.UpdateLastSelectedSavedConfigID(data.specID or GetSpecializationInfo(GetSpecialization()), configID)
 end
 
 -- Check talent
-local function checkCurrentConfig(self)
-	return C_ClassTalents.GetLastSelectedSavedConfigID(self.arg2) == self.arg1
+local function checkCurrentConfig(data)
+	return (C_ClassTalents.GetLastSelectedSavedConfigID(data.specID) == data.configID)
 end
 
--- Refresh menu
-local function refreshAllTraits()
-	local numConfig = numLocal or 0
-	local specID = GetSpecializationInfo(SpecIndex)
-	local configIDs = specID and C_ClassTalents.GetConfigIDsBySpecID(specID)
-	if configIDs then
-		for i = 1, #configIDs do
-			local configID = configIDs[i]
-			if configID then
-				local info = C_Traits.GetConfigInfo(configID)
-				numConfig = numConfig + 1
-				if not newMenu[numConfig] then newMenu[numConfig] = {} end
-				newMenu[numConfig].text = info.name
-				newMenu[numConfig].arg1 = configID
-				newMenu[numConfig].arg2 = specID
-				newMenu[numConfig].func = selectCurrentConfig
-				newMenu[numConfig].checked = checkCurrentConfig
-			end
-		end
-	end
-
-	for i = numConfig+1, #newMenu do
-		if newMenu[i] then newMenu[i].text = nil end
-	end
-end
-
--- Sperator menu
-local seperatorMenu = {
-	text = "",
-	isTitle = true,
-	notCheckable = true,
-	iconOnly = true,
-	icon = "Interface\\Common\\UI-TooltipDivider-Transparent",
-	iconInfo = {
-		tCoordLeft = 0,
-		tCoordRight = 1,
-		tCoordTop = 0,
-		tCoordBottom = 1,
-		tSizeX = 0,
-		tSizeY = 8,
-		tFitDropDownSizeX = true
-	},
-}
-
--- Build menu
-local function BuildSpecMenu()
-	if newMenu then return end
-	
-	-- Build menu
-	newMenu = {
-		{text = SPECIALIZATION, isTitle = true, notCheckable = true},
-		seperatorMenu,
-		{text = SELECT_LOOT_SPECIALIZATION, isTitle = true, notCheckable = true},
-		{text = "", arg1 = 0, func = selectLootSpec, checked = checkLootSpec},
-	}
-
-	-- Build spec and lootspec menu
+-- 每次開啟查詢最新資料；選單的顯示、關閉與回收交由 Blizzard_Menu。
+local function BuildSpecMenu(_, rootDescription)
+	rootDescription:CreateTitle(SPECIALIZATION)
 	for i = 1, 4 do
 		local id, name = GetSpecializationInfo(i)
 		if id then
-			numSpecs = (numSpecs or 0) + 1
-			tinsert(newMenu, i+1, {text = name, arg1 = i, func = selectSpec, checked = checkSpec})
-			tinsert(newMenu, {text = name, arg1 = id, func = selectLootSpec, checked = checkLootSpec})
+			rootDescription:CreateRadio(name, checkSpec, selectSpec, i)
 		end
 	end
-	
-	-- Build talent menu
-	tinsert(newMenu, seperatorMenu)
-	tinsert(newMenu, {text = C_Spell_GetSpellInfo(384255).name, isTitle = true, notCheckable = true})
-	tinsert(newMenu, {text = BLUE_FONT_COLOR:WrapTextInColorCode(TALENT_FRAME_DROP_DOWN_STARTER_BUILD), func = selectCurrentConfig,
-		arg1 = STARTER_BUILD,	checked = function() return C_ClassTalents.GetStarterBuildActive() end,
-	})
-	
-	numLocal = #newMenu
-	refreshDefaultLootSpec()
-	refreshAllTraits()
-	
-	-- Register even for menu update
-	local frame = CreateFrame("Frame", nil, UIParent)
-		frame:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
-		frame:RegisterEvent("TRAIT_CONFIG_DELETED")
-		frame:RegisterEvent("TRAIT_CONFIG_UPDATED")
-		frame:SetScript("OnEvent", function()
-			refreshDefaultLootSpec()
-			refreshAllTraits()
-		end)
+
+	local specIndex = GetSpecialization()
+	local specID, specName
+	if specIndex then
+		specID, specName = GetSpecializationInfo(specIndex)
+	end
+
+	rootDescription:CreateDivider()
+	rootDescription:CreateTitle(SELECT_LOOT_SPECIALIZATION)
+	rootDescription:CreateRadio(format(LOOT_SPECIALIZATION_DEFAULT, specName or NONE), checkLootSpec, selectLootSpec, 0)
+	for i = 1, 4 do
+		local id, name = GetSpecializationInfo(i)
+		if id then
+			rootDescription:CreateRadio(name, checkLootSpec, selectLootSpec, id)
+		end
+	end
+
+	if not specID then return end
+	rootDescription:CreateDivider()
+	rootDescription:CreateTitle(C_Spell_GetSpellInfo(384255).name)
+	-- Starter Build 作用於點選當下的專精，不固定在開啟選單時。
+	rootDescription:CreateRadio(BLUE_FONT_COLOR:WrapTextInColorCode(TALENT_FRAME_DROP_DOWN_STARTER_BUILD),
+		function() return C_ClassTalents.GetStarterBuildActive() end,
+		selectCurrentConfig, {configID = STARTER_BUILD})
+
+	local configIDs = C_ClassTalents.GetConfigIDsBySpecID(specID)
+	if configIDs then
+		for _, configID in ipairs(configIDs) do
+			local info = C_Traits.GetConfigInfo(configID)
+			rootDescription:CreateRadio(info.name, checkCurrentConfig, selectCurrentConfig,
+				{configID = configID, specID = specID})
+		end
+	end
 end
 
 --=========================================--
@@ -288,8 +231,7 @@ end
 		GameTooltip:Hide()
 		
 		if button == "RightButton" then
-			BuildSpecMenu()
-			LibEasyMenu:EasyMenu(newMenu, SpecMenuFrame, "cursor", 0, 0, "MENU", 3)
+			MenuUtil.CreateContextMenu(self, BuildSpecMenu)
 		elseif button == "LeftButton" then
 			if InCombatLockdown() then UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT) return end
 			if not PlayerSpellsFrame then C_AddOns.LoadAddOn("Blizzard_PlayerSpells") end
