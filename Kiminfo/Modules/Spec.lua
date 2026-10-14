@@ -64,14 +64,28 @@ end
 -- Select talent
 local function selectCurrentConfig(data)
 	if InCombatLockdown() then UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT) return end
-	local configID = data.configID
-	if configID == STARTER_BUILD then
-		C_ClassTalents.SetStarterBuildActive(true)
+	local configIDs = C_ClassTalents.GetConfigIDsBySpecID(PlayerUtil.GetCurrentSpecID())
+	local loadoutIndex
+	if data.configID == STARTER_BUILD then
+		if C_ClassTalents.GetHasStarterBuild() then
+			-- 原生選單將 Starter Build 放在所有 saved loadout 之後。
+			loadoutIndex = #configIDs + 1
+		end
 	else
-		C_ClassTalents.LoadConfig(configID, true)
-		C_ClassTalents.SetStarterBuildActive(false)
+		for index, configID in ipairs(configIDs) do
+			if configID == data.configID then
+				loadoutIndex = index
+				break
+			end
+		end
 	end
-	C_ClassTalents.UpdateLastSelectedSavedConfigID(data.specID or GetSpecializationInfo(GetSpecialization()), configID)
+
+	if loadoutIndex then
+		-- 由原生天賦流程處理非同步完成、Starter 狀態及最後選取紀錄。
+		C_ClassTalents.SwitchToLoadoutByIndex(loadoutIndex)
+	else
+		UIErrorsFrame:AddExternalErrorMessage(ERR_TALENT_FAILED_INVALID_CONFIG)
+	end
 end
 
 -- Check talent
@@ -109,17 +123,17 @@ local function BuildSpecMenu(_, rootDescription)
 	rootDescription:CreateDivider()
 	rootDescription:CreateTitle(C_Spell_GetSpellInfo(384255).name)
 	-- Starter Build 作用於點選當下的專精，不固定在開啟選單時。
-	rootDescription:CreateRadio(BLUE_FONT_COLOR:WrapTextInColorCode(TALENT_FRAME_DROP_DOWN_STARTER_BUILD),
-		function() return C_ClassTalents.GetStarterBuildActive() end,
-		selectCurrentConfig, {configID = STARTER_BUILD})
+	if C_ClassTalents.GetHasStarterBuild() then
+		rootDescription:CreateRadio(BLUE_FONT_COLOR:WrapTextInColorCode(TALENT_FRAME_DROP_DOWN_STARTER_BUILD),
+			function() return C_ClassTalents.GetStarterBuildActive() end,
+			selectCurrentConfig, {configID = STARTER_BUILD})
+	end
 
 	local configIDs = C_ClassTalents.GetConfigIDsBySpecID(specID)
-	if configIDs then
-		for _, configID in ipairs(configIDs) do
-			local info = C_Traits.GetConfigInfo(configID)
-			rootDescription:CreateRadio(info.name, checkCurrentConfig, selectCurrentConfig,
-				{configID = configID, specID = specID})
-		end
+	for _, configID in ipairs(configIDs) do
+		local info = C_Traits.GetConfigInfo(configID)
+		rootDescription:CreateRadio(info.name, checkCurrentConfig, selectCurrentConfig,
+			{configID = configID, specID = specID})
 	end
 end
 
