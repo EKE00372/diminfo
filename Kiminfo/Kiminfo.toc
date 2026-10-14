@@ -1,4 +1,4 @@
-## Interface: 120100
+## Interface: 120105
 ## Author: EK
 ## Title: |cff00ffffKim|rinfo
 ## Title-zhTW: |cff00ffffKim|rinfo 資訊條
@@ -27,7 +27,7 @@
 Libs\Libs.xml
 
 Config.lua
-API.lua
+Core.lua
 
 Locale.lua
 Modules\Modules.xml

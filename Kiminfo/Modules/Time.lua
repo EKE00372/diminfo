@@ -117,16 +117,15 @@ end
 --==========================================--
 
 --[[ Create elements ]]--
-local Stat = CreateFrame("Frame", G.addon.."Time", UIParent)
-	Stat:SetHitRectInsets(-5, -5, -10, -10)
-	Stat:SetFrameStrata("BACKGROUND")
+local Stat = CreateFrame("Frame", G.addon.."Time", UIParent, "HorizontalLayoutFrame")
 
 --[[ Create text ]]--
 local Text  = Stat:CreateFontString(nil, "OVERLAY")
+	Text.layoutIndex = 1
+	Text.align = "center"
 	Text:SetFont(G.Fonts, G.FontSize, G.FontFlag)
-	Text:SetPoint(unpack(C.TimePoint))
 	Text:SetTextColor(1, 1, 1)
-	Stat:SetAllPoints(Text)
+	F.RegisterModule("Time", Stat)
 
 --===========================================--
 ---------------	[[ Functions ]] ---------------
@@ -355,6 +354,7 @@ local function OnUpdate(self, elapsed)
 			hour, minute = GetGameTime()
 		end
 		Text:SetText(updateTimerFormat(hour, minute))
+		self:Layout()
 		
 		self.timer = 0
 	end

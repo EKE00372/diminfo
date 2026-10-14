@@ -19,23 +19,23 @@ local tokenPriceTicker
 --==========================================--
 
 --[[ Create elements ]]--
-local Stat = CreateFrame("Frame", G.addon.."Bags", UIParent)
-	Stat:SetHitRectInsets(-30, -5, -10, -10)
-	Stat:SetFrameStrata("BACKGROUND")
+local Stat = CreateFrame("Frame", G.addon.."Bags", UIParent, "HorizontalLayoutFrame")
 
 --[[ Create icon ]]--
 local Icon = Stat:CreateTexture(nil, "OVERLAY")
+	Icon.layoutIndex = 1
+	Icon.align = "center"
 	Icon:SetSize(G.FontSize, G.FontSize)
-	Icon:SetPoint("RIGHT", Stat, "LEFT", 0, 0)
 	Icon:SetTexture(G.Bags)
 	Icon:SetVertexColor(1, 1, 1)
 
 --[[ Create text ]]--
 local Text  = Stat:CreateFontString(nil, "OVERLAY")
+	Text.layoutIndex = 2
+	Text.align = "center"
 	Text:SetFont(G.Fonts, G.FontSize, G.FontFlag)
-	Text:SetPoint(unpack(C.BagsPoint))
 	Text:SetTextColor(1, 1, 1)
-	Stat:SetAllPoints(Text)
+	F.RegisterModule("Bags", Stat)
 
 --===========================================--
 ---------------	[[ Functions ]] ---------------
@@ -80,7 +80,7 @@ local function OnEvent(self, event)
 
 	local free = getBagSlots()
 	Text:SetText(free)
-	self:SetAllPoints(Text)
+	self:Layout()
 	
 	if event == "PLAYER_LOGIN" then
 		UpdateTokenPrice()

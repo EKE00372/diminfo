@@ -97,23 +97,23 @@ end
 --==========================================--
 
 --[[ Create elements ]]--
-local Stat = CreateFrame("Frame", G.addon.."Friends", UIParent)
-	Stat:SetHitRectInsets(-30, -5, -10, -10)
-	Stat:SetFrameStrata("BACKGROUND")
+local Stat = CreateFrame("Frame", G.addon.."Friends", UIParent, "HorizontalLayoutFrame")
 
 --[[ Create icon ]]--
 local Icon = Stat:CreateTexture(nil, "OVERLAY")
+	Icon.layoutIndex = 1
+	Icon.align = "center"
 	Icon:SetSize(G.FontSize+8, G.FontSize+8)
-	Icon:SetPoint("RIGHT", Stat, "LEFT", 0, 0)
 	Icon:SetTexture(G.Friends)
 	Icon:SetVertexColor(1, 1, 1)
 	
 --[[ Create text ]]--
 local Text  = Stat:CreateFontString(nil, "OVERLAY")
+	Text.layoutIndex = 2
+	Text.align = "center"
 	Text:SetFont(G.Fonts, G.FontSize, G.FontFlag)
-	Text:SetPoint(unpack(C.FriendsPoint))
 	Text:SetTextColor(1, 1, 1)
-	Stat:SetAllPoints(Text)
+	F.RegisterModule("Friends", Stat)
 	
 --===========================================--
 --------------- [[ Functions ]] ---------------
@@ -519,7 +519,7 @@ local function OnEvent(self, event, key)
 	local online = onlineFriends + numBNetOnline
 
 	Text:SetText(online)
-	self:SetAllPoints(Text)
+	self:Layout()
 
 	if self.tooltip then
 		OnEnter(self)
