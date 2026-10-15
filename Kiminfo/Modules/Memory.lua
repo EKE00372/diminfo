@@ -2,6 +2,7 @@
 local C, F, G, L = unpack(ns)
 if not C.Memory then return end
 
+local GameTooltip = F.Tooltip
 local format, min, sort, wipe = string.format, min, sort, table.wipe
 local CreateFrame = CreateFrame
 local C_AddOns_GetNumAddOns, C_AddOns_GetAddOnInfo, C_AddOns_IsAddOnLoaded = C_AddOns.GetNumAddOns, C_AddOns.GetAddOnInfo, C_AddOns.IsAddOnLoaded
@@ -220,7 +221,7 @@ local function OnEnter(self)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.AutoCollect..(Kiminfo.AutoCollect and G.Enable or G.Disable)..G.RightButton)
 	
 
-	GameTooltip:Show()
+	F.ShowTooltip()
 end
 
 local function OnLeave(self)

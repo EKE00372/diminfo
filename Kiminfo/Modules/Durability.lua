@@ -2,6 +2,7 @@ local addon, ns = ...
 local C, F, G, L = unpack(ns)
 if not C.Durability then return end
 
+local GameTooltip = F.Tooltip
 local format, floor, min, sort, modf, select = string.format, math.floor, math.min, table.sort, math.modf, select
 local CreateFrame = CreateFrame
 local GetInventoryItemLink, GetInventoryItemDurability, GetInventoryItemTexture = GetInventoryItemLink, GetInventoryItemDurability, GetInventoryItemTexture
@@ -141,7 +142,7 @@ local function OnEnter(self)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..CHARACTER_INFO..G.LeftButton)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.AutoRepair..(Kiminfo.AutoRepair and G.Enable or G.Disable)..G.RightButton)
 	
-	GameTooltip:Show()
+	F.ShowTooltip()
 end
 
 --=========================================--

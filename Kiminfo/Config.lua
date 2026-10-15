@@ -41,44 +41,27 @@ local C, F, G, L = unpack(ns)
 	-- if you put databar on screen botton, change true to false. / 如果你調整訊息列至畫面底部，將ture改為false
 	C.StickTop = true
 
-	-- Maximum addons shown in the memory / CPU list / 記憶體與 CPU 列表顯示上限
-	C.MaxAddOns = 30
+	C.MaxAddOns = 30	-- Maximum addons shown in the memory / CPU list / 記憶體與 CPU 列表顯示上限
+	C.InfoPanel = {maxWidth = 600, maxHeight = 600}	-- Friends / Guild panel size / 好友、公會面板尺寸
 	
 	-- Enable modules; changes take effect after reload / 模組開關，重載後生效
-	-- Timer / 時鐘
-	C.Time = true
 	
-	-- Bags / 背包
-	C.Bags = true
-	
-	-- Memory / 記憶體占用列表
-	C.Memory = true
-	
-	-- System: Fps and latency / 幀數與延遲
-	C.System = true
-	
-	-- Spec: Spec and Loot Spec
-	C.Spec = true
-	
-	-- Friends / 好友
-	C.Friends = true
-	
-	-- Guild / 公會
-	C.Guild = true
-	
-	-- Durability / 耐久
-	C.Durability = true
-
-	-- Zone and Position / 地名座標
-	C.Positions = true
+	C.Time = true		-- Timer / 時鐘
+	C.Bags = true		-- Bags / 背包
+	C.Memory = true		-- Memory / 記憶體占用列表	
+	C.System = true		-- System: Fps and latency / 幀數與延遲
+	C.Spec = true		-- Spec: Spec and Loot Spec / 專精與拾取專精
+	C.Friends = true	-- Friends / 好友
+	C.Guild = true		-- Guild / 公會
+	C.Durability = true	-- Durability / 耐久
+	C.Positions = true	-- Zone and Position / 地名與座標
 
 ------------
 -- Layout --
 ------------
 
 	-- Gap between module layout bounds / 模組排列範圍之間的通用間距
-	-- 圖示素材的尺寸校正與內部排列由模組處理；間距與內容起點可依遊戲畫面校準。
-	C.Gap = 4
+	C.Gap = 8
 
 	-- point: anchor, parent, x, y / 列錨點、相對框體、X、Y
 	-- inset: x, y / 內容排列起點相對列左上角的 X、Y；不是個別 FontString 的舊錨點

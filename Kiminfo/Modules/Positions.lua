@@ -2,6 +2,7 @@ local addon, ns = ...
 local C, F, G, L = unpack(ns)
 if not C.Positions then return end
 
+local GameTooltip = F.Tooltip
 local format, unpack = string.format, unpack
 local CreateFrame = CreateFrame
 local canaccessvalue = canaccessvalue
@@ -169,7 +170,7 @@ local function OnEnter(self)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..WORLDMAP_BUTTON..G.LeftButton)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..MAP_PIN..G.RightButton)
 	
-	GameTooltip:Show()
+	F.ShowTooltip()
 end
 
 --=========================================--
