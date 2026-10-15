@@ -2,6 +2,7 @@ local addon, ns = ...
 local C, F, G, L = unpack(ns)
 if not C.Spec then return end
 
+local GameTooltip = F.Tooltip
 local format, wipe = string.format, table.wipe
 local TALENTS, SPECIALIZATION, TALENTS_BUTTON = TALENTS, SPECIALIZATION, TALENTS_BUTTON
 local PVP_TALENTS, LOOT_SPECIALIZATION_DEFAULT = PVP_TALENTS, LOOT_SPECIALIZATION_DEFAULT
@@ -211,7 +212,7 @@ local function OnEnter(self)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..TALENTS..G.LeftButton)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..SPECIALIZATION..G.RightButton)
 	
-	GameTooltip:Show()
+	F.ShowTooltip()
 end
 
 --=========================================--

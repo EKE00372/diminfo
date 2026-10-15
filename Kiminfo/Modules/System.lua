@@ -2,6 +2,7 @@
 local C, F, G, L = unpack(ns)
 if not C.System then return end
 
+local GameTooltip = F.Tooltip
 local format, min, max, sort, wipe = string.format, min, max, sort, table.wipe
 local CreateFrame = CreateFrame
 local C_AddOns_GetNumAddOns, C_AddOns_GetAddOnInfo, C_AddOns_IsAddOnLoaded = C_AddOns.GetNumAddOns, C_AddOns.GetAddOnInfo, C_AddOns.IsAddOnLoaded
@@ -220,7 +221,7 @@ local function OnEnter(self)
 	end
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.CPU..(GetCVar("scriptProfile") == "1" and G.Enable or G.Disable)..G.RightButton)
 
-	GameTooltip:Show()
+	F.ShowTooltip()
 end
 
 --=========================================--

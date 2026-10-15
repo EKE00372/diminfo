@@ -2,6 +2,7 @@
 local C, F, G, L = unpack(ns)
 if not C.Bags then return end
 
+local GameTooltip = F.Tooltip
 local format = format
 local CreateFrame = CreateFrame
 local C_Timer_NewTicker = C_Timer.NewTicker
@@ -135,7 +136,7 @@ local function OnEnter(self)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..BAGSLOT..G.LeftButton)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.AutoSell..(Kiminfo.AutoSell and G.Enable or G.Disable)..G.RightButton, 1, 1, 1, .4, .78, 1)
 	
-	GameTooltip:Show()
+	F.ShowTooltip()
 end
 
 --=========================================--

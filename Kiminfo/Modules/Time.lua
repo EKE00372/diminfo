@@ -2,6 +2,7 @@ local addon, ns = ...
 local C, F, G, L = unpack(ns)
 if not C.Time then return end
 
+local GameTooltip = F.Tooltip
 local format, date = string.format, date
 local CreateFrame = CreateFrame
 local C_DateAndTime_GetCurrentCalendarTime, C_Calendar_GetNumPendingInvites = C_DateAndTime.GetCurrentCalendarTime, C_Calendar.GetNumPendingInvites
@@ -309,7 +310,7 @@ local function OnEnter(self, isShiftDown)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.Calendar..G.LeftButton)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..STOPWATCH_TITLE..G.RightButton)
 	
-	GameTooltip:Show()
+	F.ShowTooltip()
 end
 
 --[[ Update data text ]]--
