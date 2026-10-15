@@ -51,6 +51,11 @@ local zoneColor = {
 	neutral = {format(FACTION_CONTROLLED_TERRITORY,FACTION_STANDING_LABEL4), {1, .93, .76}}
 }
 
+-- 原生語系字串的外層括號
+for _, info in pairs(zoneColor) do
+	info[1] = info[1]:gsub("^%((.*)%)$", "%1"):gsub("^（(.*)）$", "%1")
+end
+
 --[[ Format ]]--
 local function formatCoords()
 	return format("%.1f, %.1f", coordX*100, coordY*100)
@@ -135,7 +140,8 @@ end
 
 local function OnEnter(self)
 	local inInstance = IsInInstance()
-	if inInstance then
+	local showCoords = not inInstance and not C_CVar_GetCVarBool("minimapShowPlayerCoords")
+	if not showCoords then
 		self:SetScript("OnUpdate", nil)
 	elseif not self:GetScript("OnUpdate") then
 		self:SetScript("OnUpdate", UpdateCoords)
@@ -156,7 +162,7 @@ local function OnEnter(self)
 	end
 
 	-- Coords
-	if not inInstance then
+	if showCoords then
 		GameTooltip:AddLine(format("|cffffffff%s|r", formatCoords()))
 	end
 
