@@ -144,7 +144,7 @@ local function OnEnter(self)
 	-- Title
 	GameTooltip:SetOwner(self, C.StickTop and "ANCHOR_BOTTOM" or "ANCHOR_TOP", 0, C.StickTop and -10 or 10)
 	GameTooltip:ClearLines()
-	GameTooltip:AddLine(zone, 0, .6, 1)
+	GameTooltip:AddLine(G.TitleColor..zone)
 	
 	-- Subzone
 	if pvpType and not inInstance then
@@ -157,12 +157,12 @@ local function OnEnter(self)
 
 	-- Coords
 	if not inInstance then
-		GameTooltip:AddLine(format("|cffffffff%s|r", formatCoords()), 1, 1, 1)
+		GameTooltip:AddLine(format("|cffffffff%s|r", formatCoords()))
 	end
 
 	if IsControlKeyDown() then
 		GameTooltip:AddLine(" ")
-		GameTooltip:AddDoubleLine("Secret Value CVar", AreSecretValueCVarsEnabled() and G.Enable or G.Disable, 1, 1, 1, 1, 1, 1)
+		GameTooltip:AddDoubleLine("Secret Value CVar", AreSecretValueCVarsEnabled() and G.Enable or G.Disable, 1, 1, 1)
 	end
 	
 	-- Options

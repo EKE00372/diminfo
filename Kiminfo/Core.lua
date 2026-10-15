@@ -30,8 +30,9 @@ G.LeftButton = " |T"..G.MediaFolder.."MouseButtonOrange.tga:13:11:0:-2:128:32:4:
 G.RightButton = " |T"..G.MediaFolder.."MouseButtonOrange.tga:13:11:0:-2:128:32:36:60:0:32|t "
 G.MiddleButton = " |T"..G.MediaFolder.."MouseButtonOrange.tga:13:11:0:-2:128:32:68:92:0:32|t "
 
-G.AFK = "|T"..FRIENDS_TEXTURE_AFK..":14:14:0:-1:16:16:1:15:1:15|t"
-G.DND = "|T"..FRIENDS_TEXTURE_DND..":14:14:0:-1:16:16:1:15:1:15|t"
+-- 狀態圖示：左右各留 1px 透明邊，上下裁切置中；Y=-2 對齊文字。
+G.AFK = "|T"..FRIENDS_TEXTURE_AFK..":13:15:0:-2:16:16:0:15:1:14|t"
+G.DND = "|T"..FRIENDS_TEXTURE_DND..":13:15:0:-2:16:16:0:15:1:14|t"
 
 G.Enable = "|cff55ff55"..ENABLE
 G.Disable = "|cffff5555"..DISABLE
@@ -134,7 +135,7 @@ local modules = {}
    - Core.lua 不處理模組內部結構，只使用原生模板算出的完整框體尺寸。
 ]]
 
--- 模組名稱、CreateFrame 建立的完整框體物件名稱
+-- 參數：模組名稱、CreateFrame 建立的完整框體物件名稱
 function F.RegisterModule(name, frame)
 	frame:SetFrameStrata("BACKGROUND")
 	frame:SetHitRectInsets(0, 0, -10, -10)

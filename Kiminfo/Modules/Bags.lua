@@ -98,7 +98,7 @@ local function OnEnter(self)
 	-- Title
 	GameTooltip:SetOwner(self, C.StickTop and "ANCHOR_BOTTOM" or "ANCHOR_TOP", 0, C.StickTop and -10 or 10)
 	GameTooltip:ClearLines()
-	GameTooltip:AddDoubleLine(BAGSLOT, free.."/"..total, 0, .6, 1, 0, .6, 1)
+	GameTooltip:AddDoubleLine(G.TitleColor..BAGSLOT, G.TitleColor..free.."/"..total)
 	GameTooltip:AddLine(" ")
 	
 	-- Bag slot and money
@@ -134,7 +134,7 @@ local function OnEnter(self)
 	GameTooltip:AddDoubleLine(" ", G.Line)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..CURRENCY..G.MiddleButton)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..BAGSLOT..G.LeftButton)
-	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.AutoSell..(Kiminfo.AutoSell and G.Enable or G.Disable)..G.RightButton, 1, 1, 1, .4, .78, 1)
+	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.AutoSell..(Kiminfo.AutoSell and G.Enable or G.Disable)..G.RightButton)
 	
 	F.ShowTooltip()
 end
@@ -209,7 +209,7 @@ local sellGray = CreateFrame("Frame")
 			end
 			
 			if c > 0 then
-				print(format("|cff99CCFF"..L.TrashSold.."|r%s", GetMoneyString(c)))
+				print(format(G.OptionColor..L.TrashSold.."|r%s", GetMoneyString(c)))
 			end
 		end
 	end)

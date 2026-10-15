@@ -22,7 +22,7 @@ local getLocale = GetLocale()
 		L.Collected = "釋放記憶體："
 		L.ManualCollect = "手動釋放暫存記憶體"
 		L.AutoCollect = "自動整理暫存記憶體："
-		L.CollectWarning = "|cff00ffffKim|rinfo[|cff00ff00Memory|r]：|cffff0000注意：危險功能！|r啟用自動整理暫存記憶體可能使遊戲主程式周期性凍結。"
+		L.CollectWarning = "|cff00ffffKim|rinfo[|cff00ff00Memory|r]："..G.ErrColor.."注意：危險功能！|r啟用自動整理暫存記憶體可能使遊戲主程式周期性凍結。"
 
 		L.Spec = "專精"
 		L.Loot = LOOT
@@ -31,8 +31,8 @@ local getLocale = GetLocale()
 		L.World = "世界"
 		L.CPU = "顯示 CPU 平均耗時："
 		L.ResetCPU = "重置 CPU 占用列表"
-		L.ReloadOn = "|cff00ffffKim|rinfo[|cff00ff00System|r]：重載介面後顯示插件的 CPU 占用。"
-		L.ReloadOff = "|cff00ffffKim|rinfo[|cff00ff00System|r]：重載介面後隱藏插件的 CPU 占用。"
+		L.ReloadOn = "|cff00ffffKim|rinfo[|cff00ff00System|r]："..G.OptionColor.."重載介面後顯示插件的 CPU 占用。|r"
+		L.ReloadOff = "|cff00ffffKim|rinfo[|cff00ff00System|r]："..G.OptionColor.."重載介面後隱藏插件的 CPU 占用。|r"
 		
 		L.App = "魔獸好戰友"
 		L.Mobile = "行動裝置"
@@ -58,7 +58,7 @@ local getLocale = GetLocale()
 		L.Collected = "释放內存："
 		L.ManualCollect = "手动释放"
 		L.AutoCollect = "自动整理內存："
-		L.CollectWarning = "|cff00ffffKim|rinfo[|cff00ff00Memory|r]：|cffff0000注意：危险功能！|r启用自动整理內存可能使客户端周期性冻结。"
+		L.CollectWarning = "|cff00ffffKim|rinfo[|cff00ff00Memory|r]："..G.ErrColor.."注意：危险功能！|r启用自动整理內存可能使客户端周期性冻结。"
 			
 		L.Spec = "专精"
 		L.Loot = "拾取"
@@ -67,8 +67,8 @@ local getLocale = GetLocale()
 		L.World = "世界"
 		L.CPU = "显示 CPU 平均耗时："
 		L.ResetCPU = "重置 CPU 占用列表"
-		L.ReloadOn = "|cff00ffffKim|rinfo[|cff00ff00System|r]：重载界面后显示插件的 CPU 占用。"
-		L.ReloadOff = "|cff00ffffKim|rinfo[|cff00ff00System|r]：重载界面后隐藏插件的 CPU 占用。"
+		L.ReloadOn = "|cff00ffffKim|rinfo[|cff00ff00System|r]："..G.OptionColor.."重载界面后显示插件的 CPU 占用。|r"
+		L.ReloadOff = "|cff00ffffKim|rinfo[|cff00ff00System|r]："..G.OptionColor.."重载界面后隐藏插件的 CPU 占用。|r"
 		
 		L.App = "随身助手"
 		L.Mobile = "移动装置"
@@ -94,7 +94,7 @@ local getLocale = GetLocale()
 		L.Collected = "Сборка мусора: "
 		L.ManualCollect = "Ручной Сбор"
 		L.AutoCollect = "Автоматический Сбор Памяти: "
-		L.CollectWarning = "|cff00ffffKim|rinfo[|cff00ff00Memory|r]: |cffff0000NOTICE: DANGER!|r Auto collected memory may cause your client freeze."
+		L.CollectWarning = "|cff00ffffKim|rinfo[|cff00ff00Memory|r]: "..G.ErrColor.."NOTICE: DANGER!|r Auto collected memory may cause your client freeze."
 		
 		L.Spec = "Спек"
 		L.Loot = LOOT
@@ -103,8 +103,8 @@ local getLocale = GetLocale()
 		L.World = "Мир"
 		L.CPU = "Показать среднее время ЦП: "
 		L.ResetCPU = "Сброс загрузку процессора"
-		L.ReloadOn = "|cff00ffffKim|rinfo[|cff00ff00Система|r]: Вы увидите загрузку процессора аддона после перезагрузки пользовательского интерфейса."
-		L.ReloadOff = "|cff00ffffKim|rinfo[|cff00ff00Система|r]: Вы можете скрыть таблицу использования процессора аддона после перезагрузки пользовательского интерфейса."
+		L.ReloadOn = "|cff00ffffKim|rinfo[|cff00ff00Система|r]: "..G.OptionColor.."Вы увидите загрузку процессора аддона после перезагрузки пользовательского интерфейса.|r"
+		L.ReloadOff = "|cff00ffffKim|rinfo[|cff00ff00Система|r]: "..G.OptionColor.."Вы можете скрыть таблицу использования процессора аддона после перезагрузки пользовательского интерфейса.|r"
 		
 		L.App = "Портативный помощник"
 		L.Mobile = "Мобильный"
@@ -129,7 +129,7 @@ local getLocale = GetLocale()
 		L.Collected = "Garbage collected: "
 		L.ManualCollect = "Manual Collect"
 		L.AutoCollect = "Auto Collect Memory: "
-		L.CollectWarning = "|cff00ffffKim|rinfo[|cff00ff00Memory|r]: |cffff0000NOTICE: DANGER!|r Auto collected memory may cause your client freeze."
+		L.CollectWarning = "|cff00ffffKim|rinfo[|cff00ff00Memory|r]: "..G.ErrColor.."NOTICE: DANGER!|r Auto collected memory may cause your client freeze."
 		
 		L.Spec = "Spec"
 		L.Loot = LOOT
@@ -138,8 +138,8 @@ local getLocale = GetLocale()
 		L.World = "World"
 		L.CPU = "Show Average CPU Time: "
 		L.ResetCPU = "Reset CPU Usage"
-		L.ReloadOn = "|cff00ffffKim|rinfo[|cff00ff00System|r]: You would see addon's CPU usage after reloding UI."
-		L.ReloadOff = "|cff00ffffKim|rinfo[|cff00ff00System|r]: You could hide the addon's CPU usage table after reloding UI."
+		L.ReloadOn = "|cff00ffffKim|rinfo[|cff00ff00System|r]: "..G.OptionColor.."You would see addon's CPU usage after reloding UI.|r"
+		L.ReloadOff = "|cff00ffffKim|rinfo[|cff00ff00System|r]: "..G.OptionColor.."You could hide the addon's CPU usage table after reloding UI.|r"
 		
 		L.App = "Companion"
 		L.Mobile = "Mobile"

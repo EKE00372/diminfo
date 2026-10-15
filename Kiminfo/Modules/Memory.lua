@@ -186,7 +186,7 @@ local function OnEnter(self)
 	-- Title
 	GameTooltip:SetOwner(self, C.StickTop and "ANCHOR_BOTTOM" or "ANCHOR_TOP", 0, C.StickTop and -10 or 10)
 	GameTooltip:ClearLines()
-	GameTooltip:AddLine(ADDONS, 0, .6, 1)
+	GameTooltip:AddLine(G.TitleColor..ADDONS)
 	GameTooltip:AddLine(" ")
 
 	-- List
@@ -206,13 +206,13 @@ local function OnEnter(self)
 
 	-- Merge line when not shift key down / 合併統計行
 	if numEnabled > maxShown then
-		GameTooltip:AddDoubleLine(format("%d %s (%s)", numEnabled - maxShown, L.Hidden, L.Shift), formatMemory(hiddenMemory), .6, .8, 1, .6, .8, 1)
+		GameTooltip:AddDoubleLine(G.OptionColor..format("%d %s (%s)", numEnabled - maxShown, L.Hidden, L.Shift), G.OptionColor..formatMemory(hiddenMemory))
 	end
 
 	-- Total
 	GameTooltip:AddLine(" ")
-	GameTooltip:AddDoubleLine(L.DefaultUsage, formatMemory(gcinfo() - totalMemory), .6, .8, 1, 1, 1, 1)
-	GameTooltip:AddDoubleLine(L.TotleUsage, formatMemory(collectgarbage("count")), .6, .8, 1, 1, 1, 1)
+	GameTooltip:AddDoubleLine(G.OptionColor..L.DefaultUsage, formatMemory(gcinfo() - totalMemory), 1, 1, 1, 1, 1, 1)
+	GameTooltip:AddDoubleLine(G.OptionColor..L.TotleUsage, formatMemory(collectgarbage("count")), 1, 1, 1, 1, 1, 1)
 	
 	-- Options
 	GameTooltip:AddDoubleLine(" ", G.Line)
@@ -253,7 +253,7 @@ end
 			local before = gcinfo()
 			
 			collectgarbage("collect")
-			print(format("|cff66C6FF%s|r%s", L.Collected, formatMemory(before - gcinfo())))
+			print(format(G.OptionColor.."%s|r%s", L.Collected, formatMemory(before - gcinfo())))
 		elseif btn == "RightButton" then
 			Kiminfo.AutoCollect = not Kiminfo.AutoCollect
 			updateAutoCollect()
