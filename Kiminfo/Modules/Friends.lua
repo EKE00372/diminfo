@@ -2,7 +2,7 @@
 local C, F, G, L = unpack(ns)
 if not C.Friends then return end
 
-local LibQTip = LibStub('LibQTip-1.0')
+local GameTooltip = F.Tooltip
 local format, sort, wipe = format, sort, wipe
 local CreateFrame = CreateFrame
 local C_FriendList_GetFriendInfoByIndex = C_FriendList.GetFriendInfoByIndex
@@ -210,6 +210,98 @@ local function getLocationText(area, regionName, currentZone)
 	return color..location
 end
 
+local function getClassFilename(gameAccountInfo)
+	local classFilename = gameAccountInfo.classFilename
+	if not classFilename or classFilename == "" then
+		classFilename = gameAccountInfo.className and classFilenameByLocalizedName[gameAccountInfo.className]
+	end
+	return classFilename
+end
+
+local function getGameIcon(gameAccountInfo)
+	local client = gameAccountInfo.clientProgram
+	if client == BNET_CLIENT_WOW and gameAccountInfo.wowProjectID == WOW_PROJECT_ID then
+		if gameAccountInfo.factionName == "Horde" then
+			return F.addIcon(G.Horde, 14, 2, 48)
+		elseif gameAccountInfo.factionName == "Alliance" then
+			return F.addIcon(G.Alliance, 14, 2, 48)
+		end
+	end
+	return "|T"..GetIconTexture(client)..":14:14:0:0:50:50|t"
+end
+
+-- 名單位置會變動，詳細資料與邀請每次都從帳號身分重新定位。
+local function getGameAccounts(bnetAccountID)
+	local friendIndex = BNGetFriendIndex(bnetAccountID)
+	if not friendIndex then return end
+	local accountInfo = C_BattleNet_GetFriendAccountInfo(friendIndex)
+	if not accountInfo then return end
+
+	local gameAccounts = {}
+	for i = 1, C_BattleNet.GetFriendNumGameAccounts(friendIndex) do
+		local gameAccountInfo = C_BattleNet.GetFriendGameAccountInfo(friendIndex, i)
+		if gameAccountInfo and gameAccountInfo.isOnline then
+			tinsert(gameAccounts, gameAccountInfo)
+		end
+	end
+	return accountInfo, gameAccounts
+end
+
+-- 詳情與角色選單共用完整名稱；主列表維持簡短名稱。
+local function getGameAccountLabel(gameAccountInfo, accountInfo)
+	local client = gameAccountInfo.clientProgram
+	local name = BNet_GetValidatedCharacterName(gameAccountInfo.characterName or "", accountInfo.battleTag, client) or ""
+	if name == "" then name = accountInfo.accountName end
+	if client == BNET_CLIENT_WOW then
+		local realmName = gameAccountInfo.realmName or ""
+		if realmName ~= "" then name = name.."-"..realmName end
+		name = getCharacterText(name, gameAccountInfo.characterLevel, getClassFilename(gameAccountInfo),
+			getStatus(gameAccountInfo.isGameAFK, gameAccountInfo.isGameBusy, ""))
+	end
+	return getGameIcon(gameAccountInfo).." "..name
+end
+
+local function canInviteGameAccount(gameAccountInfo)
+	return gameAccountInfo.playerGuid ~= nil
+		and FriendsListUtil.GetGameAccountPartyInviteRestriction(gameAccountInfo) == BattleNetFriendPartyInviteRestrictionType.None
+end
+
+local function inviteGameAccount(target)
+	local _, gameAccounts = getGameAccounts(target.bnetAccountID)
+	if not gameAccounts then return end
+	for _, gameAccountInfo in ipairs(gameAccounts) do
+		if gameAccountInfo.gameAccountID == target.gameAccountID and gameAccountInfo.playerGuid == target.playerGuid then
+			if canInviteGameAccount(gameAccountInfo) then
+				FriendsListUtil.InviteOrRequestToJoin(gameAccountInfo.playerGuid, gameAccountInfo.gameAccountID)
+			end
+			return
+		end
+	end
+end
+
+local function gameOnEnter(row, info)
+	GameTooltip:SetOwner(row, "ANCHOR_RIGHT")
+	GameTooltip:ClearLines()
+	GameTooltip:AddLine(info.nameText, 1, 1, 1, true)
+	if info.area ~= "" then GameTooltip:AddLine(info.area, 1, 1, 1, true) end
+	F.ShowTooltip()
+end
+
+local function bnOnEnter(row, info)
+	local accountInfo, gameAccounts = getGameAccounts(info.bnetAccountID)
+	if not accountInfo then return end
+	GameTooltip:SetOwner(row, "ANCHOR_RIGHT")
+	GameTooltip:ClearLines()
+	GameTooltip:AddLine(accountInfo.accountName ~= "" and accountInfo.accountName or accountInfo.battleTag)
+	for _, gameAccountInfo in ipairs(gameAccounts) do
+		GameTooltip:AddLine(" ")
+		GameTooltip:AddLine(getGameAccountLabel(gameAccountInfo, accountInfo), 1, 1, 1, true)
+		local location = gameAccountInfo.clientProgram == BNET_CLIENT_WOW and gameAccountInfo.areaName or gameAccountInfo.richPresence
+		if location and location ~= "" then GameTooltip:AddLine(location, .65, .65, .65, true) end
+	end
+	F.ShowTooltip()
+end
+
 --[[ Click function for in-game friends ]]--
 local function gameOnClick(_, info, btn)
 	if info.name == "" then return end
@@ -226,10 +318,36 @@ end
 --[[ Click function for bn friends ]]--
 local function bnOnClick(_, info, btn)
 	if btn == "LeftButton" and IsShiftKeyDown() then
-		-- BN invite / 戰網邀請
-		if info.inviteTarget ~= "" then
-			InviteToGroup(info.inviteTarget)
+		local accountInfo, gameAccounts = getGameAccounts(info.bnetAccountID)
+		if not accountInfo then return end
+		local characters = {}
+		for _, gameAccountInfo in ipairs(gameAccounts) do
+			if gameAccountInfo.clientProgram == BNET_CLIENT_WOW then
+				tinsert(characters, gameAccountInfo)
+			end
 		end
+		if #characters == 0 then return end
+		if #characters == 1 and canInviteGameAccount(characters[1]) then
+			FriendsListUtil.InviteOrRequestToJoin(characters[1].playerGuid, characters[1].gameAccountID)
+			return
+		end
+
+		-- 選單隸屬面板，不隨可重用的 row 改綁；選項保存穩定身分。
+		local panel = Stat.panel
+		panel.menu = MenuUtil.CreateContextMenu(panel, function(_, rootDescription)
+			rootDescription:CreateTitle(TRAVEL_PASS_INVITE)
+			for _, gameAccountInfo in ipairs(characters) do
+				local enabled = canInviteGameAccount(gameAccountInfo)
+				local label = getGameAccountLabel(gameAccountInfo, accountInfo)
+				if not enabled then label = label..CANNOT_COOPERATE_LABEL end
+				local button = rootDescription:CreateButton(label, inviteGameAccount, {
+					bnetAccountID = info.bnetAccountID,
+					gameAccountID = gameAccountInfo.gameAccountID,
+					playerGuid = gameAccountInfo.playerGuid,
+				})
+				button:SetEnabled(enabled)
+			end
+		end)
 	elseif btn == "MiddleButton" and info.accountName ~= "" then
 		-- BN msg / 戰網聊天
 		ChatFrameUtil.SendBNetTell(info.accountName, SELECTED_DOCK_FRAME)
@@ -288,16 +406,11 @@ local function buildBNetTable(num)
 			local gameAccountInfo = accountInfo.gameAccountInfo
 
 			if gameAccountInfo and gameAccountInfo.isOnline and gameAccountInfo.gameAccountID then
-				local accountName = accountInfo.accountName or ""
-				local battleTag = accountInfo.battleTag or ""
+				local accountName = accountInfo.accountName
+				local battleTag = accountInfo.battleTag
 				local characterName = gameAccountInfo.characterName or ""
-				local client = gameAccountInfo.clientProgram or ""
+				local client = gameAccountInfo.clientProgram
 				local area = gameAccountInfo.areaName or ""
-				local realmName = gameAccountInfo.realmName or ""
-				local classFilename = gameAccountInfo.classFilename
-				if not classFilename or classFilename == "" then
-					classFilename = gameAccountInfo.className and classFilenameByLocalizedName[gameAccountInfo.className]
-				end
 
 				local displayName = BNet_GetValidatedCharacterName(characterName, battleTag, client) or ""
 				if displayName == "" then
@@ -328,50 +441,36 @@ local function buildBNetTable(num)
 
 				-- Check whether the friend is on the same WoW project / 判斷是否為相同魔獸版本
 				local wowProjectID = gameAccountInfo.wowProjectID
-				local isSameWoWProject = client == BNET_CLIENT_WOW and wowProjectID == WOW_PROJECT_ID
+				local isSameWoWProject = (client == BNET_CLIENT_WOW and wowProjectID == WOW_PROJECT_ID)
 				if client == BNET_CLIENT_WOW and wowProjectID and not isSameWoWProject then
 					client = BNET_CLIENT_WOWC
 				end
 
-				local isWoW = F.Multicheck(client, BNET_CLIENT_WOW, BNET_CLIENT_WOWC)
-				local icon
+				local isWoW = (client == BNET_CLIENT_WOW or client == BNET_CLIENT_WOWC)
+				local nameText, shiftNameText
 				if isWoW then
-					icon = "|T"..GetIconTexture(BNET_CLIENT_WOW)..":14:14:0:0:50:50|t"
-					if isSameWoWProject then
-						if gameAccountInfo.factionName == "Horde" then
-							icon = F.addIcon(G.Horde, 14, 2, 48)
-						elseif gameAccountInfo.factionName == "Alliance" then
-							icon = F.addIcon(G.Alliance, 14, 2, 48)
-						end
-					end
+					local characterText = getCharacterText(displayName, gameAccountInfo.characterLevel, getClassFilename(gameAccountInfo), status)
+					local normalAccount = accountName ~= "" and G.OptionColor.." ("..accountName..")" or ""
+					local shiftAccount = battleTag ~= "" and G.OptionColor.." ("..battleTag..")" or normalAccount
+					nameText = characterText..normalAccount
+					shiftNameText = characterText..shiftAccount
 				else
-					icon = "|T"..GetIconTexture(client)..":14:14:0:0:50:50|t"
+					local shiftName = battleTag ~= "" and battleTag or displayName
+					nameText = G.OptionColor..displayName.."|r"..status
+					shiftNameText = G.OptionColor..shiftName.."|r"..status
 				end
-
-				local inviteTarget = ""
-				if isSameWoWProject and characterName ~= "" then
-					inviteTarget = characterName
-					if realmName ~= "" then
-						inviteTarget = inviteTarget.."-"..realmName
-					end
-				end
-
-				local characterText = getCharacterText(displayName, gameAccountInfo.characterLevel, classFilename, status)
-				local normalAccount = accountName ~= "" and G.OptionColor.." ("..accountName..")" or ""
-				local shiftAccount = battleTag ~= "" and G.OptionColor.." ("..battleTag..")" or normalAccount
-				local normalName = displayName
-				local shiftName = battleTag ~= "" and battleTag or normalName
 
 				tinsert(bnetTable, {
+					bnetAccountID = accountInfo.bnetAccountID,
 					accountName = accountName,
 					area = area,
 					client = client,
 					infoText = infoText ~= "" and mutedColor..infoText or "",
-					inviteTarget = inviteTarget,
+					icon = getGameIcon(gameAccountInfo),
 					isWoW = isWoW,
-					nameText = isWoW and icon.." "..characterText..normalAccount or icon.." "..G.OptionColor..normalName.."|r"..status,
+					nameText = nameText,
 					regionName = region[gameAccountInfo.regionID] or "",
-					shiftNameText = isWoW and icon.." "..characterText..shiftAccount or icon.." "..G.OptionColor..shiftName.."|r"..status,
+					shiftNameText = shiftNameText,
 					sortName = accountName ~= "" and accountName or displayName,
 				})
 			end
@@ -385,10 +484,12 @@ end
 --------------- [[ Updates ]] ---------------
 --=========================================--
 
-local function OnEnter(self)
-	-- Get local
+local function RenderFriendsPanel(self)
 	self.isShiftDown = IsShiftKeyDown()
 	local isShiftKeyDown = self.isShiftDown
+	local panel = self.panel
+	panel:Clear()
+
 	local numberOfFriends = C_FriendList.GetNumFriends()
 	local onlineFriends = C_FriendList.GetNumOnlineFriends()
 	local totalBNet, numBNetOnline = BNGetNumFriends()
@@ -404,49 +505,31 @@ local function OnEnter(self)
 		currentBroadcast = select(4, BNGetInfo()) or ""
 	end
 
-	-- Create qtip
-	local tooltip = LibQTip:Acquire("KiminfoFriendsTooltip", 2, "LEFT", "RIGHT")
-	tooltip:ClearAllPoints()
-	tooltip:SetPoint(C.StickTop and "TOP" or "BOTTOM", self, C.StickTop and "BOTTOM" or "TOP", 0, C.StickTop and -10 or 10)
-	tooltip:Clear()
-	tooltip:AddHeader(G.TitleColor..FRIENDS, G.TitleColor..format("%s/%s", totalonline, totalfriends))
+	panel:AddLine(G.TitleColor..FRIENDS, G.TitleColor..format("%s/%s", totalonline, totalfriends))
 
-	-- Show my BN roadcast
+	-- Show my BN broadcast
 	if currentBroadcast ~= "" then
-		tooltip:AddLine(" ")
-		tooltip:AddLine(BATTLENET_BROADCAST)
-		
-		-- Update width automatically
-		local width
-		if tooltip:GetWidth() > 200 then
-			width = tooltip:GetWidth() + 100
-		else
-			width = 300
-		end
-
-		local y = tooltip:AddLine()
-		tooltip:SetCell(y, 1, G.OptionColor..currentBroadcast, nil, "LEFT", 2, nil, 0, 0, width)
+		panel:AddLine()
+		panel:AddLine(BATTLENET_BROADCAST)
+		panel:AddText(G.OptionColor..currentBroadcast)
 	end
 	
 	-- Options
-	tooltip:AddLine(" ", G.Line)
-	tooltip:AddLine(G.OptionColor..G.LeftButton.."+ Shift "..INVITE, G.OptionColor..FRIENDS..G.LeftButton)
-	tooltip:AddLine(G.OptionColor..G.MiddleButton..WHISPER, G.OptionColor..BATTLENET_BROADCAST..G.RightButton)
+	panel:AddLine(" ", G.Line)
+	panel:AddLine(G.OptionColor..G.LeftButton.."+ Shift "..INVITE, G.OptionColor..FRIENDS..G.LeftButton)
+	panel:AddLine(G.OptionColor..G.MiddleButton..WHISPER, G.OptionColor..BATTLENET_BROADCAST..G.RightButton)
 
 	-- In-game online friends list
 	if onlineFriends > 0 then
 		buildFriendTable(numberOfFriends)
 		
-		tooltip:AddLine(" ")
-		tooltip:AddLine(GAME, ZONE)
-		tooltip:AddSeparator(2, .6, .8, 1)
+		panel:AddLine()
+		panel:AddLine(GAME, ZONE)
+		panel:AddSeparator()
 		
 		for i = 1, #friendTable do
 			local info = friendTable[i]
-			tooltip:AddLine(info.nameText, getLocationText(info.area, "", currentZone))
-
-			local line = tooltip:GetLineCount()
-			tooltip:SetLineScript(line, "OnMouseUp", gameOnClick, info)
+			panel:AddRow({"", info.nameText, getLocationText(info.area, "", currentZone)}, info, gameOnClick, gameOnEnter)
 		end
 	end
 	
@@ -454,9 +537,9 @@ local function OnEnter(self)
 	if numBNetOnline > 0 then
 		buildBNetTable(totalBNet)
 		
-		tooltip:AddLine(" ")
-		tooltip:AddLine(NAME, ZONE)
-		tooltip:AddSeparator(2, .6, .8, 1)
+		panel:AddLine()
+		panel:AddLine(NAME, ZONE)
+		panel:AddSeparator()
 		
 		for i = 1, #bnetTable do
 			local info = bnetTable[i]
@@ -467,48 +550,18 @@ local function OnEnter(self)
 				locationText = getLocationText(info.area, regionName, currentZone)
 			end
 
-			tooltip:AddLine(nameText, locationText)
-
-			local line = tooltip:GetLineCount()
-			tooltip:SetLineScript(line, "OnMouseUp", bnOnClick, info)
+			panel:AddRow({info.icon, nameText, locationText}, info, bnOnClick, bnOnEnter)
 		end
 	end
 	
-	tooltip:UpdateScrolling(600)
-	tooltip:Show()
-	
-	self.tooltip = tooltip
-end
-
---[[ Hide QTip tooltip ]]--
-local function OnRelease(self)
-	self:UnregisterEvent("MODIFIER_STATE_CHANGED")
-	self:SetScript("OnUpdate", nil)
-	self.isShiftDown = nil
-	self.timer = nil
-	LibQTip:Release(self.tooltip)
-	self.tooltip = nil
-end
-
---[[ Update mouseover tooltip ]]--
-local function OnUpdate(self, elapsed)
-	self.timer = (self.timer or 0) + elapsed
-
-	if self.timer > .1 then
-		if not self:IsMouseOver() and (not self.tooltip or not self.tooltip:IsMouseOver()) then
-			OnRelease(self)
-			return
-		end
-
-		self.timer = 0
-	end
+	panel:Layout()
 end
 
 local function OnEvent(self, event, key)
 	if event == "MODIFIER_STATE_CHANGED" then
 		local isShiftKey = key == "LSHIFT" or key == "RSHIFT"
-		if isShiftKey and self.tooltip and IsShiftKeyDown() ~= self.isShiftDown then
-			OnEnter(self)
+		if isShiftKey and self.panel and self.panel:IsShown() and IsShiftKeyDown() ~= self.isShiftDown then
+			RenderFriendsPanel(self)
 		end
 		return
 	end
@@ -521,8 +574,9 @@ local function OnEvent(self, event, key)
 	Text:SetText(online)
 	self:Layout()
 
-	if self.tooltip then
-		OnEnter(self)
+	if self.panel and self.panel:IsShown() then
+		self.panel:CloseMenu()
+		RenderFriendsPanel(self)
 	end
 end
 
@@ -532,23 +586,28 @@ end
 	
 	--[[ Tooltip ]]--
 	Stat:SetScript("OnEnter", function(self)
-		-- 先清除舊的tooltip，相當於重設一次，以避免重新指向stat的時候如果tooltip還沒隱藏可能出現的問題......大概吧
-		OnRelease(self)
-		self:RegisterEvent("MODIFIER_STATE_CHANGED")
 		-- Mouseover color
 		Icon:SetVertexColor(0, 1, 1)
 		Text:SetTextColor(0, 1, 1)
-		-- Tooltip show
-		OnEnter(self)
+		if not self.panel then
+			-- 圖示固定 20px；名稱、區域為自然寬，超過面板上限時先縮右欄。
+			self.panel = F.CreateInfoPanel(self, {{width = 20}, {}, {justify = "RIGHT"}})
+			self.panel:HookScript("OnHide", function()
+				self:UnregisterEvent("MODIFIER_STATE_CHANGED")
+				self.isShiftDown = nil
+			end)
+		end
+		RenderFriendsPanel(self)
+		if not self.panel:IsShown() then
+			self:RegisterEvent("MODIFIER_STATE_CHANGED")
+			self.panel:Show()
+		end
 	end)
 	
-	Stat:SetScript("OnLeave", function(self)
+	Stat:SetScript("OnLeave", function()
 		-- Normal color
 		Icon:SetVertexColor(1, 1, 1)
 		Text:SetTextColor(1, 1, 1)
-		-- Tooltip hide
-		if not self.tooltip then return end
-		self:SetScript("OnUpdate", OnUpdate)
 	end)
 	
 	--[[ Options ]]--
