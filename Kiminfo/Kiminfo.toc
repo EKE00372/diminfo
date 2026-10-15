@@ -24,10 +24,9 @@
 ## Category-zhTW: 資料管理
 
 
-Libs\Libs.xml
-
 Config.lua
 Core.lua
+InfoPanel.lua
 
 Locale.lua
 Modules\Modules.xml
