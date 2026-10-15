@@ -85,7 +85,7 @@ local function selectCurrentConfig(data)
 		-- 由原生天賦流程處理非同步完成、Starter 狀態及最後選取紀錄。
 		C_ClassTalents.SwitchToLoadoutByIndex(loadoutIndex)
 	else
-		UIErrorsFrame:AddExternalErrorMessage(ERR_TALENT_FAILED_INVALID_CONFIG)
+		UIErrorsFrame:AddExternalErrorMessage(G.ErrColor..ERR_TALENT_FAILED_INVALID_CONFIG)
 	end
 end
 
@@ -173,7 +173,7 @@ local function OnEnter(self)
 	
 	GameTooltip:SetOwner(self, C.StickTop and "ANCHOR_BOTTOM" or "ANCHOR_TOP", 0, C.StickTop and -10 or 10)
 	GameTooltip:ClearLines()
-	GameTooltip:AddLine(TALENTS_BUTTON, 0, .6, 1)
+	GameTooltip:AddLine(G.TitleColor..TALENTS_BUTTON)
 	GameTooltip:AddLine(" ")
 	
 	-- Spec
@@ -194,7 +194,7 @@ local function OnEnter(self)
 		if #pvpTalents > 0 then
 			-- PvP title
 			GameTooltip:AddLine(" ")
-			GameTooltip:AddLine(F.addIcon(pvpTexture, 14, 4, 46).." "..PVP_TALENTS, .6, .8, 1)
+			GameTooltip:AddLine(F.addIcon(pvpTexture, 14, 4, 46).." "..G.OptionColor..PVP_TALENTS)
 			
 			-- List
 			for _, talentID in next, pvpTalents do

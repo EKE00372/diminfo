@@ -142,7 +142,7 @@ local title
 local function addTitle(text)
 	if not title then
 		GameTooltip:AddLine(" ")
-		GameTooltip:AddLine(text, .6, .8, 1)
+		GameTooltip:AddLine(text and G.OptionColor..text)
 		title = true
 	end
 end
@@ -181,14 +181,14 @@ local function OnEnter(self, isShiftDown)
 	-- Title
 	GameTooltip:SetOwner(self, C.StickTop and "ANCHOR_BOTTOM" or "ANCHOR_TOP", 0, C.StickTop and -10 or 10)
 	GameTooltip:ClearLines()
-	GameTooltip:AddLine(format(FULLDATE, CALENDAR_WEEKDAY_NAMES[w], CALENDAR_FULLDATE_MONTH_NAMES[m], d, y), 0, .6, 1)
+	GameTooltip:AddLine(G.TitleColor..format(FULLDATE, CALENDAR_WEEKDAY_NAMES[w], CALENDAR_FULLDATE_MONTH_NAMES[m], d, y))
 	GameTooltip:AddLine(" ")
 	
 	-- Game time
 	local localHour, localMinute = tonumber(date("%H")), tonumber(date("%M"))
 	local realmHour, realmMinute = GetGameTime()
-	GameTooltip:AddDoubleLine(TIMEMANAGER_TOOLTIP_LOCALTIME, updateTimerFormat(localHour, localMinute), .6, .8, 1, 1, 1, 1)
-	GameTooltip:AddDoubleLine(TIMEMANAGER_TOOLTIP_REALMTIME, updateTimerFormat(realmHour, realmMinute), .6, .8, 1, 1, 1, 1)
+	GameTooltip:AddDoubleLine(G.OptionColor..TIMEMANAGER_TOOLTIP_LOCALTIME, updateTimerFormat(localHour, localMinute), 1, 1, 1, 1, 1, 1)
+	GameTooltip:AddDoubleLine(G.OptionColor..TIMEMANAGER_TOOLTIP_REALMTIME, updateTimerFormat(realmHour, realmMinute), 1, 1, 1, 1, 1, 1)
 	
 	-- Mythic+ and Weekly chest quest only on max level
 	if UnitLevel("player") == GetMaxLevelForLatestExpansion() then
@@ -241,7 +241,7 @@ local function OnEnter(self, isShiftDown)
 		
 		if numRuns > 0 then
 			GameTooltip:AddLine(" ")
-			GameTooltip:AddDoubleLine(format(WEEKLY_REWARDS_MYTHIC_TOP_RUNS, WeeklyRunsThreshold), "("..numRuns..")", .6, .8, 1)
+			GameTooltip:AddDoubleLine(G.OptionColor..format(WEEKLY_REWARDS_MYTHIC_TOP_RUNS, WeeklyRunsThreshold), "("..numRuns..")")
 			sort(runHistory, sortHistory)
 
 			for i = 1, WeeklyRunsThreshold do

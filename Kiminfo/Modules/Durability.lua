@@ -123,7 +123,7 @@ local function OnEnter(self)
 	-- Title
 	GameTooltip:SetOwner(self, C.StickTop and "ANCHOR_BOTTOM" or "ANCHOR_TOP", 0, C.StickTop and -10 or 10)
 	GameTooltip:ClearLines()
-	GameTooltip:AddDoubleLine(STAT_AVERAGE_ITEM_LEVEL, format("%d/%d", equipped, total), 0, .6, 1, 0, .6, 1)
+	GameTooltip:AddDoubleLine(G.TitleColor..STAT_AVERAGE_ITEM_LEVEL, G.TitleColor..format("%d/%d", equipped, total))
 	GameTooltip:AddLine(" ")
 	
 	-- Slot item list
@@ -211,16 +211,16 @@ local RepairGear = CreateFrame("Frame")
 					-- Use guild repair if you can / 優先使用公會修理
 					if guildMoney >= cost then
 						RepairAllItems(true)
-						print(format("|cff99CCFF"..GUILDCONTROL_OPTION15.."|r %s", GetMoneyString(cost)))
+						print(format(G.OptionColor..GUILDCONTROL_OPTION15.."|r %s", GetMoneyString(cost)))
 						return
 					end
 				end
 				
 				if money >= cost then
 					RepairAllItems()
-					print(format("|cff99CCFF"..REPAIR_COST.."|r%s", GetMoneyString(cost)))
+					print(format(G.OptionColor..REPAIR_COST.."|r%s", GetMoneyString(cost)))
 				else
-					print("|cff99CCFF"..ERR_NOT_ENOUGH_MONEY.."|r")
+					print(G.ErrColor..ERR_NOT_ENOUGH_MONEY.."|r")
 				end
 			end
 		end

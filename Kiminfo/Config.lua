@@ -28,21 +28,22 @@ local C, F, G, L = unpack(ns)
 	G.FontSize = 16						-- 大小 / Font size
 	G.FontFlag = "OUTLINE"				-- 描邊 / Font outline
 
-	G.Line = "|cff7b8489---------------|r"
-	G.TitleColor = "|cff0099ff"		-- .6, .8, 1 /or .4, .78, .1
-	G.OptionColor = "|cff99ccff"		-- .6, .8, 1 /or .4, .78, .1
-	G.ErrColor = "|cffff0000"			-- 1, 0, 0
+	G.Line = "|cff7b8489---------------|r"	-- or ffd100
+	G.TitleColor = "|cff66ccff"				-- or 0099FF
+	G.OptionColor = "|cff99ccff"
+	G.ErrColor = "|cffff0000"
 	
 --------------
 -- Settings --
 --------------
 	
 	-- Tooltip showup direction / 滑鼠提示的顯示方向
-	-- if you put databar on screen botton, change true to false. / 如果你調整訊息列至畫面底部，將ture改為false
+	-- If you put databar on screen botton, change true to false. / 如果你調整訊息列至畫面底部，將ture改為false
 	C.StickTop = true
 
-	C.MaxAddOns = 30	-- Maximum addons shown in the memory / CPU list / 記憶體與 CPU 列表顯示上限
-	C.InfoPanel = {maxWidth = 600, maxHeight = 600}	-- Friends / Guild panel size / 好友、公會面板尺寸
+	-- Friends & Guild panel size / 好友、公會面板尺寸
+	-- Size should not exceed 1200*600 / 尺寸建議不超過 1200*600
+	C.InfoPanel = {maxWidth = 1000, maxHeight = 600}
 	
 	-- Enable modules; changes take effect after reload / 模組開關，重載後生效
 	
@@ -50,6 +51,7 @@ local C, F, G, L = unpack(ns)
 	C.Bags = true		-- Bags / 背包
 	C.Memory = true		-- Memory / 記憶體占用列表	
 	C.System = true		-- System: Fps and latency / 幀數與延遲
+	C.MaxAddOns = 30	-- Addon list maximum / 插件列表顯示數量
 	C.Spec = true		-- Spec: Spec and Loot Spec / 專精與拾取專精
 	C.Friends = true	-- Friends / 好友
 	C.Guild = true		-- Guild / 公會
