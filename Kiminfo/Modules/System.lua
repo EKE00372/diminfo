@@ -213,11 +213,8 @@ local function OnEnter(self)
 	
 	-- Options
 	GameTooltip:AddDoubleLine(" ", G.Line)
-	GameTooltip:AddDoubleLine(" ", G.OptionColor..RELOADUI..G.MiddleButton)
-	if profilingEnabled then
-		GameTooltip:AddDoubleLine(" ", G.OptionColor..L.ResetCPU..G.LeftButton)
-	end
-	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.CPU..(profilingEnabled and G.Enable or G.Disable)..G.RightButton)
+	GameTooltip:AddDoubleLine(G.OptionColor..G.LeftButton.."+ Shift "..L.SwitchAudioOutput, (profilingEnabled and G.OptionColor..L.ResetCPU..G.LeftButton) or " ")
+	GameTooltip:AddDoubleLine(G.OptionColor..G.MiddleButton..RELOADUI, G.OptionColor..L.CPU..(profilingEnabled and G.Enable or G.Disable)..G.RightButton)
 
 	F.ShowTooltip()
 end
@@ -228,7 +225,16 @@ end
 	
 	--[[ Options ]]--
 	Stat:SetScript("OnMouseDown", function(self, btn)
-		if btn == "RightButton" then
+		if btn == "LeftButton" and IsShiftKeyDown() then
+			local count = Sound_GameSystem_GetNumOutputDrivers()
+			if count > 1 then
+				local index = (tonumber(C_CVar.GetCVar("Sound_OutputDriverIndex")) + 1) % count
+				if C_CVar.SetCVar("Sound_OutputDriverIndex", tostring(index)) then
+					local current = tonumber(C_CVar.GetCVar("Sound_OutputDriverIndex"))
+					print(G.OptionColor..AUDIO_OUTPUT_DEVICE.."|r: "..Sound_GameSystem_GetOutputDriverNameByIndex(current))
+				end
+			end
+		elseif btn == "RightButton" then
 			if GetCVar("scriptProfile") == "0" then
 				SetCVar("scriptProfile", 1)
 				print(L.ReloadOn)
