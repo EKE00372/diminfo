@@ -55,6 +55,7 @@ end
 local delvesKeys = {91175, 91176, 91177, 91178}
 local keyName = C_CurrencyInfo.GetCurrencyInfo(3028).name
 
+-- 12.1.5 豐裕入口 POI；名稱由遊戲取得，迷宮不套用一般地下堡的每日倒數。
 local delveList = {
 	{uiMapID = 2393, delveID = 8426}, -- 學院災禍
 	{uiMapID = 2424, delveID = 8428}, -- 幻日廣場
@@ -66,6 +67,9 @@ local delveList = {
 	{uiMapID = 2393, delveID = 8440}, -- 黑暗之途
 	{uiMapID = 2437, delveID = 8442}, -- 暮光墓穴
 	{uiMapID = 2437, delveID = 8444}, -- 阿塔阿曼
+	{uiMapID = 2512, delveID = 8760}, -- 納爾多島
+	{uiMapID = 2512, delveID = 8763}, -- 榮耀競技場
+	{uiMapID = 2395, delveID = 9035, hideReset = true}, -- 金多詹的迷宮
 }
 
 --[[ Weekly quest ]] --
@@ -222,7 +226,7 @@ local function OnEnter(self, isShiftDown)
 					local mapInfo = C_Map_GetMapInfo(v.uiMapID)
 					if mapInfo then
 						addTitle(delveInfo.description)
-						GameTooltip:AddDoubleLine(mapInfo.name .. " - " .. delveInfo.name, SecondsToTime(GetQuestResetTime(), true, nil, 3), 1, 1, 1, 1, 1, 1)
+						GameTooltip:AddDoubleLine(mapInfo.name .. " - " .. delveInfo.name, v.hideReset and "" or SecondsToTime(GetQuestResetTime(), true, nil, 3), 1, 1, 1, 1, 1, 1)
 					end
 				end
 			end
