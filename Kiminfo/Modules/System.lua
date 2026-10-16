@@ -1,4 +1,4 @@
-﻿local addon, ns = ... 
+﻿local _, ns = ...
 local C, F, G, L = unpack(ns)
 if not C.System then return end
 
@@ -119,9 +119,7 @@ local function updateUsageTable()
 end
 
 local function sortUsage(a, b)
-	if a and b then
-		return a[3] > b[3]
-	end
+	return a[3] > b[3]
 end
 
 local function updateUsage()
@@ -165,6 +163,7 @@ end
 --[[ Update tooltip ]]--
 local function OnEnter(self)
 	local _, _, latencyHome, latencyWorld = GetNetStats()
+	local profilingEnabled = (GetCVar("scriptProfile") == "1")
 	
 	-- Title
 	GameTooltip:SetOwner(self, C.StickTop and "ANCHOR_BOTTOM" or "ANCHOR_TOP", 0, C.StickTop and -10 or 10)
@@ -176,7 +175,7 @@ local function OnEnter(self)
 	GameTooltip:AddDoubleLine(G.OptionColor..L.Home, colorLatencyTooltip(latencyHome).."|r ms", 1, 1, 1, 1, 1, 1)
 	GameTooltip:AddDoubleLine(G.OptionColor..L.World, colorLatencyTooltip(latencyWorld).."|r ms", 1, 1, 1, 1, 1, 1)
 	
-	if GetCVar("scriptProfile") == "1" then
+	if profilingEnabled then
 		updateUsageTable()
 		local totalCPU = updateUsage()
 		local passedTime = max(1, GetTime() - cpuUsageStartTime)
@@ -184,14 +183,13 @@ local function OnEnter(self)
 		
 		if totalCPU > 0 then
 			local maxAddOns = C.MaxAddOns
-			local isShiftKeyDown = IsShiftKeyDown()
-			local maxShown = isShiftKeyDown and #usageTable or min(maxAddOns, #usageTable)
+			local maxShown = IsShiftKeyDown() and #usageTable or min(maxAddOns, #usageTable)
 			local numEnabled = 0
 			local hiddenUsage = 0
 			
 			for i = 1, #usageTable do
 				local value = usageTable[i]
-				if value and C_AddOns_IsAddOnLoaded(value[1]) then
+				if C_AddOns_IsAddOnLoaded(value[1]) then
 					numEnabled = numEnabled + 1
 					if numEnabled <= maxShown then
 						local r = value[3] / totalCPU
@@ -203,7 +201,7 @@ local function OnEnter(self)
 				end
 			end
 
-			if not isShiftKeyDown and numEnabled > maxShown then
+			if numEnabled > maxShown then
 				GameTooltip:AddDoubleLine(G.OptionColor..format("%d %s (%s)", numEnabled - maxShown, L.Hidden, L.Shift), G.OptionColor..format(usageString, hiddenUsage / passedTime))
 			end
 			
@@ -216,10 +214,10 @@ local function OnEnter(self)
 	-- Options
 	GameTooltip:AddDoubleLine(" ", G.Line)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..RELOADUI..G.MiddleButton)
-	if GetCVar("scriptProfile") == "1" then
+	if profilingEnabled then
 		GameTooltip:AddDoubleLine(" ", G.OptionColor..L.ResetCPU..G.LeftButton)
 	end
-	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.CPU..(GetCVar("scriptProfile") == "1" and G.Enable or G.Disable)..G.RightButton)
+	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.CPU..(profilingEnabled and G.Enable or G.Disable)..G.RightButton)
 
 	F.ShowTooltip()
 end
