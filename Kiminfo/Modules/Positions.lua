@@ -1,5 +1,5 @@
 local _, ns = ...
-local C, F, G = unpack(ns)
+local C, F, G, L = unpack(ns)
 if not C.Positions then return end
 
 local GameTooltip = F.Tooltip
@@ -21,6 +21,20 @@ local secretValueCVars = {
 	"addonPvPMatchRestrictionsForced",
 	"addonMapRestrictionsForced",
 	"addonCombatRestrictionsForced",
+}
+-- 顯示名字時套用的預設；隱藏時這些選項全部設為 0，不影響名條。
+local namePreset = {
+	{"UnitNameOwn", "0"},
+	{"UnitNameNPC", "1"},
+	-- NPC 子選項歸零，以對應原生「所有／無 NPC」。
+	{"UnitNameFriendlySpecialNPCName", "0"},
+	{"UnitNameHostleNPC", "0"},
+	{"UnitNameInteractiveNPC", "0"},
+	{"UnitNameNonCombatCreatureName", "1"},
+	{"UnitNameFriendlyPlayerName", "1"},
+	{"UnitNameFriendlyMinionName", "1"},
+	{"UnitNameEnemyPlayerName", "1"},
+	{"UnitNameEnemyMinionName", "0"},
 }
 
 --==========================================--
@@ -60,6 +74,14 @@ end
 --[[ Format ]]--
 local function formatCoords()
 	return format("%.1f, %.1f", coordX*100, coordY*100)
+end
+
+-- 任一名稱選項開啟就提供「隱藏」；提示與點擊共用目前的實際設定。
+local function AreNamesEnabled()
+	for i = 1, #namePreset do
+		if C_CVar_GetCVarBool(namePreset[i][1]) then return true end
+	end
+	return false
 end
 
 --[[ Secret value test CVars ]]--
@@ -182,8 +204,8 @@ local function OnEnter(self)
 	
 	-- Options
 	GameTooltip:AddDoubleLine(" ", G.Line)
-	GameTooltip:AddDoubleLine(" ", G.OptionColor..WORLDMAP_BUTTON..G.LeftButton)
-	GameTooltip:AddDoubleLine(" ", G.OptionColor..MAP_PIN..G.RightButton)
+	GameTooltip:AddDoubleLine(G.OptionColor..G.LeftButton.."+ Shift "..(AreNamesEnabled() and L.HideNames or L.NamePreset), G.OptionColor..WORLDMAP_BUTTON..G.LeftButton)
+	GameTooltip:AddDoubleLine(G.OptionColor..G.MiddleButton..(C_CVar_GetCVarBool("gxMaximize") and VIDEO_OPTIONS_WINDOWED or VIDEO_OPTIONS_FULLSCREEN), G.OptionColor..MAP_PIN..G.RightButton)
 	
 	F.ShowTooltip()
 end
@@ -225,7 +247,20 @@ end
 	
 	--[[ Options ]]--
 	Stat:SetScript("OnMouseUp", function(self, btn)
-		if btn == "LeftButton" and IsControlKeyDown() then
+		if btn == "LeftButton" and IsShiftKeyDown() then
+			local enabled = not AreNamesEnabled()
+			for i = 1, #namePreset do
+				local option = namePreset[i]
+				C_CVar_SetCVar(option[1], enabled and option[2] or "0")
+			end
+			OnEnter(self)
+		elseif btn == "MiddleButton" then
+			-- 原生顯示模式：視窗化／全螢幕視窗化，只更新視窗，不重啟圖形引擎。
+			if C_CVar_SetCVar("gxMaximize", C_CVar_GetCVarBool("gxMaximize") and "0" or "1") then
+				UpdateWindow()
+				OnEnter(self)
+			end
+		elseif btn == "LeftButton" and IsControlKeyDown() then
 			SetSecretValueCVarsEnabled(not AreSecretValueCVarsEnabled())
 			OnEnter(self)
 		elseif btn == "LeftButton" then
