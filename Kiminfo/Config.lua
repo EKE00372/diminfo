@@ -42,8 +42,9 @@ local C, F, G, L = unpack(ns)
 	C.StickTop = true
 
 	-- Friends & Guild panel size / 好友、公會面板尺寸
+	-- Min/max width includes padding / 最小、最大寬度皆含面板內距
 	-- Size should not exceed 1200*600 / 尺寸建議不超過 1200*600
-	C.InfoPanel = {maxWidth = 1000, maxHeight = 600}
+	C.InfoPanel = {minWidth = 300, maxWidth = 800, maxHeight = 600}
 	
 	-- Enable modules; changes take effect after reload / 模組開關，重載後生效
 	

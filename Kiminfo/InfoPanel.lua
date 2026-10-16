@@ -183,7 +183,7 @@ function Panel:Layout()
 
 	local naturalWidth = columnGap * (#widths - 1)
 	for _, width in ipairs(widths) do naturalWidth = naturalWidth + width end
-	local wantedWidth = math.max(naturalWidth, fullWidth)
+	local wantedWidth = math.max(naturalWidth, fullWidth, C.InfoPanel.minWidth - padding * 2)
 	local maxWidth = math.min(C.InfoPanel.maxWidth, UIParent:GetWidth())
 	local contentWidth = math.min(wantedWidth, maxWidth - padding * 2)
 	local overflow = naturalWidth - contentWidth
@@ -211,7 +211,12 @@ function Panel:Layout()
 			for j, column in ipairs(self.columns) do
 				local cell = row.cells[j]
 				cell:ClearAllPoints()
-				cell:SetPoint("LEFT", row, "LEFT", x, 0)
+				-- 末欄靠右時貼齊內容右緣；面板多出的寬度留在欄間，不拉寬文字欄。
+				if j == #self.columns and column.justify == "RIGHT" then
+					cell:SetPoint("RIGHT", row, "RIGHT", 0, 0)
+				else
+					cell:SetPoint("LEFT", row, "LEFT", x, 0)
+				end
 				cell:SetWidth(widths[j])
 				cell:SetJustifyH(column.justify or "LEFT")
 				height = math.max(height, cell:GetStringHeight() + G.TooltipRowPadding * 2)
@@ -263,10 +268,11 @@ end
 	owner：就是模組的 stat，用於定位和指向判斷
 	columns：依顯示順序排列的欄位設定
 		width：不含欄間距的固定欄寬，省略則取整份名單中該欄的最大自然寬
-		justify：該欄文字水平對齊方向，預設 LEFT。
+		justify：該欄文字水平對齊方向，預設 LEFT；末欄設 RIGHT 時貼齊內容右緣。
 		例：{{width = 20}, {}, {justify = "RIGHT"}} = 第一欄20寬，第二欄不指定，第三欄靠右對齊
 	
-	C.InfoPanel.maxWidth/maxHeight：內容面板尺寸上限，含內距
+	C.InfoPanel.minWidth/maxWidth：面板寬度下限／上限，含內距；上限與 UIParent 寬度優先於下限
+	C.InfoPanel.maxHeight：內容面板高度上限，含內距
 	超高時底部額外加一列 G.TooltipRowHeight 的方向提示，不計入 maxHeight
 
 	開啟：加入內容 → Layout() → Show()
