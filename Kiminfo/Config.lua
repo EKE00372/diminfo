@@ -93,6 +93,36 @@ local C, F, G, L = unpack(ns)
 		},
 	}
 
+	-- Custom layout example / 雙列範例
+	-- Replace the C.Layout above with this block, then /reload. / 使用時以此段 C.Layout 取代上方單列設定，再重載介面。
+	--[[
+	C.Layout = {
+		{
+			point = {"TOPLEFT", UIParent, 288, -20},
+			inset = {22, -10},
+			panel = {420, 36, .8},
+			modules = {
+				{"Time", 0},
+				{"Friends", 0},
+				{"Guild", 0},
+				{"Bags", 0},
+				{"Durability", 0},
+				{"Positions", 0},
+			},
+		},
+		{
+			point = {"TOPLEFT", UIParent, 288, -60},
+			inset = {15, -8},
+			panel = {320, 36, .8},
+			modules = {
+				{"Memory", 0},
+				{"System", 0},
+				{"Spec", 0},
+			},
+		},
+	}
+	]]--
+
 -------------
 -- Credits --
 -------------
