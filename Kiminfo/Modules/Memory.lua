@@ -42,7 +42,7 @@ local Text  = Stat:CreateFontString(nil, "OVERLAY")
 
 --[[ Format memory for tooltip list ]]--
 local function formatMemory(value)
-	if value > 1024 then
+	if value >= 1024 then
 		return format("%.1f mb", value / 1024)
 	else
 		return format("%.0f kb", value)
@@ -51,8 +51,6 @@ end
 
 --[[ Format memory color for tooltip list ]]--
 local function memoryColor(value, times)
-	if not times then times = 1 end
-
 	if value <= 1024*times then
 		return 0, 1, 0
 	elseif value <= 2048*times then
@@ -100,9 +98,7 @@ end
 
 --[[ Sort addon list ]]--
 local function sortMemory(a, b)
-	if a and b then
-		return a[3] > b[3]
-	end
+	return a[3] > b[3]
 end
 
 --[[ Update addon memory ]]--
@@ -125,11 +121,7 @@ local function RefreshText()
 	updateMemoryTable()
 	totalMemory = updateMemory()
 	
-	if totalMemory >= 1024 then
-		Text:SetText(format("%.1fmb", totalMemory/1024))
-	else
-		Text:SetText(format("%.1fmb", totalMemory/1024))
-	end
+	Text:SetText(format("%.1fmb", totalMemory/1024))
 	Stat:Layout()
 end
 
@@ -193,7 +185,7 @@ local function OnEnter(self)
 	for i = 1, #memoryTable do
 		local value = memoryTable[i]
 		
-		if value and C_AddOns_IsAddOnLoaded(value[1]) then
+		if C_AddOns_IsAddOnLoaded(value[1]) then
 			numEnabled = numEnabled + 1
 			
 			if numEnabled <= maxShown then

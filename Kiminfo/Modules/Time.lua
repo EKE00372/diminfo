@@ -1,4 +1,4 @@
-local addon, ns = ... 
+local _, ns = ...
 local C, F, G, L = unpack(ns)
 if not C.Time then return end
 
@@ -93,7 +93,7 @@ local function LoadQuestListNames(questList)
 			if not itemCache[entry.itemID] then
 				LoadItemLink(entry.itemID)
 			end
-		elseif not entry.name or entry.name == "" then
+		elseif entry.name == "" then
 			if entry.spellID then
 				LoadSpellName(entry)
 			elseif entry.areaID then
@@ -106,11 +106,6 @@ local function LoadQuestListNames(questList)
 			end
 		end
 	end
-end
-
-local function LoadQuestNames()
-	LoadQuestListNames(DFQuestList)
-	LoadQuestListNames(TWWQuestList)
 end
 
 --==========================================--
@@ -151,7 +146,7 @@ local function addQuestList(text, questList)
 	title = false
 	for _, entry in ipairs(questList) do
 		addTitle(text)
-		local name = (entry.itemID and itemCache[entry.itemID]) or entry.name or ""
+		local name = (entry.itemID and itemCache[entry.itemID]) or entry.name
 		if C_QuestLog_IsQuestFlaggedCompleted(entry.questID) then
 			GameTooltip:AddDoubleLine(name, COMPLETE, 1, 1, 1, .3, 1, .3)
 		else
@@ -235,9 +230,8 @@ local function OnEnter(self, isShiftDown)
 		--end
 		
 		-- Mythic+ 8 runs
-		title = false
 		local runHistory = C_MythicPlus_GetRunHistory(false, true)
-		local numRuns = runHistory and #runHistory
+		local numRuns = #runHistory
 		
 		if numRuns > 0 then
 			GameTooltip:AddLine(" ")
@@ -330,7 +324,8 @@ local function OnEvent(self, event, key)
 	if event == "PLAYER_ENTERING_WORLD" then
 		RequestRaidInfo()
 		C_MythicPlus_RequestMapInfo()
-		LoadQuestNames()
+		LoadQuestListNames(DFQuestList)
+		LoadQuestListNames(TWWQuestList)
 	end
 
 	local r, g, b
@@ -403,7 +398,6 @@ end
 			ToggleTimeManager()
 		elseif btn == "LeftButton" then
 			if InCombatLockdown() then UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT) return end
-			if not CalendarFrame then C_AddOns.LoadAddOn("Blizzard_Calendar") end
 			ToggleCalendar()
 		elseif btn == "MiddleButton" then
 			if InCombatLockdown() then UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT) return end

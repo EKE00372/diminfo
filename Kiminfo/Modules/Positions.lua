@@ -1,5 +1,5 @@
-local addon, ns = ... 
-local C, F, G, L = unpack(ns)
+local _, ns = ...
+local C, F, G = unpack(ns)
 if not C.Positions then return end
 
 local GameTooltip = F.Tooltip
@@ -13,6 +13,7 @@ local GetSubZoneText, GetZoneText = GetSubZoneText, GetZoneText
 
 local subzone, zone, pvpType, faction
 local coordX, coordY = 0, 0
+local coordLine, secretValueLine
 local secretValueCVars = {
 	"addonChatRestrictionsForced",
 	"addonEncounterRestrictionsForced",
@@ -110,33 +111,37 @@ local function UpdateCoords(self, elapsed)
 	self.elapsed = (self.elapsed or 0) + elapsed
 	
 	if self.elapsed > .1 then
+		self.elapsed = 0
+		if not GameTooltip:IsOwned(self) or not GameTooltip:IsShown() then
+			self:SetScript("OnUpdate", nil)
+			coordLine, secretValueLine = nil, nil
+			return
+		end
+
+		-- 只有列結構改變才重繪整個 tooltip；一般移動只更新座標文字。
+		if IsInInstance() or C_CVar_GetCVarBool("minimapShowPlayerCoords") or IsControlKeyDown() ~= (secretValueLine ~= nil) then
+			self:GetScript("OnEnter")(self)
+			return
+		end
+
 		local x, y = GetPlayerMapPos(C_Map_GetBestMapForUnit("player"))
 		if x then
 			coordX, coordY = x, y
 		else
 			coordX, coordY = 0, 0
 		end
-		self:GetScript("OnEnter")(self)
-		
-		self.elapsed = 0
+		coordLine:SetText("|cffffffff"..formatCoords().."|r")
+		if secretValueLine then
+			secretValueLine:SetText(AreSecretValueCVarsEnabled() and G.Enable or G.Disable)
+		end
+		-- 內容仍是同一列，交原生 tooltip 更新寬度，不重設所有列高。
+		GameTooltip:Show()
 	end
 end
 
 --=========================================--
 ---------------	[[ Updates ]] ---------------
 --=========================================--
-
-local function OnEvent(self)
-	subzone, zone =  GetSubZoneText(), GetZoneText()
-	pvpType, _, faction = C_PvP_GetZonePVPInfo()
-	pvpType = pvpType or "neutral"
-	
-	local r, g, b = unpack(zoneColor[pvpType][2])
-	
-	Text:SetText((subzone ~= "") and subzone or zone)
-	Text:SetTextColor(r, g, b)
-	self:Layout()
-end
 
 local function OnEnter(self)
 	local inInstance = IsInInstance()
@@ -162,13 +167,17 @@ local function OnEnter(self)
 	end
 
 	-- Coords
+	coordLine = nil
 	if showCoords then
-		GameTooltip:AddLine(format("|cffffffff%s|r", formatCoords()))
+		GameTooltip:AddLine("|cffffffff"..formatCoords().."|r")
+		coordLine = GameTooltip:GetLeftLine(GameTooltip:NumLines())
 	end
 
+	secretValueLine = nil
 	if IsControlKeyDown() then
 		GameTooltip:AddLine(" ")
 		GameTooltip:AddDoubleLine("Secret Value CVar", AreSecretValueCVarsEnabled() and G.Enable or G.Disable, 1, 1, 1)
+		secretValueLine = GameTooltip:GetRightLine(GameTooltip:NumLines())
 	end
 	
 	-- Options
@@ -179,6 +188,22 @@ local function OnEnter(self)
 	F.ShowTooltip()
 end
 
+local function OnEvent(self)
+	subzone, zone =  GetSubZoneText(), GetZoneText()
+	local _
+	pvpType, _, faction = C_PvP_GetZonePVPInfo()
+	pvpType = pvpType or "neutral"
+
+	local r, g, b = unpack(zoneColor[pvpType][2])
+
+	Text:SetText((subzone ~= "") and subzone or zone)
+	Text:SetTextColor(r, g, b)
+	self:Layout()
+	if GameTooltip:IsOwned(self) and GameTooltip:IsShown() then
+		OnEnter(self)
+	end
+end
+
 --=========================================--
 ---------------	[[ Scripts ]] ---------------
 --=========================================--
@@ -187,7 +212,8 @@ end
 	Stat:SetScript("OnEnter", OnEnter)
 	Stat:SetScript("OnLeave", function(self)
 		self:SetScript("OnUpdate", nil)
-		GameTooltip:Hide()
+		coordLine, secretValueLine = nil, nil
+		if GameTooltip:IsOwned(self) then GameTooltip:Hide() end
 	end)
 	
 	--[[ Data text ]]--
@@ -207,33 +233,29 @@ end
 			ToggleFrame(WorldMapFrame)
 		elseif btn == "RightButton" then
 			local inInstance, instanceType = IsInInstance()
-			if (not inInstance) and (instanceType == "none") then
-				local map = C_Map_GetBestMapForUnit("player")
-				if not map then return end
+			if inInstance or instanceType ~= "none" then return end
+			local map = C_Map_GetBestMapForUnit("player")
+			if not map then return end
 
-				local x, y = GetPlayerMapPos(map)
-				if not x or not y then return end
+			local x, y = GetPlayerMapPos(map)
+			if not x or not y then return end
 
-				coordX, coordY = x, y
-				local unitName = ""
-				if UnitExists("target") and not UnitIsPlayer("target") then
-					local targetName = UnitName("target")
-					if canaccessvalue(targetName) then
-						unitName = targetName
-					end
+			coordX, coordY = x, y
+			local unitName = ""
+			if UnitExists("target") and not UnitIsPlayer("target") then
+				local targetName = UnitName("target")
+				if canaccessvalue(targetName) then
+					unitName = targetName
 				end
-				
-				if C_Map.CanSetUserWaypointOnMap(map) and C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(map, x, y)) then
-					local waypointLink = C_Map.GetUserWaypointHyperlink()
-					if waypointLink then
-						ChatFrameUtil.OpenChat(format("%s %s (%s) %s", waypointLink, zone, formatCoords(), unitName))
-						return
-					end
-				end
-
-				ChatFrameUtil.OpenChat(format("%s (%s) %s", zone, formatCoords(), unitName))
 			end
-		else
-			return
+
+			local message = format("%s (%s) %s", zone, formatCoords(), unitName)
+			if C_Map.CanSetUserWaypointOnMap(map) and C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(map, x, y)) then
+				local waypointLink = C_Map.GetUserWaypointHyperlink()
+				if waypointLink then
+					message = waypointLink.." "..message
+				end
+			end
+			ChatFrameUtil.OpenChat(message)
 		end
 	end)

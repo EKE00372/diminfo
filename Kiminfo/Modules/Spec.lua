@@ -1,4 +1,4 @@
-local addon, ns = ... 
+local _, ns = ...
 local C, F, G, L = unpack(ns)
 if not C.Spec then return end
 
@@ -17,7 +17,6 @@ local C_SpecializationInfo_GetAllSelectedPvpTalentIDs = C_SpecializationInfo.Get
 local C_Spell_GetSpellInfo = C_Spell.GetSpellInfo
 local STARTER_BUILD = Constants.TraitConsts.STARTER_BUILD_TRAIT_CONFIG_ID
 
-local pvpTalents, SpecIndex, LootIndex
 local pvpTexture = C_CurrencyInfo.GetCurrencyInfo(1792).iconFileID
 
 --==========================================--
@@ -144,32 +143,25 @@ end
 
 --[[ Update data text ]]--
 local function OnEvent(self)
-	SpecIndex = GetSpecialization()
-	if not SpecIndex then return end
+	local specIndex = GetSpecialization()
+	if not specIndex then return end
 	
-	if SpecIndex then
-		local SpecIcon
-		SpecIcon = F.addIcon(select(4, GetSpecializationInfo(SpecIndex)), 12, 4, 46)
-		
-		LootIndex = GetLootSpecialization()
-		local LootIcon
-		if LootIndex == 0 then
-			LootIcon = SpecIcon
-		else
-			LootIcon = F.addIcon(select(4, GetSpecializationInfoByID(LootIndex)), 12, 4, 46)
-		end
-		
-		Text:SetText(SpecIcon..L.Spec..LootIcon..LOOT)
+	local specIcon = F.addIcon(select(4, GetSpecializationInfo(specIndex)), 12, 4, 46)
+	local lootIndex = GetLootSpecialization()
+	local lootIcon
+	if lootIndex == 0 then
+		lootIcon = specIcon
 	else
-		Text:SetText(L.Spec..NONE..LOOT..NONE)
+		lootIcon = F.addIcon(select(4, GetSpecializationInfoByID(lootIndex)), 12, 4, 46)
 	end
+	Text:SetText(specIcon..L.Spec..lootIcon..LOOT)
 	self:Layout()
 end
 
 --[[ Update tooltip ]]--
 local function OnEnter(self)
-	SpecIndex = GetSpecialization()
-	if not SpecIndex or SpecIndex == 5 then return end
+	local specIndex = GetSpecialization()
+	if not specIndex or specIndex == 5 then return end
 	
 	GameTooltip:SetOwner(self, C.StickTop and "ANCHOR_BOTTOM" or "ANCHOR_TOP", 0, C.StickTop and -10 or 10)
 	GameTooltip:ClearLines()
@@ -177,7 +169,7 @@ local function OnEnter(self)
 	GameTooltip:AddLine(" ")
 	
 	-- Spec
-	local specID, specName, _, specIcon = GetSpecializationInfo(SpecIndex)
+	local specID, specName, _, specIcon = GetSpecializationInfo(specIndex)
 	GameTooltip:AddLine(F.addIcon(specIcon, 14, 4, 46).." "..G.OptionColor..specName.."|r")
 	
 	-- Telent
@@ -189,7 +181,7 @@ local function OnEnter(self)
 	
 	-- PvP telent
 	if C_SpecializationInfo_CanPlayerUsePVPTalentUI() then
-		pvpTalents = C_SpecializationInfo_GetAllSelectedPvpTalentIDs()
+		local pvpTalents = C_SpecializationInfo_GetAllSelectedPvpTalentIDs()
 		
 		if #pvpTalents > 0 then
 			-- PvP title
@@ -249,7 +241,6 @@ end
 			MenuUtil.CreateContextMenu(self, BuildSpecMenu)
 		elseif button == "LeftButton" then
 			if InCombatLockdown() then UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT) return end
-			if not PlayerSpellsFrame then C_AddOns.LoadAddOn("Blizzard_PlayerSpells") end
 			PlayerSpellsUtil.ToggleClassTalentOrSpecFrame()
 		else
 			return

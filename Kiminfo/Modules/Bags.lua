@@ -1,4 +1,4 @@
-﻿local addon, ns = ... 
+﻿local _, ns = ...
 local C, F, G, L = unpack(ns)
 if not C.Bags then return end
 
@@ -54,17 +54,6 @@ local function getBagSlots()
 	return free, total, used
 end
 
---[[ GetCurrencyInfo ]]--
-local function GetBackpackCurrencyInfo(id)
-	local info = C_CurrencyInfo_GetBackpackCurrencyInfo(id)
-	
-	if info then
-		return info.name, info.quantity, info.iconFileID, info.currencyTypesID
-	end
-	
-	return nil
-end
-
 --=========================================--
 ---------------	[[ Updates ]] ---------------
 --=========================================--
@@ -109,23 +98,23 @@ local function OnEnter(self)
 	
 	-- Currency
 	for i = 1, 10 do
-		local name, count, icon, currencyID = GetBackpackCurrencyInfo(i)
+		local info = C_CurrencyInfo_GetBackpackCurrencyInfo(i)
 		
-		if name and i == 1 then
-			local iconTexture = C_CurrencyInfo_GetCurrencyInfo(1792).iconFileID
+		if info then
+			if i == 1 then
+				local iconTexture = C_CurrencyInfo_GetCurrencyInfo(1792).iconFileID
+
+				GameTooltip:AddLine(" ")
+				GameTooltip:AddLine(F.addIcon(iconTexture, 14, 4, 46).." "..G.OptionColor..CURRENCY)
+			end
 			
-			GameTooltip:AddLine(" ")
-			GameTooltip:AddLine(F.addIcon(iconTexture, 14, 4, 46).." "..G.OptionColor..CURRENCY)
-		end
-		
-		if name and count then
-			local total = C_CurrencyInfo_GetCurrencyInfo(currencyID).maxQuantity
-			local iconTexture = F.addIcon(icon, 14, 4, 46)
+			local total = C_CurrencyInfo_GetCurrencyInfo(info.currencyTypesID).maxQuantity
+			local iconTexture = F.addIcon(info.iconFileID, 14, 4, 46)
 			
 			if total > 0 then
-				GameTooltip:AddDoubleLine(iconTexture.." "..name, count.."/"..total, 1, 1, 1, 1, 1, 1)
+				GameTooltip:AddDoubleLine(iconTexture.." "..info.name, info.quantity.."/"..total, 1, 1, 1, 1, 1, 1)
 			else
-				GameTooltip:AddDoubleLine(iconTexture.." "..name, count, 1, 1, 1, 1, 1, 1)
+				GameTooltip:AddDoubleLine(iconTexture.." "..info.name, info.quantity, 1, 1, 1, 1, 1, 1)
 			end
 		end
 	end
@@ -193,10 +182,8 @@ local sellGray = CreateFrame("Frame")
 				for slot = 1, C_Container_GetContainerNumSlots(bag) do
 					local info = C_Container_GetContainerItemInfo(bag, slot)
 					if info then
-						local count, quality, link, noValue, itemID = info.stackCount, info.quality, info.hyperlink, info.hasNoValue, info.itemID
-						local isInSet = C_Container_GetContainerItemEquipmentSetInfo(bag, slot)
-						
-						if link and not noValue and not isInSet and quality == 0 then
+						local count, quality, link, noValue = info.stackCount, info.quality, info.hyperlink, info.hasNoValue
+						if link and not noValue and quality == 0 and not C_Container_GetContainerItemEquipmentSetInfo(bag, slot) then
 							local price = select(11, GetItemInfo(link)) * count
 						
 							if price > 0 then

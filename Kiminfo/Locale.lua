@@ -1,5 +1,5 @@
-﻿local addon, ns = ... 
-local C, F, G, L = unpack(ns)
+﻿local _, ns = ...
+local G, L = ns[3], ns[4]
 
 local getLocale = GetLocale()
 	if getLocale == "zhTW" then
@@ -25,7 +25,6 @@ local getLocale = GetLocale()
 		L.CollectWarning = "|cff00ffffKim|rinfo[|cff00ff00Memory|r]："..G.ErrColor.."注意：危險功能！|r啟用自動整理暫存記憶體可能使遊戲主程式周期性凍結。"
 
 		L.Spec = "專精"
-		L.Loot = LOOT
 		
 		L.Home = "本地"
 		L.World = "世界"
@@ -61,7 +60,6 @@ local getLocale = GetLocale()
 		L.CollectWarning = "|cff00ffffKim|rinfo[|cff00ff00Memory|r]："..G.ErrColor.."注意：危险功能！|r启用自动整理內存可能使客户端周期性冻结。"
 			
 		L.Spec = "专精"
-		L.Loot = "拾取"
 		
 		L.Home = "本地"
 		L.World = "世界"
@@ -97,7 +95,6 @@ local getLocale = GetLocale()
 		L.CollectWarning = "|cff00ffffKim|rinfo[|cff00ff00Memory|r]: "..G.ErrColor.."NOTICE: DANGER!|r Auto collected memory may cause your client freeze."
 		
 		L.Spec = "Спек"
-		L.Loot = LOOT
 		
 		L.Home = "Домой"
 		L.World = "Мир"
@@ -132,7 +129,6 @@ local getLocale = GetLocale()
 		L.CollectWarning = "|cff00ffffKim|rinfo[|cff00ff00Memory|r]: "..G.ErrColor.."NOTICE: DANGER!|r Auto collected memory may cause your client freeze."
 		
 		L.Spec = "Spec"
-		L.Loot = LOOT
 		
 		L.Home = "Home"
 		L.World = "World"
