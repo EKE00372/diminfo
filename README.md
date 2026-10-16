@@ -61,7 +61,7 @@ There is no in-game configuration panel. Edit [Kiminfo/Config.lua](Kiminfo/Confi
 
 Friends and Guild use `InfoPanel`, with two naturally sized columns separated by a gap. Announcements wrap to the width established by the other contents. The panel uses the native GameTooltip background appearance.
 
-`C.InfoPanel = {maxWidth = 1000, maxHeight = 600}` sets the width and content-panel height limits. If the natural width exceeds the limit, natural columns shrink from right to left. If the content is too tall, use the mouse wheel to scroll; the bottom arrows indicate the available directions and add one extra row beyond `maxHeight`.
+`C.InfoPanel = {minWidth = 300, maxWidth = 1000, maxHeight = 600}` sets the minimum/maximum total width, including padding, and the content-panel height limit. The panel grows naturally within those width limits; `maxWidth` and the UIParent width take priority over `minWidth`. The last right-aligned column stays at the right edge, leaving extra space between columns. If the natural width exceeds the limit, natural columns shrink from right to left. If the content is too tall, use the mouse wheel to scroll; the bottom arrows indicate the available directions and add one extra row beyond `maxHeight`.
 
 `C.StickTop = true` places tooltips below the info bar; use `false` for a bar at the bottom of the screen. `C.MaxAddOns` limits the initial Memory/System addon lists. Font, title/option/error colors and the separator are configured in the same file.
 
@@ -211,7 +211,7 @@ Kiminfo 是一個適用於 WoW 正式服的輕量資訊條，基於 diminfo 製�
 
 好友與公會使用共用的 `InfoPanel`，兩欄皆為自然寬度，欄間保留間距。廣播與公會訊息依其他內容算出的寬度換行，不自行撐寬面板；背景沿用原生 GameTooltip 的外觀。
 
-`C.InfoPanel = {maxWidth = 1000, maxHeight = 600}` 設定寬度與內容面板高度上限。自然寬超過上限時由右向左縮減自然欄；內容過高時使用滑鼠滾輪捲動，底部箭頭提示可捲動方向，另加一列高度，不計入 `maxHeight`。
+`C.InfoPanel = {minWidth = 300, maxWidth = 1000, maxHeight = 600}` 設定含內距的總寬下限／上限，以及內容面板高度上限。面板在寬度範圍內自然伸展；`maxWidth` 與 UIParent 寬度優先於 `minWidth`。最後一個靠右欄貼齊內容右緣，多出的寬度留在欄間。自然寬超過上限時由右向左縮減自然欄；內容過高時使用滑鼠滾輪捲動，底部箭頭提示可捲動方向，另加一列高度，不計入 `maxHeight`。
 
 `C.StickTop = true` 將提示放在資訊條下方；資訊條位於畫面底部時改為 `false`。`C.MaxAddOns` 限制記憶體／系統模組初始顯示的插件數量。字型、標題／選項／錯誤顏色與分隔線也在同一檔案設定。
 
