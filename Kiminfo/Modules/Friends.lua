@@ -11,7 +11,6 @@ local C_FriendList_GetNumOnlineFriends, BNGetNumFriends = C_FriendList.GetNumOnl
 local InviteToGroup = C_PartyInfo.InviteUnit -- Replace old InviteToGroup()
 
 local friendTable, bnetTable = {}, {}	-- build table
-local BNET_CLIENT_WOWC = "WoWC"	-- custom string for classic
 local BNET_CLIENT_BSAP = "BSAp"
 local region = {[1] = "US", [2] = "KR", [3] = "EU", [4] = "TW", [5] = "CN",}
 local normalColor = F.Hex(1, 1, 1)
@@ -194,20 +193,13 @@ local function getCharacterText(name, level, classFilename, status)
 	return levelText..nameColor..name.."|r"..status
 end
 
---[[ Build location text without leaving empty separators ]]--
-local function getLocationText(area, regionName, currentZone)
-	local location = area
-
-	if regionName ~= "" then
-		location = location ~= "" and location.." - "..regionName or regionName
-	end
-
-	if location == "" then
+--[[ Color the current zone without appending account-region information ]]--
+local function getLocationText(area, currentZone)
+	if area == "" then
 		return ""
 	end
 
-	local color = area ~= "" and area == currentZone and zoneColor or mutedColor
-	return color..location
+	return (area == currentZone and zoneColor or mutedColor)..area
 end
 
 local function getClassFilename(gameAccountInfo)
@@ -230,7 +222,7 @@ local function getGameIcon(gameAccountInfo)
 	return "|T"..GetIconTexture(client)..":14:14:0:0:50:50|t"
 end
 
--- 名單位置會變動，詳細資料與邀請每次都從帳號身分重新定位。
+-- 名單位置會變動，詳細資料與邀請每次都從帳號身分重新定位；只收集在線遊戲，不含應用程式。
 local function getGameAccounts(bnetAccountID)
 	local friendIndex = BNGetFriendIndex(bnetAccountID)
 	if not friendIndex then return end
@@ -240,21 +232,27 @@ local function getGameAccounts(bnetAccountID)
 	local gameAccounts = {}
 	for i = 1, C_BattleNet.GetFriendNumGameAccounts(friendIndex) do
 		local gameAccountInfo = C_BattleNet.GetFriendGameAccountInfo(friendIndex, i)
-		if gameAccountInfo and gameAccountInfo.isOnline then
+		if gameAccountInfo and gameAccountInfo.isOnline
+			and gameAccountInfo.clientProgram ~= BNET_CLIENT_APP
+			and gameAccountInfo.clientProgram ~= BNET_CLIENT_CLNT
+			and gameAccountInfo.clientProgram ~= BNET_CLIENT_BSAP
+			and not gameAccountInfo.isWowMobile then
 			tinsert(gameAccounts, gameAccountInfo)
 		end
 	end
 	return accountInfo, gameAccounts
 end
 
--- 詳情與角色選單共用完整名稱；主列表維持簡短名稱。
+-- 詳情與角色選單共用角色－伺服器及地區；主列表維持簡短角色名稱。
 local function getGameAccountLabel(gameAccountInfo, accountInfo)
 	local client = gameAccountInfo.clientProgram
-	local name = BNet_GetValidatedCharacterName(gameAccountInfo.characterName or "", accountInfo.battleTag, client) or ""
+	local name = BNet_GetValidatedCharacterName(gameAccountInfo.characterName, accountInfo.battleTag, client)
 	if name == "" then name = accountInfo.accountName end
 	if client == BNET_CLIENT_WOW then
 		local realmName = gameAccountInfo.realmName or ""
 		if realmName ~= "" then name = name.."-"..realmName end
+		local regionName = region[gameAccountInfo.regionID]
+		if regionName then name = name.." ("..regionName..")" end
 		name = getCharacterText(name, gameAccountInfo.characterLevel, getClassFilename(gameAccountInfo),
 			getStatus(gameAccountInfo.isGameAFK, gameAccountInfo.isGameBusy, ""))
 	end
@@ -280,23 +278,32 @@ local function inviteGameAccount(target)
 end
 
 local function gameOnEnter(row, info)
-	GameTooltip:SetOwner(row, "ANCHOR_RIGHT")
+	GameTooltip:SetOwner(row, "ANCHOR_RIGHT", 10, 0)
 	GameTooltip:ClearLines()
-	GameTooltip:AddLine(info.nameText, 1, 1, 1, true)
+	GameTooltip:AddLine(info.nameText, 1, 1, 1, false)
 	if info.area ~= "" then GameTooltip:AddLine(info.area, 1, 1, 1, true) end
 	F.ShowTooltip()
 end
 
 local function bnOnEnter(row, info)
 	local accountInfo, gameAccounts = getGameAccounts(info.bnetAccountID)
-	if not accountInfo then return end
-	GameTooltip:SetOwner(row, "ANCHOR_RIGHT")
+	if not accountInfo or #gameAccounts == 0 then return end
+	GameTooltip:SetOwner(row, "ANCHOR_RIGHT", 10, 0)
 	GameTooltip:ClearLines()
-	GameTooltip:AddLine(accountInfo.accountName ~= "" and accountInfo.accountName or accountInfo.battleTag)
+	GameTooltip:AddLine(G.TitleColor..(accountInfo.accountName ~= "" and accountInfo.accountName or accountInfo.battleTag))
 	for _, gameAccountInfo in ipairs(gameAccounts) do
 		GameTooltip:AddLine(" ")
-		GameTooltip:AddLine(getGameAccountLabel(gameAccountInfo, accountInfo), 1, 1, 1, true)
-		local location = gameAccountInfo.clientProgram == BNET_CLIENT_WOW and gameAccountInfo.areaName or gameAccountInfo.richPresence
+		GameTooltip:AddLine(getGameAccountLabel(gameAccountInfo, accountInfo), 1, 1, 1, false)
+		local location = gameAccountInfo.richPresence
+		if gameAccountInfo.clientProgram == BNET_CLIENT_WOW then
+			local area = gameAccountInfo.areaName
+			-- 同版本只顯示地區；其他版本保留 rich presence 原文，再接地區。
+			if gameAccountInfo.wowProjectID == WOW_PROJECT_ID then
+				location = area
+			elseif area and area ~= "" then
+				location = location and location ~= "" and location.." - "..area or area
+			end
+		end
 		if location and location ~= "" then GameTooltip:AddLine(location, .65, .65, .65, true) end
 	end
 	F.ShowTooltip()
@@ -387,13 +394,11 @@ local function buildFriendTable(num)
 	sort(friendTable, sortFriends)
 end
 
---[[ Sort BN friends by client ]] --
+-- 只有同 WoW 版本的摯友優先；其餘依目前顯示的遊戲分類，同組按名稱與帳號身分排序。
 local function sortBNFriends(a, b)
-	if a.client == b.client then
-		return a.sortName < b.sortName
-	end
-
-	return a.client > b.client
+	if a.sortPriority ~= b.sortPriority then return a.sortPriority < b.sortPriority end
+	if a.sortName ~= b.sortName then return a.sortName < b.sortName end
+	return a.bnetAccountID < b.bnetAccountID
 end
 
 --[[ Build BN friends table ]]--
@@ -405,14 +410,13 @@ local function buildBNetTable(num)
 		if accountInfo then
 			local gameAccountInfo = accountInfo.gameAccountInfo
 
-			if gameAccountInfo and gameAccountInfo.isOnline and gameAccountInfo.gameAccountID then
+			if gameAccountInfo.isOnline then
 				local accountName = accountInfo.accountName
 				local battleTag = accountInfo.battleTag
-				local characterName = gameAccountInfo.characterName or ""
 				local client = gameAccountInfo.clientProgram
 				local area = gameAccountInfo.areaName or ""
 
-				local displayName = BNet_GetValidatedCharacterName(characterName, battleTag, client) or ""
+				local displayName = BNet_GetValidatedCharacterName(gameAccountInfo.characterName, battleTag, client)
 				if displayName == "" then
 					displayName = accountName
 				end
@@ -423,30 +427,33 @@ local function buildBNetTable(num)
 					""
 				)
 
+				local isWoW = (client == BNET_CLIENT_WOW)
 				local infoText
-				if client == BNET_CLIENT_WOW then
-					-- Print area when friend is playing WoW / 玩魔獸顯示地區
-					infoText = area
-				elseif gameAccountInfo.isWowMobile then
-					-- Runtime field still used by Blizzard although omitted from API docs.
-					infoText = L.App
-				elseif client == BNET_CLIENT_BSAP then
-					infoText = L.Mobile
-				elseif client == BNET_CLIENT_APP or client == BNET_CLIENT_CLNT then
-					infoText = L.Desktop
-				else
-					-- Print current activity when playing other games / 玩其他遊戲顯示狀態
-					infoText = gameAccountInfo.richPresence or ""
+				if not isWoW then
+					if gameAccountInfo.isWowMobile then
+						-- Runtime field still used by Blizzard although omitted from API docs.
+						infoText = L.App
+					elseif client == BNET_CLIENT_BSAP then
+						infoText = L.Mobile
+					elseif client == BNET_CLIENT_APP or client == BNET_CLIENT_CLNT then
+						infoText = L.Desktop
+					else
+						-- Print current activity when playing other games / 玩其他遊戲顯示狀態
+						infoText = gameAccountInfo.richPresence or ""
+					end
+					if infoText ~= "" then infoText = mutedColor..infoText end
 				end
 
 				-- Check whether the friend is on the same WoW project / 判斷是否為相同魔獸版本
-				local wowProjectID = gameAccountInfo.wowProjectID
-				local isSameWoWProject = (client == BNET_CLIENT_WOW and wowProjectID == WOW_PROJECT_ID)
-				if client == BNET_CLIENT_WOW and wowProjectID and not isSameWoWProject then
-					client = BNET_CLIENT_WOWC
+				local isSameWoWProject = (isWoW and gameAccountInfo.wowProjectID == WOW_PROJECT_ID)
+				local sortPriority = 3
+				if gameAccountInfo.isWowMobile or client == BNET_CLIENT_APP or client == BNET_CLIENT_CLNT or client == BNET_CLIENT_BSAP then
+					sortPriority = 4
+				elseif isSameWoWProject then
+					sortPriority = accountInfo.isFavorite and 0 or 1
+				elseif isWoW then
+					sortPriority = 2
 				end
-
-				local isWoW = (client == BNET_CLIENT_WOW or client == BNET_CLIENT_WOWC)
 				local nameText, shiftNameText
 				if isWoW then
 					local characterText = getCharacterText(displayName, gameAccountInfo.characterLevel, getClassFilename(gameAccountInfo), status)
@@ -464,12 +471,11 @@ local function buildBNetTable(num)
 					bnetAccountID = accountInfo.bnetAccountID,
 					accountName = accountName,
 					area = area,
-					client = client,
-					infoText = infoText ~= "" and mutedColor..infoText or "",
+					sortPriority = sortPriority,
+					infoText = infoText,
 					icon = getGameIcon(gameAccountInfo),
 					isWoW = isWoW,
 					nameText = nameText,
-					regionName = region[gameAccountInfo.regionID] or "",
 					shiftNameText = shiftNameText,
 					sortName = accountName ~= "" and accountName or displayName,
 				})
@@ -510,8 +516,8 @@ local function RenderFriendsPanel(self)
 	-- Show my BN broadcast
 	if currentBroadcast ~= "" then
 		panel:AddLine()
-		panel:AddLine(BATTLENET_BROADCAST)
-		panel:AddText(G.OptionColor..currentBroadcast)
+		panel:AddLine(G.OptionColor..BATTLENET_BROADCAST)
+		panel:AddText(currentBroadcast)
 	end
 	
 	-- Options
@@ -524,12 +530,12 @@ local function RenderFriendsPanel(self)
 		buildFriendTable(numberOfFriends)
 		
 		panel:AddLine()
-		panel:AddLine(GAME, ZONE)
+		panel:AddRow({GAME, ZONE})
 		panel:AddSeparator()
 		
 		for i = 1, #friendTable do
 			local info = friendTable[i]
-			panel:AddRow({"", info.nameText, getLocationText(info.area, "", currentZone)}, info, gameOnClick, gameOnEnter)
+			panel:AddRow({info.nameText, getLocationText(info.area, currentZone)}, info, gameOnClick, gameOnEnter)
 		end
 	end
 	
@@ -538,7 +544,7 @@ local function RenderFriendsPanel(self)
 		buildBNetTable(totalBNet)
 		
 		panel:AddLine()
-		panel:AddLine(NAME, ZONE)
+		panel:AddRow({NAME, ZONE})
 		panel:AddSeparator()
 		
 		for i = 1, #bnetTable do
@@ -546,11 +552,10 @@ local function RenderFriendsPanel(self)
 			local nameText = isShiftKeyDown and info.shiftNameText or info.nameText
 			local locationText = info.infoText
 			if info.isWoW then
-				local regionName = isShiftKeyDown and info.regionName or ""
-				locationText = getLocationText(info.area, regionName, currentZone)
+				locationText = getLocationText(info.area, currentZone)
 			end
 
-			panel:AddRow({info.icon, nameText, locationText}, info, bnOnClick, bnOnEnter)
+			panel:AddRow({info.icon.." "..nameText, locationText}, info, bnOnClick, bnOnEnter)
 		end
 	end
 	
@@ -590,8 +595,8 @@ end
 		Icon:SetVertexColor(0, 1, 1)
 		Text:SetTextColor(0, 1, 1)
 		if not self.panel then
-			-- 圖示固定 20px；名稱、區域為自然寬，超過面板上限時先縮右欄。
-			self.panel = F.CreateInfoPanel(self, {{width = 20}, {}, {justify = "RIGHT"}})
+			-- 圖示與名稱合為左欄，區域／遊戲狀態為右欄；兩欄皆自然寬，超過面板上限時先縮右欄。
+			self.panel = F.CreateInfoPanel(self, {{}, {justify = "RIGHT"}})
 			self.panel:HookScript("OnHide", function()
 				self:UnregisterEvent("MODIFIER_STATE_CHANGED")
 				self.isShiftDown = nil

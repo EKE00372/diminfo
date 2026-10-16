@@ -114,27 +114,26 @@ local function RenderGuildPanel(self)
 
 	-- Get local
 	local total, numOnline = GetNumGuildMembers()
-	local guildName, guildRank = GetGuildInfo("player")
+	local guildName, guildRank, guildRankIndex = GetGuildInfo("player")
 	total = total or 0
 	numOnline = numOnline or 0
 	guildName = guildName or GUILD
 	guildRank = guildRank or UNKNOWN
+	-- API 的會長索引為 0；顯示沿用原生會階管理的 1-based 順序。
+	if guildRankIndex then guildRank = format("%s (%d)", guildRank, guildRankIndex + 1) end
 	
 	-- Get table
 	BuildGuildTable(self.sortDescending)
 	
-	panel:AddLine(G.TitleColor..guildName, G.TitleColor..(format("%d/%d", numOnline, total)))
-	
+	panel:AddLine(G.TitleColor..GUILD, G.TitleColor..(format("%d/%d", numOnline, total)))
 	panel:AddLine()
-	panel:AddLine(GUILD)
-	panel:AddLine(G.OptionColor..RANK, G.OptionColor..guildRank)
+	panel:AddLine(G.OptionColor..guildName)
 
 	local GetGuildFactionInfo = C_Reputation_GetGuildFactionData()
 
 	-- Guild reputation
-	if not GetGuildFactionInfo then
-		panel:AddLine(G.OptionColor..REPUTATION, G.OptionColor..UNKNOWN)
-	else
+	local reputationText = UNKNOWN
+	if GetGuildFactionInfo then
 		local standingID = GetGuildFactionInfo.reaction
 		local barMax = GetGuildFactionInfo.nextReactionThreshold
 		local barMin = GetGuildFactionInfo.currentReactionThreshold
@@ -142,21 +141,21 @@ local function RenderGuildPanel(self)
 		local standingLabel = standingID and _G["FACTION_STANDING_LABEL"..standingID]
 
 		if standingID == 8 and standingLabel then
-			panel:AddLine(G.OptionColor..REPUTATION, G.OptionColor..standingLabel)
+			reputationText = standingLabel
 		elseif standingLabel and barMax and barMin and barValue and barMax > barMin then
-			panel:AddLine(G.OptionColor..REPUTATION, G.OptionColor..standingLabel.." " ..(format("%.3f", (barValue - barMin)/(barMax - barMin))*100).."%")
-		else
-			panel:AddLine(G.OptionColor..REPUTATION, G.OptionColor..UNKNOWN)
+			reputationText = standingLabel.." " ..(format("%.3f", (barValue - barMin)/(barMax - barMin))*100).."%"
 		end
 	end
+	panel:AddLine(guildRank, reputationText)
 	
 	-- Guild daily info
 	if not InCombatLockdown() then
-		panel:AddLine()
-		panel:AddLine(GUILD_MOTD)
 		local guildMotD = C_GuildInfo_GetMOTD()
-		if not canaccessvalue(guildMotD) or guildMotD == nil then guildMotD = "" end
-		panel:AddText(G.OptionColor..guildMotD)
+		if canaccessvalue(guildMotD) and guildMotD ~= "" then
+			panel:AddLine()
+			panel:AddLine(G.OptionColor..GUILD_MOTD)
+			panel:AddText(guildMotD)
+		end
 	end
 	
 	-- Options
@@ -222,9 +221,6 @@ end
 		if not self.panel then
 			-- 等級、姓名與狀態合為左欄，區域為右欄；兩欄皆自然寬，超過面板上限時先縮右欄。
 			self.panel = F.CreateInfoPanel(self, {{}, {justify = "RIGHT"}})
-			self.panel:HookScript("OnHide", function()
-				self.sortDescending = nil
-			end)
 		end
 		-- 一次顯示期間固定排序，避免按 Shift 邀請時換掉滑鼠下的成員。
 		if not self.panel:IsShown() then
