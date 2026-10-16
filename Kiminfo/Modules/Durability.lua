@@ -1,4 +1,4 @@
-local addon, ns = ... 
+local _, ns = ...
 local C, F, G, L = unpack(ns)
 if not C.Durability then return end
 
@@ -63,9 +63,7 @@ local localSlots = {
 
 --[[ Sort slots by durability ]]--
 local function sortSlots(a, b)
-	if a and b then
-		return (a[3] == b[3] and a[1] < b[1]) or (a[3] < b[3])
-	end
+	return (a[3] == b[3] and a[1] < b[1]) or (a[3] < b[3])
 end
 
 --[[ Get durability ]]--
@@ -96,22 +94,32 @@ end
 --=========================================--
 
 --[[ Data text update ]]--
-local function OnEvent(self)
+local function OnEvent(self, event, isInitialLogin, isReloadingUi)
+	-- 登入／重載後補讀一次；保留當下更新，普通轉圖不重排計時器。
+	if event == "PLAYER_ENTERING_WORLD" and (isInitialLogin or isReloadingUi) then
+		C_Timer.After(5, function()
+			OnEvent(self)
+		end)
+	end
+
 	if Kiminfo.AutoRepair == nil then
 		Kiminfo.AutoRepair = true
 	end
 	
 	local numSlots = getItemDurability()
-	local r, g, b = GradientColor((floor(localSlots[1][3]*100)/100))
 	
 	if numSlots > 0 then
 		Text:SetText(floor(localSlots[1][3]*100))
-		Text:SetTextColor(r, g, b)
-		Icon:SetVertexColor(r, g, b)
 	else
 		Text:SetText(L.None)
-		Text:SetTextColor(1, 1, 1)
-		Icon:SetVertexColor(1, 1, 1)
+	end
+	if not self.isHover then
+		local r, g, b = 1, 1, 1
+		if numSlots > 0 then
+			r, g, b = GradientColor((floor(localSlots[1][3]*100)/100))
+		end
+		Text:SetTextColor(r, g, b)
+		Icon:SetVertexColor(r, g, b)
 	end
 	self:Layout()
 end
@@ -151,6 +159,7 @@ end
 	
 	--[[ Tooltip ]]--
 	Stat:SetScript("OnEnter", function(self)
+		self.isHover = true
 		-- Mouseover color
 		Icon:SetVertexColor(0, 1, 1)
 		Text:SetTextColor(0, 1, 1)
@@ -159,6 +168,7 @@ end
 	end)
 	
 	Stat:SetScript("OnLeave", function(self)
+		self.isHover = nil
 		-- Refresh data text color
 		OnEvent(self)
 		-- Tooltip hide
