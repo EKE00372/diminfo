@@ -184,7 +184,7 @@ local sellGray = CreateFrame("Frame")
 					if info then
 						local count, quality, link, noValue = info.stackCount, info.quality, info.hyperlink, info.hasNoValue
 						if link and not noValue and quality == 0 and not C_Container_GetContainerItemEquipmentSetInfo(bag, slot) then
-							local price = select(11, GetItemInfo(link)) * count
+							local price = select(11, C_Item.GetItemInfo(link)) * count
 						
 							if price > 0 then
 								C_Container_UseContainerItem(bag, slot)
