@@ -1,44 +1,28 @@
-local addon, ns = ... 
-local C, F, G, L = unpack(ns)
+local _, ns = ...
+local C, F, G = unpack(ns)
 if not C.Time then return end
 
-local format, time, date = string.format, time, date
+local GameTooltip = F.Tooltip
+local format, date = string.format, date
 local GetCVarBool = GetCVarBool
-local TIMEMANAGER_TICKER_24HOUR, TIMEMANAGER_TICKER_12HOUR = TIMEMANAGER_TICKER_24HOUR, TIMEMANAGER_TICKER_12HOUR
 
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
 --=================================================--
 
 --[[ Create elements ]]--
-local Stat = CreateFrame("Frame", G.addon.."Time", UIParent)
-	Stat:SetHitRectInsets(-5, -5, -10, -10)
-	Stat:SetFrameStrata("BACKGROUND")
+local Stat = CreateFrame("Frame", G.addon.."Time", UIParent, "HorizontalLayoutFrame")
 
 --[[ Create text ]]--
 local Text  = Stat:CreateFontString(nil, "OVERLAY")
+	Text.layoutIndex = 1
+	Text.align = "center"
 	Text:SetFont(G.Fonts, G.FontSize, G.FontFlag)
-	Text:SetPoint(unpack(C.TimePoint))
-	Stat:SetAllPoints(Text)
+	F.RegisterModule("Time", Stat)
 	
 --==================================================--
 ---------------    [[ Functions ]]     ---------------
 --==================================================--
-
---[[ Format 24/12 hour clock ]]--
-local function updateTimerFormat(hour, minute)
-	if GetCVarBool("timeMgrUseMilitaryTime") then
-		return format(TIMEMANAGER_TICKER_24HOUR, hour, minute)
-	else
-		local timerUnit = hour < 12 and " AM" or " PM"
-		
-		if hour > 12 then
-			hour = hour - 12
-		end
-		
-		return format(TIMEMANAGER_TICKER_12HOUR..timerUnit, hour, minute)
-	end
-end
 
 --[[ Custom api for add title line ]]--
 local title
@@ -48,6 +32,18 @@ local function addTitle(text)
 		GameTooltip:AddLine(text, .6, .8, 1)
 		title = true
 	end
+end
+
+local resetFormatter = CreateFromMixins(SecondsFormatterMixin)
+resetFormatter:Init(0, SecondsFormatter.Abbreviation.Truncate, false, false, false)
+resetFormatter:SetDesiredUnitCount(3)
+resetFormatter:SetMinInterval(SecondsFormatter.Interval.Minutes)
+
+local function formatReset(seconds)
+	-- Keep minute-only CD text without rounding fractional seconds up.
+	seconds = math.floor(seconds)
+	if seconds < SECONDS_PER_MIN then return "" end
+	return resetFormatter:Format(seconds)
 end
 
 --================================================--
@@ -66,7 +62,8 @@ local function OnUpdate(self, elapsed)
 		else
 			hour, minute = GetGameTime()
 		end
-		Text:SetText(updateTimerFormat(hour, minute))
+		Text:SetText(GameTime_GetFormattedTime(hour, minute, true))
+		self:Layout()
 		
 		self.timer = 0
 	end
@@ -77,13 +74,13 @@ local function OnEnter(self)
 	-- 獲取進度
 	RequestRaidInfo()
 	
-	local today = C_DateAndTime.GetTodaysDate()
-	local w, m, d, y = today.weekDay, today.month, today.day, today.year
+	local today = C_DateAndTime.GetCurrentCalendarTime()
+	local w, m, d, y = today.weekday, today.month, today.monthDay, today.year
 	
 	-- Title
 	GameTooltip:SetOwner(self, C.StickTop and "ANCHOR_BOTTOM" or "ANCHOR_TOP", 0, C.StickTop and -10 or 10)
 	GameTooltip:ClearLines()
-	GameTooltip:AddLine(format(FULLDATE, CALENDAR_WEEKDAY_NAMES[w], CALENDAR_FULLDATE_MONTH_NAMES[m], d, y), 0, .6, 1)
+	GameTooltip:AddLine(format(FULLDATE, CALENDAR_WEEKDAY_NAMES[w], CALENDAR_FULLDATE_MONTH_NAMES[m], d, y, m), 0, .6, 1)
 	GameTooltip:AddLine(" ")
 
 	-- Game time
@@ -93,20 +90,21 @@ local function OnEnter(self)
 	--[[ 副本進度 ]]--
 
 	-- Dungeon
-	title = false
-	for i = 1, GetNumSavedInstances() do
-		local name, _, reset, difficulty, locked, extended = GetSavedInstanceInfo(i)
-		-- 5h and 5m
-		if difficulty == 23 and (locked or extended) then
-			addTitle(DUNGEONS)
-			local r, g, b
-			if extended then
-				r,g,b = .3, 1, .3
-			else
-				r, g, b = 1, 1, 1
+	if G.IsTBC then
+		title = false
+		for i = 1, GetNumSavedInstances() do
+			local name, _, reset, difficulty, locked, extended = GetSavedInstanceInfo(i)
+			if difficulty == DIFFICULTY_DUNGEON_HEROIC and (locked or extended) then
+				addTitle(DUNGEONS)
+				local r, g, b
+				if extended then
+					r,g,b = .3, 1, .3
+				else
+					r, g, b = 1, 1, 1
+				end
+
+				GameTooltip:AddDoubleLine(name, formatReset(reset), 1, .82, 0, r, g, b)
 			end
-		
-		GameTooltip:AddDoubleLine(name, SecondsToTime(reset, true, nil, 3), 1, .82, 0, r, g, b)
 		end
 	end
 
@@ -124,14 +122,14 @@ local function OnEnter(self)
 				r, g, b = 1, 1, 1
 			end
 		
-		GameTooltip:AddDoubleLine(difficultyName.." - "..name, SecondsToTime(reset, true, nil, 3), 1, .82, 0, r, g, b)
+		GameTooltip:AddDoubleLine(difficultyName.." - "..name, formatReset(reset), 1, .82, 0, r, g, b)
 		end
 	end
 
 	GameTooltip:AddDoubleLine(" ", G.Line)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..STOPWATCH_TITLE..G.RightButton)
 	
-	GameTooltip:Show()
+	F.ShowTooltip()
 end
 
 --================================================--
@@ -140,20 +138,16 @@ end
 	
 	--[[ Tooltip ]]--
 	Stat:SetScript("OnEnter", OnEnter)
-	Stat:SetScript("OnLeave", function()
-		GameTooltip:Hide()
+	Stat:SetScript("OnLeave", function(self)
+		if GameTooltip:IsOwned(self) then GameTooltip:Hide() end
 	end)
 	
 	--[[ Data text ]]--
-	Stat:RegisterEvent("PLAYER_ENTERING_WORLD")
-	--Stat:RegisterEvent("UPDATE_INSTANCE_INFO")
 	Stat:SetScript("OnUpdate", OnUpdate)
 	
 	--[[ Options ]]--
 	Stat:SetScript("OnMouseDown", function(self, btn)
 		if btn == "RightButton"  then
 			ToggleFrame(TimeManagerFrame)
-		else
-			return
 		end
 	end)

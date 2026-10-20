@@ -49,6 +49,7 @@ Just edit config.lua to change them. I suggest use [Notepad++](https://notepad-p
 * Positions
     * Show zone text and update xy coord when mouseover
 	* Left click: world map, right click: post coord
+	* Shift + right click: switch coordinates between the info text and tooltip; saved between sessions, tooltip by default
 * System
     * Show latency and fps, color gardient to red when low fps and high latency
 	* Option: List addon cpu usage
@@ -85,6 +86,7 @@ Just edit config.lua to change them. I suggest use [Notepad++](https://notepad-p
 * Positions / 位置
 	* 顯示區域名稱，指向時顯示座標
 	* 左鍵：大地圖；右鍵：在聊天框發送座標
+	* Shift＋右鍵：切換模式，座標顯示於地名旁或提示框，預設提示框並記住設定
 * System / 系統
 	* 顯示延遲與幀數，幀數過低或延遲過高時文字變色
 	* 選項：列出插件 CPU 占用

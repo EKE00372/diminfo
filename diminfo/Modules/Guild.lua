@@ -1,29 +1,28 @@
-local addon, ns = ... 
+local _, ns = ...
 local C, F, G, L = unpack(ns)
 if not C.Guild then return end
 
-local LibQTip = LibStub('LibQTip-1.0')
 local format, sort, wipe = string.format, table.sort, wipe
-local CreateFrame = CreateFrame
+local CreateFrame, GetTime = CreateFrame, GetTime
 local GetNumGuildMembers, GetGuildRosterInfo = GetNumGuildMembers, GetGuildRosterInfo
+local C_GuildInfo_GetMOTD, C_GuildInfo_GuildRoster = C_GuildInfo.GetMOTD, C_GuildInfo.GuildRoster
 
 local guildTable = {}
-local name, rank, level, zone, connected, status, class, mobile
+local lastRosterRequest
 
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
 --=================================================--
 
 --[[ Create elements ]]--
-local Stat = CreateFrame("Frame", G.addon.."Guild", UIParent)
-	Stat:SetHitRectInsets(-5, -5, -10, -10)
-	Stat:SetFrameStrata("BACKGROUND")
+local Stat = CreateFrame("Frame", G.addon.."Guild", UIParent, "HorizontalLayoutFrame")
+	F.RegisterModule("Guild", Stat, 0)
 
 --[[ Create text ]]--
 local Text  = Stat:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(G.Fonts, G.FontSize, G.FontFlag)
-	Text:SetPoint(unpack(C.GuildPoint))
-	Stat:SetAllPoints(Text)
+	Text.layoutIndex = 1
+	Text.align = "center"
 	
 --==================================================--
 ---------------    [[ Functions ]]     ---------------
@@ -35,32 +34,30 @@ local function OnClick(self, name, btn)
 		if IsAltKeyDown() then
 			InviteToGroup(name)
 		elseif IsShiftKeyDown() then
-			ChatFrame_OpenChat("/w "..name.." ", SELECTED_DOCK_FRAME)
-		else
-			return
+			ChatFrameUtil.OpenChat("/w "..name.." ", SELECTED_DOCK_FRAME)
 		end
 	end
 end
 
---[[ Sort by ]]--
-local function SortGuildTable(shift)
-		sort(guildTable, function(a, b)
-			if a and b then
-				if shift then
-					return a[3] > b[3]
-				else
-					return a[3] < b[3]
-				end
-			end
-		end)
-	end
+--[[ Request fresh guild data ]]--
+local function RequestGuildRoster(force)
+	if not IsInGuild() then return end
+	-- 原生公會頁已接手名單事件時，不重複提出同一份資料請求。
+	if GuildFrame:IsShown() or (CommunitiesFrame and CommunitiesFrame:IsShown()) then return end
 
-local function BuildGuildTable()
+	local now = GetTime()
+	if not force and lastRosterRequest and now - lastRosterRequest < 5 then return end
+
+	lastRosterRequest = now
+	C_GuildInfo_GuildRoster()
+end
+
+local function BuildGuildTable(sortDescending)
 	wipe(guildTable)
 	
 	local count = 0
 	for i = 1, GetNumGuildMembers() do
-		local name, rank, rankindex, level, _, zone, _, _, connected, status, class = GetGuildRosterInfo(i)
+		local name, _, rankIndex, level, _, zone, _, _, connected, status, class = GetGuildRosterInfo(i)
 		
 		
 		if status == 1 then
@@ -78,83 +75,48 @@ local function BuildGuildTable()
 		-- Show only online members / 只顯示線上成員
 		if connected then
 			count = count + 1
-			guildTable[count] = { Ambiguate(name, "guild"), rank, rankindex, level, zone, connected, status, class }
+			guildTable[count] = {
+				name = Ambiguate(name, "guild"),
+				rankIndex = rankIndex,
+				level = level,
+				zone = zone,
+				status = status,
+				class = class,
+			}
 		end
 	end
 	
-	SortGuildTable(IsShiftKeyDown())
+	sort(guildTable, function(a, b)
+		if sortDescending then
+			return a.rankIndex > b.rankIndex
+		end
+		return a.rankIndex < b.rankIndex
+	end)
 end	
 
 --================================================--
 ---------------    [[ Updates ]]     ---------------
 --================================================--
 
-local function OnEvent(self, event, ...)
-	local online = select(3, GetNumGuildMembers())
-	
-	if not IsInGuild() then
-		Text:SetText(C.ClassColor and F.Hex(G.Ccolors)..L.Lonely or L.Lonely)
-	else
-		Text:SetText(format(C.ClassColor and F.Hex(G.Ccolors)..GUILD.." |r".."%d" or GUILD.." %d", online))
-	end
-	
-	self:SetAllPoints(Text)
-end
-
---[[ Hide QTip tooltip ]]--
-local function OnRelease(self)
-	LibQTip:Release(self.tooltip)
-	self.tooltip = nil  
-end  
-
---[[ Update when mouseover tooltip ]]--
-local function OnUpdate(self, elapsed)
-	self.timer = (self.timer or 0) + elapsed
-	
-	if self.timer > .1 then
-		if not self:IsMouseOver() then
-			if not self.tooltip:IsMouseOver() then
-				OnRelease(self)
-				self:SetScript("OnUpdate", nil)
-			end
-		end
-		self.timer = 0
-	end
-end
-
-local function OnEnter(self)
-	-- No guild no tooltip / 不在公會就不顯示tooltip
-	if not IsInGuild() then return end
+--[[ Refresh the panel without requesting another roster ]]--
+local function RenderGuildPanel(self)
 	-- Get local
-	local isShiftKeyDown = IsShiftKeyDown()
 	local total, online = GetNumGuildMembers()
 	local guildName, guildRank = GetGuildInfo("player")
-	local guildMotD = GetGuildRosterMOTD() or ""
+	local guildMotD = C_GuildInfo_GetMOTD()
 	
 	-- Get table
-	BuildGuildTable()
+	BuildGuildTable(self.sortDescending)
 	
-	-- Create qtip
-	local tooltip = LibQTip:Acquire("diminfoGuildTooltip", 2, "LEFT", "RIGHT")
-	tooltip:SetPoint(C.StickTop and "TOP" or "BOTTOM", self, C.StickTop and "BOTTOM" or "TOP", 0, C.StickTop and -10 or 10)
+	local tooltip = self.panel
 	tooltip:Clear()
 	tooltip:AddHeader(G.TitleColor..guildName, G.TitleColor..(format("%d/%d", online, total)))
 	tooltip:AddHeader(G.TitleColor..RANK, G.TitleColor..guildRank)
 	
 	-- Guild daily info
-	if guildMotD then
-		tooltip:AddLine(" ")
-		tooltip:AddLine(GUILD_MOTD)
-		local width
-		if tooltip:GetWidth() > 200 then
-			width = tooltip:GetWidth() + 100
-		else
-			width = 300
-		end
-
-		local y, x = tooltip:AddLine()
-		tooltip:SetCell(y, 1, G.OptionColor..format(guildMotD), nil, "LEFT", 2, nil, 0, 0, width)
-	end
+	tooltip:AddLine(" ")
+	tooltip:AddLine(GUILD_MOTD)
+	tooltip:AddText(G.OptionColor..guildMotD)
 	
 	-- Options
 	tooltip:AddLine(" ", G.Line)
@@ -165,43 +127,72 @@ local function OnEnter(self)
 	tooltip:AddLine(MEMBERS, ZONE)
 	tooltip:AddSeparator(2, .6, .8, 1)
 
+	local currentZone = GetRealZoneText()
+	local zoneColor, mutedColor = F.Hex(.3, 1, .3), F.Hex(.65, .65, .65)
 	for i = 1, #guildTable do
 		-- get table
 		local info = guildTable[i]
 		
-		if info then
-			-- check zone
-			local zonec
-			if GetRealZoneText() == info[5] then
-				zonec = F.Hex(.3, 1, .3)
-			else
-				zonec = F.Hex(.65, .65, .65)
-			end
-			
-			local levelc = F.Hex(GetQuestDifficultyColor(info[4]))
-			
-			local classc
-			if info[8] == "SHAMAN" then
-				classc = F.Hex(0, .6, 1)
-			else
-				classc = F.Hex((CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[info[8]])
-			end
-			
-			if classc == nil then
-				classc = levelc
-			end
+		-- check zone
+		local zonec = (currentZone == info.zone) and zoneColor or mutedColor
 
-			tooltip:AddLine(levelc..info[4].."|r "..classc..info[1].."|r"..info[7], zonec..info[5])
-			
-			local line = tooltip:GetLineCount()
-			tooltip:SetLineScript(line, "OnMouseUp", OnClick, info[1])
+		local levelc = F.Hex(GetQuestDifficultyColor(info.level))
+
+		local classc
+		if info.class == "SHAMAN" then
+			classc = F.Hex(0, .6, 1)
+		else
+			classc = F.Hex((CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[info.class])
 		end
+
+		tooltip:AddRow({levelc..info.level.."|r "..classc..info.name.."|r"..info.status, zonec..info.zone}, info.name, OnClick)
 	end
 	
-	tooltip:UpdateScrolling(600)
-	tooltip:Show()
-	
-	self.tooltip = tooltip
+	tooltip:Layout()
+end
+
+local function OnEvent(self, event, ...)
+	local online = select(3, GetNumGuildMembers())
+	local isPlayerGuildUpdate = (event == "PLAYER_GUILD_UPDATE" and select(1, ...) == "player")
+
+	if not IsInGuild() then
+		Text:SetText(C.ClassColor and F.Hex(G.Ccolors)..L.Lonely or L.Lonely)
+	else
+		Text:SetText(format(C.ClassColor and F.Hex(G.Ccolors)..GUILD.." |r".."%d" or GUILD.." %d", online))
+	end
+	self:Layout()
+
+	if isPlayerGuildUpdate then
+		lastRosterRequest = nil
+		if self.panel and self.panel:IsShown() then RequestGuildRoster() end
+	elseif event == "GUILD_ROSTER_UPDATE" then
+		-- 常駐人數也使用名單資料，續請求不隨 tooltip 關閉而停止。
+		local canRequestRosterUpdate = ...
+		if canRequestRosterUpdate then RequestGuildRoster(true) end
+	end
+
+	if self.panel and self.panel:IsShown() then
+		if IsInGuild() then
+			RenderGuildPanel(self)
+		else
+			self.panel:Hide()
+		end
+	end
+end
+
+local function OnEnter(self)
+	if not IsInGuild() then return end
+	RequestGuildRoster()
+
+	if not self.panel then
+		self.panel = F.CreateInfoPanel(self, {{justify = "LEFT"}, {justify = "RIGHT"}})
+	end
+	-- 一次顯示期間固定排序，避免按 Shift 密語時換掉滑鼠下的成員。
+	if not self.panel:IsShown() then
+		self.sortDescending = IsShiftKeyDown()
+	end
+	RenderGuildPanel(self)
+	self.panel:Show()
 end
 
 --================================================--
@@ -210,22 +201,13 @@ end
 	
 	--[[ Tooltip ]]--
 	Stat:SetScript("OnEnter", OnEnter)
-	Stat:SetScript("OnLeave", function(self)
-		-- tooltip hide
-		if not self.tooltip then return end
-		self:SetScript("OnUpdate", OnUpdate)
-	end)
 	
 	--[[ Options ]]--
 	Stat:SetScript("OnMouseDown", function(self, button)
 		if button == "RightButton" then
 			ToggleCommunitiesFrame()
 		elseif button == "LeftButton" then
-			if not IsInGuild() then return end
-			if not GuildFrame then LoadAddOn("Blizzard_GuildUI") end
 			securecall(ToggleFriendsFrame, 3)
-		else
-			return
 		end
 	end)
 	

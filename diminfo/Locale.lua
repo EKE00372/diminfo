@@ -1,5 +1,5 @@
-﻿local addon, ns = ... 
-local C, F, G, L = unpack(ns)
+﻿local _, ns = ...
+local L = ns[4]
 
 local getLocale = GetLocale()
 	if getLocale == "zhTW" then
@@ -10,7 +10,7 @@ local getLocale = GetLocale()
 		L.None = "無裝備"
 		
 		L.Whisper = SLASH_WHISPER2:gsub("/(.*)","%1")
-		L.Lonely = "沒人要"
+		L.Lonely = "獨行"
 		
 		L.Shift = "Shift 展開"
 		L.Hidden = HIDE
@@ -22,6 +22,7 @@ local getLocale = GetLocale()
 		L.AutoCollect = "自動整理暫存記憶體："
 		
 		L.XY = "發送座標"
+		L.SwitchMode = "切換模式"
 		
 		L.Home = "本地"
 		L.World = "世界"
@@ -30,8 +31,6 @@ local getLocale = GetLocale()
 		L.ReloadOn = "|cff777777dim|rinfo[|cff00ff00System|r]：重載介面後顯示插件的 CPU 占用。"
 		L.ReloadOff = "|cff777777dim|rinfo[|cff00ff00System|r]：重載介面後隱藏插件的 CPU 占用。"
 		
-		L.App = "魔獸好戰友"
-		L.Mobile = "行動裝置"
 		L.Desktop = "應用程式"
 	elseif getLocale == "zhCN" then
 		L.AutoSell = "自动卖垃圾："
@@ -41,7 +40,7 @@ local getLocale = GetLocale()
 		L.None = "无装备"
 		
 		L.Whisper = "密语"
-		L.Lonely = "沒人要"
+		L.Lonely = "独行"
 		
 		L.Shift = "Shift 展开"
 		L.Hidden = HIDE
@@ -53,6 +52,7 @@ local getLocale = GetLocale()
 		L.AutoCollect = "自动整理內存："
 		
 		L.XY = "发送座标"
+		L.SwitchMode = "切换模式"
 		
 		L.Home = "本地"
 		L.World = "世界"
@@ -61,8 +61,6 @@ local getLocale = GetLocale()
 		L.ReloadOn = "|cff777777dim|rinfo[|cff00ff00System|r]：重载界面后显示插件的 CPU 占用。"
 		L.ReloadOff = "|cff777777dim|rinfo[|cff00ff00System|r]：重载界面后隐藏插件的 CPU 占用。"
 		
-		L.App = "随身助手"
-		L.Mobile = "移动装置"
 		L.Desktop = "桌面应用"	
 	else
 		L.AutoSell = "Auto Sell junk: "
@@ -72,7 +70,7 @@ local getLocale = GetLocale()
 		L.None = "None"
 		
 		L.Whisper = "Whisper"
-		L.Lonely = "Lonely"
+		L.Lonely = (getLocale == "ruRU") and "Одинокий" or "Lonely"
 		
 		L.Shift = "Shift show all"
 		L.Hidden = "Hidden"
@@ -84,6 +82,7 @@ local getLocale = GetLocale()
 		L.AutoCollect = "Auto Collect Memory: "
 		
 		L.XY = "Coordinates broadcast"
+		L.SwitchMode = (getLocale == "ruRU") and "Сменить режим" or "Switch mode"
 		
 		L.Home = "Home"
 		L.World = "World"
@@ -92,7 +91,5 @@ local getLocale = GetLocale()
 		L.ReloadOn = "|cff777777dim|rinfo[|cff00ff00System|r]: You would see addon's CPU usage after reloding UI."
 		L.ReloadOff = "|cff777777dim|rinfo[|cff00ff00System|r]: You could hide the addon's CPU usage table after reloding UI."
 		
-		L.App = "Companion"
-		L.Mobile = "Mobile"
 		L.Desktop = "Desktop"
 	end

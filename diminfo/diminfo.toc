@@ -1,4 +1,4 @@
-## Interface: 11305
+## Interface: 11509, 20506
 ## Author: Loshine, funupdate by EK
 ## Title: |cff777777dim|rinfo_Classic
 ## Notes: Info Bar
@@ -6,11 +6,10 @@
 ## SavedVariables: diminfo
 ## X-Credits: Siweia, HopeASD, Peterodox
 
-Libs\Libs.xml
-
 Config.lua
-API.lua
+Core.lua
+InfoPanel.lua
 
 Locale.lua
-diminfo.xml
+Modules\Modules.xml
 

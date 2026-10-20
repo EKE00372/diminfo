@@ -1,25 +1,25 @@
-﻿local addon, ns = ... 
+﻿local _, ns = ...
 local C, F, G, L = unpack(ns)
 if not C.Bags then return end
 
+local GameTooltip = F.Tooltip
 local format = string.format
 local CreateFrame = CreateFrame
-local GetContainerNumFreeSlots, GetContainerNumSlots = GetContainerNumFreeSlots, GetContainerNumSlots
+local GetContainerNumFreeSlots, GetContainerNumSlots = C_Container.GetContainerNumFreeSlots, C_Container.GetContainerNumSlots
 
 --=================================================--
 ---------------    [[ Elements ]]     ---------------
 --=================================================--
 
 --[[ Create elements ]]--
-local Stat = CreateFrame("Frame", G.addon.."Bags", UIParent)
-	Stat:SetHitRectInsets(-5, -5, -10, -10)
-	Stat:SetFrameStrata("BACKGROUND")
+local Stat = CreateFrame("Frame", G.addon.."Bags", UIParent, "HorizontalLayoutFrame")
 
 --[[ Create text ]]--
 local Text  = Stat:CreateFontString(nil, "OVERLAY")
+	Text.layoutIndex = 1
+	Text.align = "center"
 	Text:SetFont(G.Fonts, G.FontSize, G.FontFlag)
-	Text:SetPoint(unpack(C.BagsPoint))
-	Stat:SetAllPoints(Text)
+	F.RegisterModule("Bags", Stat)
 
 --==================================================--
 ---------------    [[ Bag slots ]]     ---------------
@@ -48,7 +48,7 @@ local function OnEvent(self)
 
 	local free, total = getBagSlots()
 	Text:SetText(C.ClassColor and F.Hex(G.Ccolors)..BAGSLOT.." |r"..free.."/"..total or BAGSLOT.." "..free.."/"..total)
-	self:SetAllPoints(Text)
+	self:Layout()
 end
 
 --[[ Tooltip update ]]--
@@ -72,7 +72,7 @@ local function OnEnter(self)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..BAGSLOT..G.LeftButton)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.AutoSell..(diminfo.AutoSell and G.Enable or G.Disable)..G.RightButton, 1, 1, 1, .4, .78, 1)
 	
-	GameTooltip:Show()
+	F.ShowTooltip()
 end
 
 --================================================--
@@ -81,8 +81,8 @@ end
 	
 	--[[ Tooltip ]]--
 	Stat:SetScript("OnEnter", OnEnter)
-	Stat:SetScript("OnLeave", function()
-		GameTooltip:Hide()
+	Stat:SetScript("OnLeave", function(self)
+		if GameTooltip:IsOwned(self) then GameTooltip:Hide() end
 	end)
 	
 	--[[ Data text ]]--
@@ -97,8 +97,6 @@ end
 			OnEnter(self)
 		elseif button == "LeftButton" then
 			ToggleAllBags()
-		else
-			return
 		end
 	end)
 
@@ -113,14 +111,15 @@ local sellGray = CreateFrame("Frame")
 			
 			for bag = 0, 4 do
 				for slot = 1, GetContainerNumSlots(bag) do
-					local link = GetContainerItemLink(bag, slot)
+					local info = C_Container.GetContainerItemInfo(bag, slot)
 					
-					if link and (select(11, GetItemInfo(link)) ~= nil) and (select(2, GetContainerItemInfo(bag, slot)) ~= nil) then
-						local price = select(11, GetItemInfo(link)) * select(2, GetContainerItemInfo(bag, slot))
+					if info then
+						local _, _, quality, _, _, _, _, _, _, _, sellPrice = C_Item.GetItemInfo(info.hyperlink)
 						
-						if select(3, GetItemInfo(link)) == 0 and price > 0 then
-							UseContainerItem(bag, slot)
-							PickupMerchantItem()
+						if quality == 0 and sellPrice > 0 then
+							local price = sellPrice * info.stackCount
+							C_Container.UseContainerItem(bag, slot)
+							PickupMerchantItem(0)
 							c = c + price
 						end
 					end
