@@ -1,11 +1,11 @@
-## Interface: 120105, 120107
+## Interface: 120105, 120107, 16001
 ## Author: EK
 ## Title: |cff00ffffKim|rinfo
 ## Notes: Light info bar.
 ## Notes-zhTW: 小巧資訊條。
 ## Notes-zhCN: 轻量级信息条。
 ## IconTexture: "Interface\\Buttons\\WHITE8x8"
-## Version: R6.1b
+## Version: R6.2
 ## SavedVariables: Kiminfo
 ## X-Credits: Tukz, Loshine, Siweia, HopeASD, Peter, Rhythm
 
