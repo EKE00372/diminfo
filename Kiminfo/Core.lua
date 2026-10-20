@@ -1,8 +1,8 @@
 local addon, ns = ... 
 local C, F, G = unpack(ns)
 
--- multi version support prepare
---F.isNewPatch = select(4, GetBuildInfo()) >= 120000
+-- 版本判斷
+G.IsForever = (WOW_PROJECT_ID == WOW_PROJECT_CAMELOT)
 
 --======================================================--
 ---------------	[[ Resource and Texture ]] ---------------
