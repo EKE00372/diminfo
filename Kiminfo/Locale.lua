@@ -15,6 +15,8 @@ local getLocale = GetLocale()
 		L.Lonely = "獨行"
 		L.NamePreset = "顯示名字"
 		L.HideNames = "隱藏名字"
+		L.AddOnRestrictions = "受限環境"
+		L.SecretValueWarning = G.ErrColor.."警告：這是開發者專用的危險功能，如果誤開請關閉！|r"
 		
 		L.Shift = "Shift 展開"
 		L.Hidden = HIDE
@@ -24,7 +26,7 @@ local getLocale = GetLocale()
 		L.Collected = "釋放記憶體："
 		L.ManualCollect = "回收記憶體"
 		L.AutoCollect = "自動回收記憶體："
-		L.CollectWarning = "|cff00ffffKim|rinfo[|cff00ff00Memory|r]："..G.ErrColor.."危險功能！|r啟用自動整理暫存記憶體可能使遊戲主程式周期性凍結。"
+		L.CollectWarning = G.ErrColor.."警告|r：啟用自動回收記憶體可能使遊戲主程式週期性凍結。"
 
 		L.Spec = "專精"
 		
@@ -53,6 +55,8 @@ local getLocale = GetLocale()
 		L.Lonely = "独行"
 		L.NamePreset = "显示名字"
 		L.HideNames = "隐藏名字"
+		L.AddOnRestrictions = "受限环境"
+		L.SecretValueWarning = G.ErrColor.."警告：这是开发者专用的危险功能，如果误开请关闭！|r"
 		
 		L.Shift = "Shift 展开"
 		L.Hidden = HIDE
@@ -62,7 +66,7 @@ local getLocale = GetLocale()
 		L.Collected = "释放內存："
 		L.ManualCollect = "回收内存"
 		L.AutoCollect = "自动回收内存："
-		L.CollectWarning = "|cff00ffffKim|rinfo[|cff00ff00Memory|r]："..G.ErrColor.."危险功能！|r启用自动整理內存可能使客户端周期性冻结。"
+		L.CollectWarning = G.ErrColor.."警告|r：启用自动回收内存可能使游戏客户端周期性冻结。"
 			
 		L.Spec = "专精"
 		
@@ -91,6 +95,8 @@ local getLocale = GetLocale()
 		L.Lonely = "Одинокий"
 		L.NamePreset = "Показать имена"
 		L.HideNames = "Скрыть имена"
+		L.AddOnRestrictions = "Ограничения аддонов"
+		L.SecretValueWarning = G.ErrColor.."Внимание: это опасная функция только для разработчиков. Если включили её случайно, отключите!|r"
 		
 		L.Shift = "Shift показать все"
 		L.Hidden = "Скрытый"
@@ -100,7 +106,7 @@ local getLocale = GetLocale()
 		L.Collected = "Сборка мусора: "
 		L.ManualCollect = "Сборка мусора"
 		L.AutoCollect = "Автоматическая сборка мусора: "
-		L.CollectWarning = "|cff00ffffKim|rinfo[|cff00ff00Memory|r]: "..G.ErrColor.."NOTICE: DANGER!|r Auto collected memory may cause your client freeze."
+		L.CollectWarning = G.ErrColor.."Внимание|r: автоматическая сборка мусора может периодически вызывать зависание игрового клиента."
 		
 		L.Spec = "Спек"
 		
@@ -128,6 +134,8 @@ local getLocale = GetLocale()
 		L.Lonely = "Lonely"
 		L.NamePreset = "Show names"
 		L.HideNames = "Hide names"
+		L.AddOnRestrictions = "AddOn Restrictions"
+		L.SecretValueWarning = G.ErrColor.."Warning: this is a dangerous developer-only feature. If enabled accidentally, turn it off!|r"
 		
 		L.Shift = "Shift show all"
 		L.Hidden = "Hidden"
@@ -137,7 +145,7 @@ local getLocale = GetLocale()
 		L.Collected = "Garbage collected: "
 		L.ManualCollect = "Collect garbage"
 		L.AutoCollect = "Auto collect memory: "
-		L.CollectWarning = "|cff00ffffKim|rinfo[|cff00ff00Memory|r]: "..G.ErrColor.."DANGER!|r Auto collected memory may cause your client freeze."
+		L.CollectWarning = G.ErrColor.."Warning|r: automatic garbage collection may cause the game client to freeze periodically."
 		
 		L.Spec = "Spec"
 		
