@@ -95,6 +95,10 @@ local function AreSecretValueCVarsEnabled()
 	return true
 end
 
+local function GetSecretValueText()
+	return (AreSecretValueCVarsEnabled() and "|cffff5555"..ENABLE or "|cff55ff55"..DISABLE).."|r"
+end
+
 local function SetSecretValueCVarsEnabled(enabled)
 	local value = enabled and "1" or "0"
 
@@ -141,7 +145,7 @@ local function UpdateCoords(self, elapsed)
 		end
 
 		-- 只有列結構改變才重繪整個 tooltip；一般移動只更新座標文字。
-		if IsInInstance() or C_CVar_GetCVarBool("minimapShowPlayerCoords") or (not G.IsForever and IsControlKeyDown()) ~= (secretValueLine ~= nil) then
+		if IsInInstance() or C_CVar_GetCVarBool("minimapShowPlayerCoords") then
 			self:GetScript("OnEnter")(self)
 			return
 		end
@@ -154,7 +158,7 @@ local function UpdateCoords(self, elapsed)
 		end
 		coordLine:SetText("|cffffffff"..formatCoords().."|r")
 		if secretValueLine then
-			secretValueLine:SetText(AreSecretValueCVarsEnabled() and G.Enable or G.Disable)
+			secretValueLine:SetText(GetSecretValueText())
 		end
 		-- 內容仍是同一列，交原生 tooltip 更新寬度，不重設所有列高。
 		GameTooltip:Show()
@@ -196,9 +200,9 @@ local function OnEnter(self)
 	end
 
 	secretValueLine = nil
-	if not G.IsForever and IsControlKeyDown() then
+	if not G.IsForever then
 		GameTooltip:AddLine(" ")
-		GameTooltip:AddDoubleLine("Secret Value CVar", AreSecretValueCVarsEnabled() and G.Enable or G.Disable, 1, 1, 1)
+		GameTooltip:AddDoubleLine(G.OptionColor..G.LeftButton.."+ Ctrl "..L.AddOnRestrictions, GetSecretValueText(), 1, 1, 1)
 		secretValueLine = GameTooltip:GetRightLine(GameTooltip:NumLines())
 	end
 	
@@ -262,7 +266,9 @@ end
 			end
 		elseif btn == "LeftButton" and IsControlKeyDown() then
 			if G.IsForever then return end
-			SetSecretValueCVarsEnabled(not AreSecretValueCVarsEnabled())
+			local enabled = not AreSecretValueCVarsEnabled()
+			SetSecretValueCVarsEnabled(enabled)
+			if enabled then print(L.SecretValueWarning) end
 			OnEnter(self)
 		elseif btn == "LeftButton" then
 			if InCombatLockdown() then UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT) return end
