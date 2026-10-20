@@ -53,7 +53,10 @@ end
 -- [[ Delves ]] --
 
 local delvesKeys = {91175, 91176, 91177, 91178}
-local keyName = C_CurrencyInfo.GetCurrencyInfo(3028).name
+local keyName
+if not G.IsForever then
+	keyName = C_CurrencyInfo.GetCurrencyInfo(3028).name
+end
 
 -- 12.1.5 豐裕入口 POI；名稱由遊戲取得，迷宮不套用一般地下堡的每日倒數。
 local delveList = {
@@ -190,7 +193,7 @@ local function OnEnter(self, isShiftDown)
 	GameTooltip:AddDoubleLine(G.OptionColor..TIMEMANAGER_TOOLTIP_REALMTIME, updateTimerFormat(realmHour, realmMinute), 1, 1, 1, 1, 1, 1)
 	
 	-- Mythic+ and Weekly chest quest only on max level
-	if UnitLevel("player") == GetMaxLevelForLatestExpansion() then
+	if not G.IsForever and UnitLevel("player") == GetMaxLevelForLatestExpansion() then
 		
 		-- Quests
 
@@ -256,32 +259,33 @@ local function OnEnter(self, isShiftDown)
 	
 	--[[ 副本進度 ]]--
 	
-	-- World boss
-	title = false
-	for i = 1, GetNumSavedWorldBosses() do
-		local name, id, reset = GetSavedWorldBossInfo(i)
-		
-		if not (id == 11 or id == 12 or id == 13) then
-			addTitle(RAID_INFO_WORLD_BOSS)
-			GameTooltip:AddDoubleLine(name, SecondsToTime(reset, true, nil, 3), 1, 1, 1, 1, 1, 1)
-		end
-	end
-	
-	-- Dungeon
-	title = false
-	for i = 1, GetNumSavedInstances() do
-		local name, _, reset, difficulty, locked, extended, _, _, _, difficultyName, numEncounters, encounterProgress = GetSavedInstanceInfo(i)
-		-- 5h and 5m
-		if (difficulty == 2 or difficulty == 23) and (locked or extended) then
-			addTitle(DUNGEONS)
-			local r, g, b
-			if extended then
-				r,g,b = .3, 1, .3
-			else
-				r, g, b = 1, 1, 1
+	if not G.IsForever then
+		-- World boss
+		title = false
+		for i = 1, GetNumSavedWorldBosses() do
+			local name, id, reset = GetSavedWorldBossInfo(i)
+
+			if not (id == 11 or id == 12 or id == 13) then
+				addTitle(RAID_INFO_WORLD_BOSS)
+				GameTooltip:AddDoubleLine(name, SecondsToTime(reset, true, nil, 3), 1, 1, 1, 1, 1, 1)
 			end
+		end
 		
-		GameTooltip:AddDoubleLine(difficultyName.." "..name.." |cff4cff4c("..encounterProgress.."/"..numEncounters..")|r", SecondsToTime(reset, true, nil, 3), 1, 1, 1, r, g, b)
+		-- Dungeon
+		title = false
+		for i = 1, GetNumSavedInstances() do
+			local name, _, reset, difficulty, locked, extended, _, _, _, difficultyName, numEncounters, encounterProgress = GetSavedInstanceInfo(i)
+			if (difficulty == 2 or difficulty == 23) and (locked or extended) then
+				addTitle(DUNGEONS)
+				local r, g, b
+				if extended then
+					r,g,b = .3, 1, .3
+				else
+					r, g, b = 1, 1, 1
+				end
+
+				GameTooltip:AddDoubleLine(difficultyName.." "..name.." |cff4cff4c("..encounterProgress.."/"..numEncounters..")|r", SecondsToTime(reset, true, nil, 3), 1, 1, 1, r, g, b)
+			end
 		end
 	end
 
@@ -304,7 +308,9 @@ local function OnEnter(self, isShiftDown)
 	end
 
 	GameTooltip:AddDoubleLine(" ", G.Line)
-	GameTooltip:AddDoubleLine(" ", G.OptionColor..RATED_PVP_WEEKLY_VAULT..G.MiddleButton)
+	if not G.IsForever then
+		GameTooltip:AddDoubleLine(" ", G.OptionColor..RATED_PVP_WEEKLY_VAULT..G.MiddleButton)
+	end
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.Calendar..G.LeftButton)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..STOPWATCH_TITLE..G.RightButton)
 	
@@ -327,9 +333,11 @@ local function OnEvent(self, event, key)
 
 	if event == "PLAYER_ENTERING_WORLD" then
 		RequestRaidInfo()
-		C_MythicPlus_RequestMapInfo()
-		LoadQuestListNames(DFQuestList)
-		LoadQuestListNames(TWWQuestList)
+		if not G.IsForever then
+			C_MythicPlus_RequestMapInfo()
+			LoadQuestListNames(DFQuestList)
+			LoadQuestListNames(TWWQuestList)
+		end
 	end
 
 	local r, g, b
@@ -368,10 +376,14 @@ end
 	Stat:SetScript("OnEnter", function(self)
 		-- mouseover color
 		Text:SetTextColor(0, 1, 1)
-		self.isShiftDown = IsShiftKeyDown()
-		self:RegisterEvent("MODIFIER_STATE_CHANGED")
+		if not G.IsForever then
+			self.isShiftDown = IsShiftKeyDown()
+			self:RegisterEvent("MODIFIER_STATE_CHANGED")
+		end
 		RequestRaidInfo()
-		C_MythicPlus_RequestMapInfo()
+		if not G.IsForever then
+			C_MythicPlus_RequestMapInfo()
+		end
 		-- tooltip show
 		OnEnter(self, self.isShiftDown)
 	end)
@@ -403,7 +415,7 @@ end
 		elseif btn == "LeftButton" then
 			if InCombatLockdown() then UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT) return end
 			ToggleCalendar()
-		elseif btn == "MiddleButton" then
+		elseif btn == "MiddleButton" and not G.IsForever then
 			if InCombatLockdown() then UIErrorsFrame:AddMessage(G.ErrColor..ERR_NOT_IN_COMBAT) return end
 			if not WeeklyRewardsFrame then C_AddOns.LoadAddOn("Blizzard_WeeklyRewards") end
 			if not WeeklyRewardsFrame:IsShown() then ShowUIPanel(WeeklyRewardsFrame) else HideUIPanel(WeeklyRewardsFrame) end
