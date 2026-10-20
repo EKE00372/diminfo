@@ -28,3 +28,5 @@ InfoPanel.lua
 
 Locale.lua
 Modules\Modules.xml
+Modules\Spec.lua [AllowLoadGameType standard]
+Modules\Spec_Forever.lua [AllowLoadGameType camelot] [ExcludeLoadGameType standard, classic]
