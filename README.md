@@ -23,7 +23,7 @@ There is no in-game configuration panel. Edit [Kiminfo/Config.lua](Kiminfo/Confi
   - Forever: includes the ranged weapon slot.
   - Left click: character window. Right click: toggle auto-repair.
 - **Friends**
-  - Shows online friends and their game details. Hold Shift to show full BattleTags.
+  - Shows online friends and their game details. Hold Alt to show full BattleTags.
   - List entries: Shift + left click to invite or request to join; middle click to whisper.
   - Info bar: left click opens friends; right click edits your Battle.net broadcast.
 - **Guild**
@@ -121,7 +121,7 @@ Kiminfo 是一個適用於 WoW 正式服與 Forever 的輕量資訊條，基於 
   - Forever：包含遠程武器欄位。
   - 左鍵：角色資訊。右鍵：自動修理開關。
 - **Friends／好友**
-  - 顯示線上好友與遊戲詳情，按住 Shift 可顯示完整 BattleTag。
+  - 顯示線上好友與遊戲詳情，按住 Alt 可顯示完整 BattleTag。
   - 名單項目上 Shift＋左鍵邀請或請求加入，中鍵密語。
   - 資訊條上左鍵開啟好友視窗，右鍵編輯戰網廣播。
 - **Guild／公會**
