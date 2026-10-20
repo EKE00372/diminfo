@@ -141,7 +141,7 @@ local function UpdateCoords(self, elapsed)
 		end
 
 		-- 只有列結構改變才重繪整個 tooltip；一般移動只更新座標文字。
-		if IsInInstance() or C_CVar_GetCVarBool("minimapShowPlayerCoords") or IsControlKeyDown() ~= (secretValueLine ~= nil) then
+		if IsInInstance() or C_CVar_GetCVarBool("minimapShowPlayerCoords") or (not G.IsForever and IsControlKeyDown()) ~= (secretValueLine ~= nil) then
 			self:GetScript("OnEnter")(self)
 			return
 		end
@@ -196,7 +196,7 @@ local function OnEnter(self)
 	end
 
 	secretValueLine = nil
-	if IsControlKeyDown() then
+	if not G.IsForever and IsControlKeyDown() then
 		GameTooltip:AddLine(" ")
 		GameTooltip:AddDoubleLine("Secret Value CVar", AreSecretValueCVarsEnabled() and G.Enable or G.Disable, 1, 1, 1)
 		secretValueLine = GameTooltip:GetRightLine(GameTooltip:NumLines())
@@ -261,6 +261,7 @@ end
 				OnEnter(self)
 			end
 		elseif btn == "LeftButton" and IsControlKeyDown() then
+			if G.IsForever then return end
 			SetSecretValueCVarsEnabled(not AreSecretValueCVarsEnabled())
 			OnEnter(self)
 		elseif btn == "LeftButton" then
