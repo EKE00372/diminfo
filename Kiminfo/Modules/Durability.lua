@@ -60,6 +60,9 @@ local localSlots = {
 	[9] = {16, INVTYPE_WEAPONMAINHAND, 1000},
 	[10] = {17, INVTYPE_WEAPONOFFHAND, 1000},
 }	
+if G.IsForever then
+	localSlots[#localSlots + 1] = {INVSLOT_RANGED, INVTYPE_RANGED, 1000}
+end
 
 --[[ Sort slots by durability ]]--
 local function sortSlots(a, b)
@@ -70,7 +73,7 @@ end
 local function getItemDurability()
 	local numSlots = 0
 	
-	for i = 1, 10 do
+	for i = 1, #localSlots do
 		localSlots[i][3] = 1000
 		
 		local index = localSlots[i][1]
@@ -135,7 +138,7 @@ local function OnEnter(self)
 	GameTooltip:AddLine(" ")
 	
 	-- Slot item list
-	for i = 1, 10 do
+	for i = 1, #localSlots do
 		if localSlots[i][3] ~= 1000 then
 			local slot = localSlots[i][1]
 			local green = localSlots[i][3]*2
