@@ -296,13 +296,11 @@ local function bnOnEnter(row, info)
 		GameTooltip:AddLine(getGameAccountLabel(gameAccountInfo, accountInfo), 1, 1, 1, false)
 		local location = gameAccountInfo.richPresence
 		if gameAccountInfo.clientProgram == BNET_CLIENT_WOW then
-			local area = gameAccountInfo.areaName
-			-- 同版本只顯示地區；其他版本保留 rich presence 原文，再接地區。
-			if gameAccountInfo.wowProjectID == WOW_PROJECT_ID then
-				location = area
-			elseif area and area ~= "" then
-				location = location and location ~= "" and location.." - "..area or area
+			-- 不同版本的 rich presence 保留原文，與所在地區分列顯示。
+			if gameAccountInfo.wowProjectID ~= WOW_PROJECT_ID and location and location ~= "" then
+				GameTooltip:AddLine(location, .65, .65, .65, true)
 			end
+			location = gameAccountInfo.areaName
 		end
 		if location and location ~= "" then GameTooltip:AddLine(location, .65, .65, .65, true) end
 	end
