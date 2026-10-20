@@ -2,7 +2,7 @@
 -- Dont touch this! --
 ----------------------
 
-local addon, ns = ...
+local _, ns = ...
 	ns[1] = {} -- C, config
 	ns[2] = {} -- F, functions, constants, variables
 	ns[3] = {} -- G, globals (Optionnal)
@@ -10,7 +10,7 @@ local addon, ns = ...
 	
 	if diminfo == nil then diminfo = {} end
 	
-local C, F, G, L = unpack(ns)
+local C, G = ns[1], ns[3]
 
 	G.addon = "diminfo_"
 	G.MediaFolder = "Interface\\AddOns\\diminfo\\Media\\"
@@ -20,7 +20,6 @@ local C, F, G, L = unpack(ns)
 -- Golbal --
 ------------
 
-	C.ShowPanel = true		-- Enable panel / 啟用面板
 	C.ClassColor = true		-- Enable font color / 啟用職業染色
 
 -----------
@@ -36,22 +35,6 @@ local C, F, G, L = unpack(ns)
 	G.Line = "|cff7b8489---------------|r"
 	G.TitleColor = "|cff0099ff"		-- .6, .8, 1 /or .4, .78, .1
 	G.OptionColor = "|cff99ccff"		-- .6, .8, 1 /or .4, .78, .1
-	G.ErrColor = "|cffff0000"			-- 1, 0, 0
-	
------------
--- Panel --
------------
-
-	-- style, anchor, parent, x, y, width, height, alpha
-	-- 風格，錨點，父級框體，x座標，y座標，寬度，高度，透明度
-	
-	C.Panel1 = {"Gradient", "TOPLEFT", UIParent, 0, -2, 730, 36, .6}
-	--C.Panel1 = {"Glass", "TOPLEFT", UIParent, 0, -6, 860, 16, .6}
-	-- add if you need, max to C.Panel5 / 自己加，最多到C.Panel5
-	
-	-- NOTE:
-	-- 風格必需是 "Gradient" (漸變) 或 "Glass" (玻璃)
-	-- style should be "Gradient" or "Glass"
 	
 --------------
 -- Settings --
@@ -62,45 +45,49 @@ local C, F, G, L = unpack(ns)
 	-- Note: if you put databar on screen botton, change true to false.
 	C.StickTop = true
 
-	-- Bags / 背包
-	C.Bags = true
-	C.BagsPoint = {"TOPLEFT", UIParent, 18, -12}
-	
-	-- Memory / 記憶體占用列表
-	C.Memory = true
-	C.MaxAddOns = 30
-	C.MemoryPoint = {"LEFT", "diminfo_Bags", "RIGHT", 16, 0}
-	--C.MemoryPoint = {"TOPLEFT", UIParent, 120, -12}
-	
-	-- System: Fps and latency / 幀數與延遲
-	C.System = true
-	C.SystemPoint = {"LEFT", "diminfo_Mem", "RIGHT", 16, 0}
-	--C.SystemPoint = {"TOPLEFT", UIParent, 220, -12}
-	
-	-- 好友 / Friends
-	C.Friends = true
-	C.FriendsPoint =  {"LEFT", "diminfo_System", "RIGHT", 16, 0}
-	--C.FriendsPoint =  {"TOPLEFT", UIParent, 320, -12}
-	
-	-- 公會 / Guild
-	C.Guild = true
-	C.GuildPoint = {"LEFT", "diminfo_Friends", "RIGHT", 16, 0}
-	--C.GuildPoint = {"TOPLEFT", UIParent, 420, -12}
-	
-	-- Durability / 耐久
-	C.Durability = true
-	C.DurabilityPoint = {"LEFT", "diminfo_Guild", "RIGHT", 16, 0}
-	--C.DurabilityPoint = {"TOPLEFT", UIParent, 520, -12}
-	
-	-- Timer / 時鐘
-	C.Time = true
-	C.TimePoint =  {"LEFT", "diminfo_Dura", "RIGHT", 16, 0}
-	--C.TimePoint =  {"TOPLEFT", UIParent, 620, -12}
-	
-	-- Zone text and Position / 地名座標
-	C.Positions = true
-	C.PositionsPoint = {"LEFT", "diminfo_Time", "RIGHT", 16, 0}
-	--C.PositionsPoint = {"TOP", UIParent, 0, -12}
+	C.MaxAddOns = 30		-- 插件列表顯示數量 / Addon list maximum
+	C.InfoPanel = {maxHeight = 600}	-- 好友與公會共用的面板高度上限 / Shared panel height limit
+
+	-- 模組開關，重載後生效 / Enable modules; reload after editing
+	C.Bags = true		-- 背包 / Bags
+	C.Memory = true		-- 記憶體 / Memory
+	C.System = true		-- 幀數與延遲 / FPS and latency
+	C.Friends = true		-- 好友 / Friends
+	C.Guild = true		-- 公會 / Guild
+	C.Durability = true	-- 耐久 / Durability
+	C.Time = true		-- 時鐘 / Time
+	C.Positions = true	-- 地名與座標 / Zone and coordinates
+
+------------
+-- Layout --
+------------
+
+	C.Gap = 16	-- 模組之間的共用間距 / Gap between modules
+
+	-- point：列錨點、父框體、X、Y / Row anchor, parent, X, Y
+	-- inset：內容起點相對列左上角的X、Y / Content offset from row TOPLEFT
+	-- style："Gradient"漸層或"Glass"玻璃 / Background style
+	-- panel：背景寬度、高度、透明度；false或省略可關閉背景 / Width, height, alpha; false/nil hides background
+	-- modules：{模組名稱, 額外水平偏移}；偏移可省略 / {Module, optional horizontal offset}
+	-- 停用模組不留空位；每個模組只放一列。未列入只隱藏顯示，C.模組=false才停用功能。
+	C.Layout = {
+		{
+			point = {"TOPLEFT", UIParent, 0, -2},
+			inset = {18, -10},
+			style = "Gradient",
+			panel = {730, 36, .6},
+			modules = {
+				{"Bags", 0},
+				{"Memory", 0},
+				{"System", 0},
+				{"Friends", 0},
+				{"Guild", 0},
+				{"Durability", 0},
+				{"Time", 0},
+				{"Positions", 0},
+			},
+		},
+	}
 	
 -------------
 -- Credits --

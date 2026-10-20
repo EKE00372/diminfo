@@ -1,12 +1,14 @@
-local addon, ns = ... 
+local _, ns = ...
 local C, F, G, L = unpack(ns)
 if not C.Positions then return end
 
+local GameTooltip = F.Tooltip
 local format = string.format
 local CreateFrame = CreateFrame
 
-local subzone, zone, pvp
+local subzone, zone, pvpType, faction
 local coordX, coordY = 0, 0
+local coordLine
 local mapRects = {}
 
 --=================================================--
@@ -14,15 +16,14 @@ local mapRects = {}
 --=================================================--
 
 --[[ Create elements ]]--
-local Stat = CreateFrame("Frame", G.addon.."Pos", UIParent)
-	Stat:SetHitRectInsets(-5, -5, -10, -10)
-	Stat:SetFrameStrata("BACKGROUND")
+local Stat = CreateFrame("Frame", G.addon.."Pos", UIParent, "HorizontalLayoutFrame")
 
 --[[ Create text ]]--
 local Text  = Stat:CreateFontString(nil, "OVERLAY")
+	Text.layoutIndex = 1
+	Text.align = "center"
 	Text:SetFont(G.Fonts, G.FontSize, G.FontFlag)
-	Text:SetPoint(unpack(C.PositionsPoint))
-	Stat:SetAllPoints(Text)
+	F.RegisterModule("Positions", Stat)
 
 --==================================================--
 ---------------    [[ Functions ]]     ---------------
@@ -39,23 +40,42 @@ local zoneColor = {
 	neutral = {format(FACTION_CONTROLLED_TERRITORY,FACTION_STANDING_LABEL4), {1, .93, .76}}
 }
 
+-- 原生語系字串的外層括號
+for _, info in pairs(zoneColor) do
+	info[1] = info[1]:gsub("^%((.*)%)$", "%1"):gsub("^（(.*)）$", "%1")
+end
+
 --[[ Format ]]--
 local function formatCoords()
 	return format("%.1f, %.1f", coordX*100, coordY*100)
 end
 
+local function UpdateLocationText(self, inInstance)
+	local location = (subzone ~= "") and subzone or zone
+	if diminfo.ShowCoords and not inInstance then
+		Text:SetText(format("%s |cffffffff(%s)|r", location, formatCoords()))
+	else
+		Text:SetText(location)
+	end
+	self:Layout()
+end
+
 --[[ Get xy ]]--
 local tempVec2D = CreateVector2D(0, 0)
 local function GetPlayerMapPos(mapID)
+	if not mapID then return end
+
 	tempVec2D.x, tempVec2D.y = UnitPosition("player")
 	if not tempVec2D.x then return end
 	
 	local mapRect = mapRects[mapID]
 	if not mapRect then
-		mapRect = {}
-		mapRect[1] = select(2, C_Map.GetWorldPosFromMapPos(mapID, CreateVector2D(0, 0)))
-		mapRect[2] = select(2, C_Map.GetWorldPosFromMapPos(mapID, CreateVector2D(1, 1)))
-		mapRect[2]:Subtract(mapRect[1])
+		local _, mapOrigin = C_Map.GetWorldPosFromMapPos(mapID, CreateVector2D(0, 0))
+		local _, mapExtent = C_Map.GetWorldPosFromMapPos(mapID, CreateVector2D(1, 1))
+		if not mapOrigin or not mapExtent then return end
+
+		mapExtent:Subtract(mapOrigin)
+		mapRect = {mapOrigin, mapExtent}
 	
 		mapRects[mapID] = mapRect
 	end
@@ -64,21 +84,52 @@ local function GetPlayerMapPos(mapID)
 	return tempVec2D.y/mapRect[2].y, tempVec2D.x/mapRect[2].x
 end
 
+local function RefreshCoords()
+	local x, y = GetPlayerMapPos(C_Map.GetBestMapForUnit("player"))
+	if x then
+		coordX, coordY = x, y
+	else
+		coordX, coordY = 0, 0
+	end
+end
+
 --[[ Update coords ]]--
 local function UpdateCoords(self, elapsed)
 	self.elapsed = (self.elapsed or 0) + elapsed
 	
 	if self.elapsed > .1 then
-		local x, y = GetPlayerMapPos(C_Map.GetBestMapForUnit("player"))
-		if x then
-			coordX, coordY = x, y
-		else
-			coordX, coordY = 0, 0
-			self:SetScript("OnUpdate", nil)
-		end
-		self:GetScript("OnEnter")(self)
-		
 		self.elapsed = 0
+		local showTooltip = (GameTooltip:IsOwned(self) and GameTooltip:IsShown())
+		if not diminfo.ShowCoords and not showTooltip then
+			self:SetScript("OnUpdate", nil)
+			coordLine = nil
+			return
+		end
+		if IsInInstance() then
+			self:SetScript("OnUpdate", nil)
+			coordLine = nil
+			if diminfo.ShowCoords then UpdateLocationText(self, true) end
+			if showTooltip then self:GetScript("OnEnter")(self) end
+			return
+		end
+
+		-- 兩種顯示模式沿用同一個座標更新器。
+		RefreshCoords()
+		if diminfo.ShowCoords then UpdateLocationText(self, false) end
+		if showTooltip and not diminfo.ShowCoords then
+			coordLine:SetText(format("|cffffffff%s|r", formatCoords()))
+			GameTooltip:Show()
+		else
+			coordLine = nil
+		end
+	end
+end
+
+local function UpdateTracking(self, inInstance)
+	if not inInstance and (diminfo.ShowCoords or (GameTooltip:IsOwned(self) and GameTooltip:IsShown())) then
+		self:SetScript("OnUpdate", UpdateCoords)
+	else
+		self:SetScript("OnUpdate", nil)
 	end
 end
 
@@ -86,47 +137,57 @@ end
 ---------------    [[ Updates ]]     ---------------
 --================================================--
 
-local function OnEvent(self)
-	subzone, zone, pvp = GetSubZoneText(), GetZoneText(), {GetZonePVPInfo()}
-	
-	if not pvp[1] then pvp[1] = "neutral" end
-	
-	local r, g, b = unpack(zoneColor[pvp[1]][2])
-	
-	Text:SetText((subzone ~= "") and subzone or zone)
-	Text:SetTextColor(r, g, b)
-end
-
 local function OnEnter(self)
-	self:SetScript("OnUpdate", UpdateCoords)
+	local inInstance = IsInInstance()
 	
 	-- Title
 	GameTooltip:SetOwner(self, C.StickTop and "ANCHOR_BOTTOM" or "ANCHOR_TOP", 0, C.StickTop and -10 or 10)
 	GameTooltip:ClearLines()
 	
 	-- Coords
-	if not IsInInstance() then
-		GameTooltip:AddLine(zone, 0, .8, 1)
+	coordLine = nil
+	GameTooltip:AddLine(zone, 0, .8, 1)
+	if not inInstance and not diminfo.ShowCoords then
 		GameTooltip:AddLine(format("|cffffffff%s|r", formatCoords()), 1, 1, 1)
-	else
-		GameTooltip:AddLine(zone, 0, .8, 1)
+		coordLine = GameTooltip:GetLeftLine(GameTooltip:NumLines())
 	end
 	
 	-- Subzone
-	if pvp[1] and not IsInInstance() then
-		local r, g, b = unpack(zoneColor[pvp[1]][2])
-		if subzone and subzone ~= zone then
+	if pvpType and not inInstance then
+		local r, g, b = unpack(zoneColor[pvpType][2])
+		if subzone ~= zone then
 			GameTooltip:AddLine(subzone, r, g, b)
 		end
-		GameTooltip:AddLine(format(zoneColor[pvp[1]][1],pvp[3] or ""), r, g, b)
+		GameTooltip:AddLine(format(zoneColor[pvpType][1],faction or ""), r, g, b)
 	end
 	
 	-- Options
 	GameTooltip:AddDoubleLine(" ", G.Line)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..WORLDMAP_BUTTON..G.LeftButton)
-	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.XY..G.RightButton)
+	GameTooltip:AddDoubleLine(G.OptionColor..G.RightButton.."+ Shift "..L.SwitchMode, G.OptionColor..L.XY..G.RightButton)
 	
-	GameTooltip:Show()
+	F.ShowTooltip()
+	UpdateTracking(self, inInstance)
+end
+
+local function OnEvent(self)
+	if diminfo.ShowCoords == nil then diminfo.ShowCoords = false end
+	subzone, zone = GetSubZoneText(), GetZoneText()
+	local _
+	pvpType, _, faction = C_PvP.GetZonePVPInfo()
+	pvpType = pvpType or "neutral"
+
+	local r, g, b = unpack(zoneColor[pvpType][2])
+	local inInstance = IsInInstance()
+	if diminfo.ShowCoords and not inInstance then RefreshCoords() end
+
+	UpdateLocationText(self, inInstance)
+	Text:SetTextColor(r, g, b)
+	if GameTooltip:IsOwned(self) and GameTooltip:IsShown() then
+		OnEnter(self)
+	else
+		UpdateTracking(self, inInstance)
+	end
 end
 
 --================================================--
@@ -136,8 +197,9 @@ end
 	--[[ Tooltip ]]--
 	Stat:SetScript("OnEnter", OnEnter)
 	Stat:SetScript("OnLeave", function(self)
-		self:SetScript("OnUpdate", nil)
-		GameTooltip:Hide()
+		coordLine = nil
+		if GameTooltip:IsOwned(self) then GameTooltip:Hide() end
+		UpdateTracking(self, IsInInstance())
 	end)
 	
 	--[[ Data text ]]--
@@ -148,14 +210,21 @@ end
 	Stat:SetScript("OnEvent", OnEvent)
 	
 	--[[ Options ]]--
-	Stat:SetScript("OnMouseUp", function(_, btn)
+	Stat:SetScript("OnMouseUp", function(self, btn)
 		if btn == "LeftButton" then
 			ToggleFrame(WorldMapFrame)
+		elseif btn == "RightButton" and IsShiftKeyDown() then
+			diminfo.ShowCoords = not diminfo.ShowCoords
+			self.elapsed = 0
+			OnEvent(self)
 		elseif btn == "RightButton" then
-			if not IsInInstance() then
-				ChatFrame_OpenChat(format("%s (%s)", zone, formatCoords()), chatFrame)
-			end
-		else
-			return
+			if IsInInstance() then return end
+			local map = C_Map.GetBestMapForUnit("player")
+
+			local x, y = GetPlayerMapPos(map)
+			if not x then return end
+
+			coordX, coordY = x, y
+			ChatFrameUtil.OpenChat(format("%s (%s)", zone, formatCoords()))
 		end
 	end)

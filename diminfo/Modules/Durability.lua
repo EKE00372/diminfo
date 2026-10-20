@@ -1,8 +1,9 @@
-local addon, ns = ... 
+local _, ns = ...
 local C, F, G, L = unpack(ns)
 if not C.Durability then return end
 
-local format, floor, max, sort, modf, select = string.format, math.floor, max, table.sort, math.modf, select
+local GameTooltip = F.Tooltip
+local format, floor, sort, select = string.format, math.floor, table.sort, select
 local CreateFrame = CreateFrame
 local GetInventoryItemLink, GetInventoryItemDurability, GetInventoryItemTexture = GetInventoryItemLink, GetInventoryItemDurability, GetInventoryItemTexture
 
@@ -11,15 +12,14 @@ local GetInventoryItemLink, GetInventoryItemDurability, GetInventoryItemTexture 
 --=================================================--
 
 --[[ Create elements ]]--
-local Stat = CreateFrame("Frame", G.addon.."Dura", UIParent)
-	Stat:SetHitRectInsets(-5, -5, -10, -10)
-	Stat:SetFrameStrata("BACKGROUND")
+local Stat = CreateFrame("Frame", G.addon.."Dura", UIParent, "HorizontalLayoutFrame")
 
 --[[ Create text ]]--
 local Text  = Stat:CreateFontString(nil, "OVERLAY")
+	Text.layoutIndex = 1
+	Text.align = "center"
 	Text:SetFont(G.Fonts, G.FontSize, G.FontFlag)
-	Text:SetPoint(unpack(C.DurabilityPoint))
-	Stat:SetAllPoints(Text)
+	F.RegisterModule("Durability", Stat)
 
 --==================================================--
 ---------------    [[ Functions ]]     ---------------
@@ -33,7 +33,7 @@ local function gradientColor(perc)
 	local r1, g1, b1, r2, g2, b2 = select(seg*3+1, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0) -- R -> Y -> G
 	local r, g, b = r1+(r2-r1)*relperc, g1+(g2-g1)*relperc, b1+(b2-b1)*relperc
 	
-	return format("|cff%02x%02x%02x", r*255, g*255, b*255), r, g, b
+	return format("|cff%02x%02x%02x", r*255, g*255, b*255)
 end
 
 --[[ Slots ]]--
@@ -53,16 +53,14 @@ local localSlots = {
 	
 --[[ Sort slots by durability ]]--
 local function sortSlots(a, b)
-	if a and b then
-		return (a[3] == b[3] and a[1] < b[1]) or (a[3] < b[3])
-	end
+	return (a[3] == b[3] and a[1] < b[1]) or (a[3] < b[3])
 end
 
 --[[ Get durability ]]--
 local function getItemDurability()
 	local numSlots = 0
 	
-	for i = 1, 10 do
+	for i = 1, #localSlots do
 		localSlots[i][3] = 1000
 		
 		local index = localSlots[i][1]
@@ -86,7 +84,14 @@ end
 --================================================--
 
 --[[ Data text update ]]--
-local function OnEvent(self)
+local function OnEvent(self, event, isInitialLogin, isReloadingUi)
+	-- 登入／重載後補讀一次；保留當下更新，普通轉圖不重排計時器。
+	if event == "PLAYER_ENTERING_WORLD" and (isInitialLogin or isReloadingUi) then
+		C_Timer.After(5, function()
+			OnEvent(self)
+		end)
+	end
+
 	if diminfo.AutoRepair == nil then
 		diminfo.AutoRepair = true
 	end
@@ -103,13 +108,14 @@ local function OnEvent(self)
 	else
 		Text:SetText(C.ClassColor and F.Hex(G.Ccolors)..L.None or L.None)
 	end
+	self:Layout()
 end
 
 --[[ Tooltip update ]]--
 local function OnEnter(self)
-	local p1 = select(3, GetTalentTabInfo(1))
-	local p2 = select(3, GetTalentTabInfo(2))
-	local p3 = select(3, GetTalentTabInfo(3))
+	local p1 = select(7, C_SpecializationInfo.GetSpecializationInfo(1))
+	local p2 = select(7, C_SpecializationInfo.GetSpecializationInfo(2))
+	local p3 = select(7, C_SpecializationInfo.GetSpecializationInfo(3))
 	
 	-- Title
 	GameTooltip:SetOwner(self, C.StickTop and "ANCHOR_BOTTOM" or "ANCHOR_TOP", 0, C.StickTop and -10 or 10)
@@ -118,7 +124,7 @@ local function OnEnter(self)
 	GameTooltip:AddLine(" ")
 	
 	-- Slot item list
-	for i = 1, 11 do
+	for i = 1, #localSlots do
 		if localSlots[i][3] ~= 1000 then
 			local slot = localSlots[i][1]
 			local green = localSlots[i][3]*2
@@ -134,7 +140,7 @@ local function OnEnter(self)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..L.AutoRepair..(diminfo.AutoRepair and G.Enable or G.Disable)..G.RightButton)
 	GameTooltip:AddDoubleLine(" ", G.OptionColor..HONOR..G.MiddleButton)
 	
-	GameTooltip:Show()
+	F.ShowTooltip()
 end
 
 --================================================--
@@ -143,8 +149,8 @@ end
 	
 	--[[ Tooltip ]]--
 	Stat:SetScript("OnEnter", OnEnter)
-	Stat:SetScript("OnLeave", function()
-		GameTooltip:Hide()
+	Stat:SetScript("OnLeave", function(self)
+		if GameTooltip:IsOwned(self) then GameTooltip:Hide() end
 	end)
 	
 	--[[ Options ]]--
@@ -153,7 +159,7 @@ end
 			diminfo.AutoRepair = not diminfo.AutoRepair
 			OnEnter(self)
 		elseif button == "MiddleButton" then
-			ToggleCharacter("HonorFrame")
+			ToggleCharacter(G.IsTBC and "PVPFrame" or "HonorFrame")
 		else
 			ToggleCharacter("PaperDollFrame")
 		end
@@ -178,7 +184,7 @@ local RepairGear = CreateFrame("Frame")
 			
 			-- 可以修裝而且花費大於零
 			if canRepair and cost > 0 then
-				if money > cost then
+				if money >= cost then
 					RepairAllItems()
 					print(format("|cff99CCFF"..REPAIR_COST.."|r%s", GetMoneyString(cost)))
 				else
