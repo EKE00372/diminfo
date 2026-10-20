@@ -72,7 +72,7 @@ local function OnEvent(self, event)
 	Text:SetText(free)
 	self:Layout()
 	
-	if event == "PLAYER_LOGIN" then
+	if event == "PLAYER_LOGIN" and not G.IsForever then
 		UpdateTokenPrice()
 		tokenPriceTicker = tokenPriceTicker or C_Timer_NewTicker(180, UpdateTokenPrice)
 	end
@@ -82,7 +82,6 @@ end
 local function OnEnter(self)
 	local free, total, used = getBagSlots()
 	local money = GetMoney()
-	local tokenMoney = C_WowTokenPublic_GetCurrentMarketPrice() or 0
 	
 	-- Title
 	GameTooltip:SetOwner(self, C.StickTop and "ANCHOR_BOTTOM" or "ANCHOR_TOP", 0, C.StickTop and -10 or 10)
@@ -93,8 +92,17 @@ local function OnEnter(self)
 	-- Bag slot and money
 	GameTooltip:AddLine(G.OptionColor..BAGSLOT)
 	GameTooltip:AddDoubleLine(USE, used, 1, 1, 1, 1, 1, 1)
+	if G.IsForever then
+		local bag = Enum.BagIndex.Keyring
+		local total = C_Container_GetContainerNumSlots(bag)
+		local used = total - C_Container_GetContainerNumFreeSlots(bag)
+		GameTooltip:AddDoubleLine(KEYRING, used.."/"..total, 1, 1, 1, 1, 1, 1)
+	end
 	GameTooltip:AddDoubleLine(MONEY, GetMoneyString(money), 1, 1, 1, 1, 1, 1)
-	GameTooltip:AddDoubleLine(TOKEN_FILTER_LABEL, (tokenMoney > 0 and GetMoneyString(tokenMoney)) or UNAVAILABLE, 1, 1, 1, 1, 1, 1)
+	if not G.IsForever then
+		local tokenMoney = C_WowTokenPublic_GetCurrentMarketPrice() or 0
+		GameTooltip:AddDoubleLine(TOKEN_FILTER_LABEL, (tokenMoney > 0 and GetMoneyString(tokenMoney)) or UNAVAILABLE, 1, 1, 1, 1, 1, 1)
+	end
 	
 	-- Currency
 	for i = 1, 10 do
