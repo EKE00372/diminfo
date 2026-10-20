@@ -452,17 +452,17 @@ local function buildBNetTable(num)
 				elseif isWoW then
 					sortPriority = 2
 				end
-				local nameText, shiftNameText
+				local nameText, altNameText
 				if isWoW then
 					local characterText = getCharacterText(displayName, gameAccountInfo.characterLevel, getClassFilename(gameAccountInfo), status)
 					local normalAccount = accountName ~= "" and G.OptionColor.." ("..accountName..")" or ""
-					local shiftAccount = battleTag ~= "" and G.OptionColor.." ("..battleTag..")" or normalAccount
+					local altAccount = battleTag ~= "" and G.OptionColor.." ("..battleTag..")" or normalAccount
 					nameText = characterText..normalAccount
-					shiftNameText = characterText..shiftAccount
+					altNameText = characterText..altAccount
 				else
-					local shiftName = battleTag ~= "" and battleTag or displayName
+					local altName = battleTag ~= "" and battleTag or displayName
 					nameText = G.OptionColor..displayName.."|r"..status
-					shiftNameText = G.OptionColor..shiftName.."|r"..status
+					altNameText = G.OptionColor..altName.."|r"..status
 				end
 
 				tinsert(bnetTable, {
@@ -474,7 +474,7 @@ local function buildBNetTable(num)
 					icon = getGameIcon(gameAccountInfo),
 					isWoW = isWoW,
 					nameText = nameText,
-					shiftNameText = shiftNameText,
+					altNameText = altNameText,
 					sortName = accountName ~= "" and accountName or displayName,
 				})
 			end
@@ -489,8 +489,8 @@ end
 --=========================================--
 
 local function RenderFriendsPanel(self)
-	self.isShiftDown = IsShiftKeyDown()
-	local isShiftKeyDown = self.isShiftDown
+	self.isAltDown = IsAltKeyDown()
+	local isAltKeyDown = self.isAltDown
 	local panel = self.panel
 	panel:Clear()
 
@@ -547,7 +547,7 @@ local function RenderFriendsPanel(self)
 		
 		for i = 1, #bnetTable do
 			local info = bnetTable[i]
-			local nameText = isShiftKeyDown and info.shiftNameText or info.nameText
+			local nameText = isAltKeyDown and info.altNameText or info.nameText
 			local locationText = info.infoText
 			if info.isWoW then
 				locationText = getLocationText(info.area, currentZone)
@@ -562,8 +562,8 @@ end
 
 local function OnEvent(self, event, key)
 	if event == "MODIFIER_STATE_CHANGED" then
-		local isShiftKey = key == "LSHIFT" or key == "RSHIFT"
-		if isShiftKey and self.panel and self.panel:IsShown() and IsShiftKeyDown() ~= self.isShiftDown then
+		local isAltKey = key == "LALT" or key == "RALT"
+		if isAltKey and self.panel and self.panel:IsShown() and IsAltKeyDown() ~= self.isAltDown then
 			RenderFriendsPanel(self)
 		end
 		return
@@ -597,7 +597,7 @@ end
 			self.panel = F.CreateInfoPanel(self, {{}, {justify = "RIGHT"}})
 			self.panel:HookScript("OnHide", function()
 				self:UnregisterEvent("MODIFIER_STATE_CHANGED")
-				self.isShiftDown = nil
+				self.isAltDown = nil
 			end)
 		end
 		RenderFriendsPanel(self)
